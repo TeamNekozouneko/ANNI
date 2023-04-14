@@ -17,10 +17,23 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
+    <url>https://github.com/TeamNekozouneko/ANNIv2</url>
+
     <organization>
         <name>Team Nekozouneko</name>
         <url>https://github.com/TeamNekozouneko/</url>
     </organization>
+
+    <issueManagement>
+        <system>GitHub</system>
+        <url>https://github.com/TeamNekozouneko/ANNIv2/issues</url>
+    </issueManagement>
+
+    <scm>
+        <connection>scm:git:https://github.com/TeamNekozouneko/ANNIv2.git</connection>
+        <developerConnection>scm:git:git@github.com:TeamNekozouneko/ANNIv2.git</developerConnection>
+        <url>https://github.com/TeamNekozouneko/ANNIv2</url>
+    </scm>
 
     <build>
         <plugins>
