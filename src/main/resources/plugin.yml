@@ -6,5 +6,6 @@ api-version: 1.16
 
 authors: [Taitaitatata]
 description: '${project.description}'
+website: '${project.url}'
 
 softdepend: [WorldEdit, WorldGuard]
