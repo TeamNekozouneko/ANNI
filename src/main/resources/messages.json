@@ -1,0 +1,26 @@
+{
+  "version": "0",
+  "example": "{0} {1|aa|bb}",
+
+  "scoreboard.title": "&c&lANNI&9&lHI&e&lLA&a&lTION",
+  "scoreboard.dateformat": "yyyy/MM/dd HH:mm",
+
+  "scoreboard.waiting.0": "&8{0}",
+  "scoreboard.waiting.1": "",
+  "scoreboard.waiting.2": "{1}",
+  "scoreboard.waiting.3": "",
+  "scoreboard.waiting.4": "プレイヤー: {2}",
+  "scoreboard.waiting.5": "マップ: {3}",
+  "scoreboard.waiting.6": "",
+  "scoreboard.waiting.7": "&9www.nekozouneko.net",
+
+  "scoreboard.waiting.2.more_player": "開始にはあと {0} 人必要です。",
+  "scoreboard.waiting.5.map_vote": "マップ投票受け付け中",
+
+  "team.red.name": "赤チーム",
+  "team.red.short": "R",
+  "team.red.prefix": "&7[{0}R&7]{0}",
+  "team.red.color": "RED",
+  "team.red.colorcode": "&c"
+
+}

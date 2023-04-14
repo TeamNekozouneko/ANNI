@@ -1,0 +1,10 @@
+name: ANNIv2
+version: '${project.version}'
+
+main: net.nekozouneko.anniv2.ANNIPlugin
+api-version: 1.16
+
+authors: [Taitaitatata]
+description: '${project.description}'
+
+softdepend: [WorldEdit, WorldGuard]
