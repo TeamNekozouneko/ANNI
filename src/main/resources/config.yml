@@ -1,0 +1,7 @@
+arena-default:
+  enabled-teams:
+    red: true
+    blue: true
+    green: false
+    yellow: false
+  max-players: 120
