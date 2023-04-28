@@ -1,8 +1,8 @@
 {
-  "version": "0",
+  "version": "-1",
   "example": "{0} {1|aa|bb}",
 
-  "scoreboard.title": "&c&lANNI&9&lHI&e&lLA&a&lTION",
+  "scoreboard.title": "&c&lANNI&9&lHI&a&lLA&e&lTION",
   "scoreboard.dateformat": "yyyy/MM/dd HH:mm",
 
   "scoreboard.waiting.0": "&8{0}",
@@ -15,12 +15,42 @@
   "scoreboard.waiting.7": "&9www.nekozouneko.net",
 
   "scoreboard.waiting.2.more_player": "開始にはあと {0} 人必要です。",
-  "scoreboard.waiting.5.map_vote": "マップ投票受け付け中",
+  "scoreboard.waiting.2.starting": "開始まであと {0}",
+  "scoreboard.waiting.5.vote": "&o投票中 (/vote <map>)",
 
-  "team.red.name": "赤チーム",
-  "team.red.short": "R",
-  "team.red.prefix": "&7[{0}R&7]{0}",
-  "team.red.color": "RED",
-  "team.red.colorcode": "&c"
+  "scoreboard.playing.0": "&8{0}",
+  "scoreboard.playing.1": "",
+  "scoreboard.playing.2": "&7[&r{1}&7] &c赤チーム&f: {5}",
+  "scoreboard.playing.3": "&7[&r{2}&7] &9青チーム&f: {6}",
+  "scoreboard.playing.4": "&7[&r{3}&7] &a緑チーム&f: {7}",
+  "scoreboard.playing.5": "&7[&r{4}&7] &e黃チーム&f: {8}",
+  "scoreboard.playing.6": "",
+  "scoreboard.playing.7": "マップ: {9}",
+  "scoreboard.playing.8": "",
+  "scoreboard.playing.9": "&9www.nekozouneko.net",
+
+  "scoreboard.stopping.0": "&8{0}",
+  "scoreboard.stopping.1": "",
+  "scoreboard.stopping.2": "&c現在ゲームを開始するには、",
+  "scoreboard.stopping.3": "&c&n運営の操作が必要です。",
+  "scoreboard.stopping.4": "",
+  "scoreboard.stopping.5": "&9www.nekozouneko.net",
+
+  "nexus.status.lost": "&c×",
+  "nexus.status.active": "&a●",
+  "nexus.health.format": "%,d",
+  "nexus.health.none": "&8---",
+
+  "bossbar.restarting": "再起動まであと {0} 秒",
+  "bossbar.next_phase": "次のフェーズ {0} まであと {1}",
+
+  "team.red.display": "赤チーム",
+  "team.red.prefix": "[R]",
+  "team.blue.display": "青チーム",
+  "team.blue.prefix": "[B]",
+  "team.green.display": "緑チーム",
+  "team.green.prefix": "[G]",
+  "team.yellow.display": "黃チーム",
+  "team.yellow.prefix": "[Y]"
 
 }
