@@ -8,4 +8,13 @@ authors: [Taitaitatata]
 description: '${project.description}'
 website: '${project.url}'
 
-softdepend: [WorldEdit, WorldGuard]
+depend: [WorldEdit, WorldGuard]
+
+commands:
+  anni-admin:
+    aliases: ["anniadmin"]
+    description: "ANNI administration command"
+    permission: anniv2.command.admin
+  anni:
+    description: "ANNI command"
+    permission: anniv2.command.anni
