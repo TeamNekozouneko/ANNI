@@ -1,16 +1,25 @@
 package net.nekozouneko.anniv2.arena;
 
+import com.google.common.base.Preconditions;
+import com.google.common.collect.*;
+import com.sk89q.worldedit.math.BlockVector3;
 import fr.mrmicky.fastboard.FastBoard;
 import net.nekozouneko.anniv2.ANNIPlugin;
+import net.nekozouneko.anniv2.arena.team.ANNITeam;
+import net.nekozouneko.anniv2.board.BoardManager;
+import net.nekozouneko.anniv2.map.ANNIMap;
 import net.nekozouneko.anniv2.message.ANNIMessage;
 import net.nekozouneko.anniv2.util.CmnUtil;
+import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scoreboard.Scoreboard;
+import org.bukkit.scoreboard.Team;
 
-import java.util.HashSet;
-import java.util.Objects;
-import java.util.Random;
-import java.util.Set;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 public class ANNIArena extends BukkitRunnable {
 
@@ -18,18 +27,37 @@ public class ANNIArena extends BukkitRunnable {
 
     private final ANNIPlugin plugin;
     private final String id;
+
     private final Set<Player> players = new HashSet<>();
+    private final BiMap<ANNITeam, Team> teams = HashBiMap.create(4);
+    private final Map<ANNITeam, Boolean> enabledTeams = new EnumMap<>(ANNITeam.class);
 
     private ArenaState state = ArenaState.WAITING;
-    private boolean a = false;
+    private ANNIMap map = null;
+
+    private boolean enableTimer = false;
+    private long timer = 0;
 
     public ANNIArena(ANNIPlugin plugin, String id) {
+        Preconditions.checkArgument(plugin != null, "Argument 'plugin' cannot be null.");
+        Preconditions.checkArgument(id.length() < 9, "Id length limit is 8! (" + id.length() + ")");
+
         this.plugin = plugin;
         this.id = id;
+
+        createTeams();
     }
 
     public String getId() {
         return id;
+    }
+
+    public ArenaState getState() {
+        return state;
+    }
+
+    public void setState(ArenaState state) {
+        this.state = state;
     }
 
     public void join(Player player) {
@@ -44,37 +72,203 @@ public class ANNIArena extends BukkitRunnable {
         players.remove(player);
     }
 
+    public Set<Player> getPlayers() {
+        return Collections.unmodifiableSet(players);
+    }
+
+    // Team
+
+    private void createTeams() {
+        final Scoreboard sb = Bukkit.getScoreboardManager().getNewScoreboard();
+        final ANNIMessage mm = plugin.getMessageManager();
+
+        Team r = sb.registerNewTeam(id + "-red");
+        Team b = sb.registerNewTeam(id + "-blue");
+        Team g = sb.registerNewTeam(id + "-green");
+        Team y = sb.registerNewTeam(id + "-yellow");
+
+        r.setDisplayName(mm.build("team.red.display"));
+        r.setPrefix("team.red.prefix");
+        r.setColor(ChatColor.RED);
+        r.setAllowFriendlyFire(false);
+        r.setCanSeeFriendlyInvisibles(true);
+
+        b.setDisplayName(mm.build("team.blue.display"));
+        b.setPrefix("team.blue.prefix");
+        b.setColor(ChatColor.BLUE);
+        b.setAllowFriendlyFire(false);
+        b.setCanSeeFriendlyInvisibles(true);
+
+        g.setDisplayName(mm.build("team.green.display"));
+        g.setPrefix(mm.build("team.green.prefix"));
+        g.setColor(ChatColor.GREEN);
+        g.setAllowFriendlyFire(false);
+        g.setCanSeeFriendlyInvisibles(true);
+
+        y.setDisplayName(mm.build("team.yellow.display"));
+        y.setPrefix(mm.build("team.yellow.prefix"));
+        y.setColor(ChatColor.YELLOW);
+        y.setAllowFriendlyFire(false);
+        y.setCanSeeFriendlyInvisibles(true);
+
+        teams.put(ANNITeam.RED, r);
+        teams.put(ANNITeam.BLUE, b);
+        teams.put(ANNITeam.GREEN, g);
+        teams.put(ANNITeam.YELLOW, y);
+        teams.keySet().forEach((t) -> enabledTeams.put(t, true));
+    }
+
+    private void deleteTeams() {
+        teams.values().forEach(Team::unregister);
+        teams.values().clear();
+    }
+
+    public void enableTeam(ANNITeam team) {
+        enabledTeams.put(team, true);
+    }
+
+    public void disableTeam(ANNITeam team) {
+        enabledTeams.put(team, false);
+    }
+
+    public boolean isEnabledTeam(ANNITeam team) {
+        return enabledTeams.getOrDefault(team, true);
+    }
+
+    public Map<ANNITeam, Boolean> getEnabledTeams() {
+        return Collections.unmodifiableMap(enabledTeams);
+    }
+
     public boolean setTeam() {
         return true;
     }
 
-    public Set<Player> getPlayers() {
-        return players;
+    public Team getTeam(ANNITeam team) {
+        return teams.get(team);
+    }
+
+    public ANNITeam getTeam(Team team) {
+        return teams.inverse().get(team);
+    }
+
+    public BiMap<ANNITeam, Team> getTeams() {
+        BiMap<ANNITeam, Team> res = EnumHashBiMap.create(ANNITeam.class);
+
+        teams.entrySet().stream()
+                .filter(t -> enabledTeams.getOrDefault(t.getKey(), true))
+                .forEach(e -> res.put(e.getKey(), e.getValue()));
+
+        return res;
+    }
+
+    public Set<Player> getTeamPlayers(ANNITeam team) {
+        Set<Player> ps = new HashSet<>();
+
+        teams.get(team).getPlayers().stream()
+                .filter(OfflinePlayer::isOnline)
+                .forEach((off) -> {
+                    Player p = Bukkit.getPlayer(off.getUniqueId());
+                    if (p != null && players.contains(p)) ps.add(p);
+                });
+
+        return ps;
+    }
+
+    // Timer
+
+    public boolean isEnabledTimer() {
+        return enableTimer;
+    }
+
+    public void enableTimer() {
+        enableTimer = true;
+    }
+
+    public void disableTimer() {
+        enableTimer = false;
+    }
+
+    public long getTimer() {
+        return timer;
     }
 
     @Override
     public void run() {
+
         updateScoreboard();
+        tickTimer();
     }
 
-    public void updateScoreboard() {
+    @Override
+    public void cancel() {
+        super.cancel();
+
+        deleteTeams();
+    }
+
+    private void updateScoreboard() {
         ANNIMessage mm = plugin.getMessageManager();
-        for (Player p : players) {
-            FastBoard b = plugin.getBoardManager().get(p);
+        BoardManager bm = plugin.getBoardManager();
 
-            b.updateTitle(mm.build("scoreboard.title"));
-            b.updateLines(
-                    mm.buildList("scoreboard.waiting",
-                            CmnUtil.getFormattedDateNow(
-                                    mm.build("scoreboard.dateformat")
-                            ),
-                            mm.build("scoreboard.waiting.2.more_player", 3 + ""),
-                            Objects.toString(players.size()),
-                            mm.build("scoreboard.waiting.5.map_vote")
-                    )
-            );
+        for (Player pl : players) {
+            FastBoard fb = bm.get(pl);
+            SimpleDateFormat df = new SimpleDateFormat(mm.build("scoreboard.dateformat"));
+            fb.updateTitle(mm.build("scoreboard.title"));
 
-            a = !a;
+            switch (state) {
+                case WAITING:
+                case STARTING: {
+                    String mapname = map != null ? map.getName() : mm.build("scoreboard.waiting.5.vote");
+                    String news = state == ArenaState.STARTING ?
+                            mm.build("scoreboard.waiting.2.starting") :
+                            mm.build("scoreboard.waiting.2.more_player", (
+                                    enabledTeams.entrySet().stream()
+                                            .filter(Map.Entry::getValue)
+                                            .count() * 2
+                                            - players.size())
+                            );
+
+                    fb.updateLines(mm.buildList("scoreboard.waiting",
+                            df.format(Calendar.getInstance().getTime()),
+                            news,
+                            players.size() + " / 120",
+                            mapname
+                    ));
+                    break;
+                }
+                case PHASE_ONE:
+                case PHASE_TWO:
+                case PHASE_THREE:
+                case PHASE_FOUR:
+                case PHASE_FIVE:
+                case GAME_OVER: {
+                    fb.updateLines(mm.buildList("scoreboard.playing",
+                            df.format(Calendar.getInstance().getTime()),
+                            mm.build("nexus.status.active"),
+                            mm.build("nexus.status.active"),
+                            mm.build("nexus.status.lost"),
+                            mm.build("nexus.status.lost"),
+                            String.format(mm.build("nexus.health.format"), 100),
+                            String.format(mm.build("nexus.health.format"), 100),
+                            mm.build("nexus.health.none"),
+                            mm.build("nexus.health.none"),
+                            "マップなんかない"
+                    ));
+                    break;
+                }
+                default: {
+                    fb.updateLines(mm.buildList("scoreboard.stopping",
+                            df.format(Calendar.getInstance().getTime())
+                    ));
+                    break;
+                }
+            }
+        }
+    }
+
+    private void tickTimer() {
+        if (isEnabledTimer() && timer > 0) {
+            timer--;
         }
     }
 }
