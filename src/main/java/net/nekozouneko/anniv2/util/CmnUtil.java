@@ -19,10 +19,24 @@ public final class CmnUtil {
         return null;
     }
 
-    public static String getFormattedDateNow(String format) {
-        SimpleDateFormat sdf = new SimpleDateFormat(format);
+    public long toTick(double l) {
+        return (long) (l * 20D);
+    }
 
-        return sdf.format(Calendar.getInstance().getTime());
+    public double toSecond(long l) {
+        return l / 20D;
+    }
+
+    /**
+     * MM...:SS
+     * @param second Total second
+     * @return Timer (MM...:SS)
+     */
+    public String secminTimer(long second) {
+        long m = second / 60;
+        long s = second - (m * 60);
+
+        return String.format("%02d", m) + ":" + String.format("%02d", s);
     }
 
 }
