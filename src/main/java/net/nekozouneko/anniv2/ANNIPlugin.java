@@ -3,6 +3,8 @@ package net.nekozouneko.anniv2;
 import com.google.gson.Gson;
 import net.nekozouneko.anniv2.arena.ArenaManager;
 import net.nekozouneko.anniv2.board.BoardManager;
+import net.nekozouneko.anniv2.command.ANNIAdminCommand;
+import net.nekozouneko.anniv2.command.ANNICommand;
 import net.nekozouneko.anniv2.listener.PlayerJoinListener;
 import net.nekozouneko.anniv2.listener.PlayerQuitListener;
 import net.nekozouneko.anniv2.message.ANNIMessage;
@@ -60,6 +62,9 @@ public final class ANNIPlugin extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new PlayerQuitListener(), this);
 
         arenaManager.create().runTaskTimer(this, 0, 20);
+
+        getCommand("anni-admin").setExecutor(new ANNIAdminCommand());
+        getCommand("anni").setExecutor(new ANNICommand());
     }
 
     @Override
@@ -72,9 +77,7 @@ public final class ANNIPlugin extends JavaPlugin {
         try (InputStreamReader lr = new InputStreamReader(getResource("messages.json"), StandardCharsets.UTF_8)) {
             Map<String, String> messageMap = new HashMap<>();
 
-            Gson gson = new Gson();
-
-            if (lr == null) throw new IOException("messages.json is not found");
+            Gson gson = FileUtil.createGson();
 
             Map<String, String> latestMap = gson.fromJson(lr, Map.class);
             messageMap.putAll(latestMap);
@@ -82,16 +85,16 @@ public final class ANNIPlugin extends JavaPlugin {
             File mf = new File(getDataFolder(), "messages.json");
 
             if (!mf.exists())
-                FileUtil.writeGson(gson, mf, latestMap, Map.class);
+                Files.copy(getResource("messages.json"), mf.toPath());
 
-            Map<String, String> curr = FileUtil.readGson(gson, mf, Map.class);
+            Map<String, String> curr = FileUtil.readGson(mf, Map.class);
 
             if (!curr.get("version").equals(LATEST_MESSAGE_VERSION)) {
                 String lmf = "messages.json." + curr.get("version");
                 Files.copy(
                         mf.toPath(), new File(getDataFolder(), lmf).toPath()
                 );
-                FileUtil.writeGson(gson, mf, latestMap, Map.class);
+                FileUtil.writeGson(mf, latestMap, Map.class);
                 getLogger().info("Updated messages.json! Saved backup to " + lmf);
             }
             else messageMap.putAll(curr);
