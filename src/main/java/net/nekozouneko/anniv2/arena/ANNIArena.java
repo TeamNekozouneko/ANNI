@@ -10,9 +10,12 @@ import net.nekozouneko.anniv2.board.BoardManager;
 import net.nekozouneko.anniv2.map.ANNIMap;
 import net.nekozouneko.anniv2.message.ANNIMessage;
 import net.nekozouneko.anniv2.util.CmnUtil;
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.OfflinePlayer;
+import net.nekozouneko.anniv2.util.FileUtil;
+import org.bukkit.*;
+import org.bukkit.boss.BarColor;
+import org.bukkit.boss.BarStyle;
+import org.bukkit.boss.BossBar;
+import org.bukkit.boss.KeyedBossBar;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scoreboard.Scoreboard;
@@ -29,14 +32,21 @@ public class ANNIArena extends BukkitRunnable {
     private final String id;
 
     private final Set<Player> players = new HashSet<>();
+
     private final BiMap<ANNITeam, Team> teams = HashBiMap.create(4);
     private final Map<ANNITeam, Boolean> enabledTeams = new EnumMap<>(ANNITeam.class);
 
     private ArenaState state = ArenaState.WAITING;
+
     private ANNIMap map = null;
+    private World copy = null;
 
     private boolean enableTimer = false;
     private long timer = 0;
+
+    private final Map<ANNITeam, Integer> nexus = new HashMap<>(4);
+
+    private final KeyedBossBar bb;
 
     public ANNIArena(ANNIPlugin plugin, String id) {
         Preconditions.checkArgument(plugin != null, "Argument 'plugin' cannot be null.");
@@ -44,6 +54,13 @@ public class ANNIArena extends BukkitRunnable {
 
         this.plugin = plugin;
         this.id = id;
+
+        this.bb = Bukkit.createBossBar(
+                new NamespacedKey(plugin, id),
+                "",
+                BarColor.BLUE,
+                BarStyle.SOLID
+        );
 
         createTeams();
     }
@@ -68,8 +85,10 @@ public class ANNIArena extends BukkitRunnable {
     }
 
     public void leave(Player player) {
-        player.setScoreboard(plugin.getServer().getScoreboardManager().getMainScoreboard());
         players.remove(player);
+
+        player.setScoreboard(plugin.getServer().getScoreboardManager().getMainScoreboard());
+        bb.removePlayer(player);
     }
 
     public Set<Player> getPlayers() {
@@ -192,9 +211,59 @@ public class ANNIArena extends BukkitRunnable {
         return timer;
     }
 
+    public void setTimer(long l) {
+        timer = l;
+    }
+
+    // Nexus
+
+    public Integer getNexusHealth(ANNITeam team) {
+        return nexus.get(team);
+    }
+
+    public void setNexusHealth(ANNITeam team, int health) {
+        nexus.put(team, health);
+    }
+
+    public void healNexusHealth(ANNITeam team, int heal) {
+        if (!isNexusLost(team)) {
+            nexus.put(team, nexus.get(team) + heal);
+        }
+        else throw new IllegalStateException("Team" + team.name() + " is nexus lost.");
+    }
+
+    public void damageNexusHealth(ANNITeam team, int damage) {
+        if (!isNexusLost(team)) {
+            nexus.put(team, Math.max(nexus.get(team) - damage, 0));
+        }
+        else throw new IllegalStateException("Team" + team.name() + " is nexus lost.");
+    }
+
+    public boolean isNexusLost(ANNITeam team) {
+        return nexus.get(team) == null;
+    }
+
+    public void restoreNexus(ANNITeam team, Integer health) {
+        if (isNexusLost(team)) {
+            nexus.put(team, health == null ? 100 : health);
+        }
+        else throw new IllegalStateException("Nexus is now active");
+    }
+
+    public void start() {
+        try {
+
+            copy = FileUtil.copyWorld(map.getBukkitWorld(), id + "-anni");
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     @Override
     public void run() {
 
+        updateBossBar();
         updateScoreboard();
         tickTimer();
     }
@@ -204,6 +273,35 @@ public class ANNIArena extends BukkitRunnable {
         super.cancel();
 
         deleteTeams();
+        bb.setVisible(false);
+        bb.removeAll();
+        Bukkit.removeBossBar(bb.getKey());
+    }
+
+    private void updateBossBar() {
+        ANNIMessage mm = plugin.getMessageManager();
+        players.forEach(bb::addPlayer);
+
+        switch (state) {
+            case PHASE_ONE:
+            case PHASE_TWO:
+            case PHASE_THREE:
+            case PHASE_FOUR:
+            case PHASE_FIVE:
+            case GAME_OVER: {
+                bb.setTitle(
+                        mm.build("bossbar.timer",
+                                mm.build(state.getTimerStateKey()),
+                                CmnUtil.secminTimer(timer)
+                        )
+                );
+                break;
+            }
+            default: {
+                bb.setVisible(false);
+                break;
+            }
+        }
     }
 
     private void updateScoreboard() {
