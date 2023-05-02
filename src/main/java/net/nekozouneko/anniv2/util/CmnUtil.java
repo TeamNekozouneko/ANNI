@@ -19,11 +19,11 @@ public final class CmnUtil {
         return null;
     }
 
-    public long toTick(double l) {
+    public static long toTick(double l) {
         return (long) (l * 20D);
     }
 
-    public double toSecond(long l) {
+    public static double toSecond(long l) {
         return l / 20D;
     }
 
@@ -32,7 +32,7 @@ public final class CmnUtil {
      * @param second Total second
      * @return Timer (MM...:SS)
      */
-    public String secminTimer(long second) {
+    public static String secminTimer(long second) {
         long m = second / 60;
         long s = second - (m * 60);
 
