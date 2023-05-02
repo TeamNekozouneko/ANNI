@@ -41,8 +41,13 @@
   "nexus.health.format": "%,d",
   "nexus.health.none": "&8---",
 
-  "bossbar.restarting": "再起動まであと {0} 秒",
-  "bossbar.next_phase": "次のフェーズ {0} まであと {1}",
+  "bossbar.timer": "{0} {1}",
+  "bossbar.timer.state.1": "フェーズ1",
+  "bossbar.timer.state.2": "フェーズ2",
+  "bossbar.timer.state.3": "フェーズ3",
+  "bossbar.timer.state.4": "フェーズ4",
+  "bossbar.timer.state.5": "フェーズ5",
+  "bossbar.timer.state.restarting": "再起動まで",
 
   "team.red.display": "赤チーム",
   "team.red.prefix": "[R]",
