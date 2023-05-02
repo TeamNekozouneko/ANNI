@@ -4,4 +4,6 @@ arena-default:
     blue: true
     green: false
     yellow: false
+
   max-players: 120
+  default-health: 100
