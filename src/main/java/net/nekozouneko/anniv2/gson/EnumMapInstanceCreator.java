@@ -10,7 +10,6 @@ public class EnumMapInstanceCreator<K extends Enum<K>, V> implements InstanceCre
     private final Class<K> enumType;
 
     public EnumMapInstanceCreator(Class<K> enumType) {
-        super();
         this.enumType = enumType;
     }
 

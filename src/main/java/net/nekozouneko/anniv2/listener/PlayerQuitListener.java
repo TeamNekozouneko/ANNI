@@ -1,7 +1,5 @@
 package net.nekozouneko.anniv2.listener;
 
-import fr.mrmicky.fastboard.FastBoard;
-
 import net.nekozouneko.anniv2.ANNIPlugin;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;

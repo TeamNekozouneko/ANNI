@@ -2,7 +2,6 @@ package net.nekozouneko.anniv2.map;
 
 import org.bukkit.Location;
 import org.bukkit.World;
-import org.bukkit.util.BlockVector;
 
 public final class SpawnLocation implements Cloneable {
 

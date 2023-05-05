@@ -2,19 +2,17 @@ package net.nekozouneko.anniv2.arena;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.*;
-import com.sk89q.worldedit.math.BlockVector3;
 import fr.mrmicky.fastboard.FastBoard;
 import net.nekozouneko.anniv2.ANNIPlugin;
 import net.nekozouneko.anniv2.arena.team.ANNITeam;
 import net.nekozouneko.anniv2.board.BoardManager;
 import net.nekozouneko.anniv2.map.ANNIMap;
-import net.nekozouneko.anniv2.message.ANNIMessage;
+import net.nekozouneko.anniv2.message.MessageManager;
 import net.nekozouneko.anniv2.util.CmnUtil;
 import net.nekozouneko.anniv2.util.FileUtil;
 import org.bukkit.*;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
-import org.bukkit.boss.BossBar;
 import org.bukkit.boss.KeyedBossBar;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -99,7 +97,7 @@ public class ANNIArena extends BukkitRunnable {
 
     private void createTeams() {
         final Scoreboard sb = Bukkit.getScoreboardManager().getNewScoreboard();
-        final ANNIMessage mm = plugin.getMessageManager();
+        final MessageManager mm = plugin.getMessageManager();
 
         Team r = sb.registerNewTeam(id + "-red");
         Team b = sb.registerNewTeam(id + "-blue");
@@ -279,7 +277,7 @@ public class ANNIArena extends BukkitRunnable {
     }
 
     private void updateBossBar() {
-        ANNIMessage mm = plugin.getMessageManager();
+        MessageManager mm = plugin.getMessageManager();
         players.forEach(bb::addPlayer);
 
         switch (state) {
@@ -289,6 +287,7 @@ public class ANNIArena extends BukkitRunnable {
             case PHASE_FOUR:
             case PHASE_FIVE:
             case GAME_OVER: {
+                bb.setVisible(true);
                 bb.setTitle(
                         mm.build("bossbar.timer",
                                 mm.build(state.getTimerStateKey()),
@@ -305,7 +304,7 @@ public class ANNIArena extends BukkitRunnable {
     }
 
     private void updateScoreboard() {
-        ANNIMessage mm = plugin.getMessageManager();
+        MessageManager mm = plugin.getMessageManager();
         BoardManager bm = plugin.getBoardManager();
 
         for (Player pl : players) {
