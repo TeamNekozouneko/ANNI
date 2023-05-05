@@ -1,7 +1,6 @@
 package net.nekozouneko.anniv2.map;
 
 import com.google.common.base.Preconditions;
-import com.sk89q.worldedit.math.BlockVector3;
 import net.nekozouneko.anniv2.arena.team.ANNITeam;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -23,10 +22,16 @@ public class ANNIMap {
 
     private SpawnLocation defaultSpawn;
 
-    public ANNIMap(String id, String name, String world) {
+    public ANNIMap(String id, String world, String name) {
         this.id = id;
-        this.name = name;
         this.world = world;
+        this.name = name;
+    }
+
+    public ANNIMap(String id, World world, String name) {
+        this.id = id;
+        this.world = world.getName();
+        this.name = name;
     }
 
     public String getId() {
