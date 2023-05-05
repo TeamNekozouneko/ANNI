@@ -1,19 +1,17 @@
 package net.nekozouneko.anniv2.arena;
 
-import net.nekozouneko.anniv2.message.ANNIMessage;
-
 public enum ArenaState {
 
     WAITING(-2, null),
     STARTING(-1, null),
 
-    PHASE_ONE(1, ""),
-    PHASE_TWO(2, ""),
-    PHASE_THREE(3, ""),
-    PHASE_FOUR(4, ""),
-    PHASE_FIVE(5, ""),
+    PHASE_ONE(1, "bossbar.timer.state.1"),
+    PHASE_TWO(2, "bossbar.timer.state.2"),
+    PHASE_THREE(3, "bossbar.timer.state.3"),
+    PHASE_FOUR(4, "bossbar.timer.state.4"),
+    PHASE_FIVE(5, "bossbar.timer.state.5"),
 
-    GAME_OVER(0, null),
+    GAME_OVER(0, "bossbar.timer.state.restarting"),
 
     STOPPED(-3, null);
 
