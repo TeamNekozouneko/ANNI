@@ -6,11 +6,11 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class ANNIMessage {
+public class MessageManager {
 
     protected Map<String, String> map;
 
-    public ANNIMessage(Map<String, String> map) {
+    public MessageManager(Map<String, String> map) {
         this.map = map;
     }
 
