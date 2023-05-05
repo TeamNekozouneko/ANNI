@@ -36,11 +36,16 @@ public abstract class AbstractGui implements InventoryHolder, Listener {
         return inventory;
     }
 
+    public Player getPlayer() {
+        return player;
+    }
+
     public static void unregisterAllGuiListeners(Player player) {
         HandlerList.getHandlerLists().forEach((hl) -> {
             Arrays.stream(hl.getRegisteredListeners())
                     .map(RegisteredListener::getListener)
                     .filter(listener -> listener instanceof AbstractGui)
+                    .filter(listener -> ((AbstractGui) listener).getPlayer().equals(player))
                     .forEach(HandlerList::unregisterAll);
         });
     }
