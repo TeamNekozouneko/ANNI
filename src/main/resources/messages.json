@@ -56,6 +56,22 @@
   "team.green.display": "緑チーム",
   "team.green.prefix": "[G]",
   "team.yellow.display": "黃チーム",
-  "team.yellow.prefix": "[Y]"
+  "team.yellow.prefix": "[Y]",
+
+  "gui.map_selector.title": "マップを選択... ({0}/{1})",
+  "gui.map_selector.map_lore.0": "&7ID: {0}",
+  "gui.map_selector.map_lore.1": "&7ワールド: {1}",
+
+  "gui.next_page": "&a次のページ",
+  "gui.prev_page": "&a前のページ",
+
+  "command.err.map_not_found": "&c「{0}」というマップは見つかりませんでした。",
+  "command.err.world_not_found": "&c「{0}」というワールドは見つかりませんでした。",
+  "command.err.ioe": "&cファイルの入出力にエラーが発生しました。コンソールを確認してください。",
+  "command.err.subcommand_not_found": "&c「{0}」というサブコマンドは見つかりませんでした。",
+
+  "command.usage": "&c使用方法: {0}",
+
+  "command.createmap.success": "&aマップが正常に作成されました。"
 
 }
