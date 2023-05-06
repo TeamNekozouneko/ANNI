@@ -1,6 +1,11 @@
 package net.nekozouneko.anniv2.message;
 
+import com.sk89q.worldedit.bukkit.BukkitAdapter;
+import com.sk89q.worldedit.math.BlockVector3;
+import net.nekozouneko.anniv2.map.SpawnLocation;
 import net.nekozouneko.anniv2.util.CmnUtil;
+
+import org.bukkit.Location;
 
 import java.util.*;
 import java.util.regex.Matcher;
@@ -56,6 +61,51 @@ public class MessageManager {
         }
 
         return l;
+    }
+
+    public String buildLines(String key, Object... args) {
+        return String.join("\n", buildList(key, args));
+    }
+
+    public String blockLocationFormat(BlockVector3 loc) {
+        String format = build("xyz.blockformat");
+        return build(
+                "xyz",
+                String.format(format, loc.getBlockX()),
+                String.format(format, loc.getBlockY()),
+                String.format(format, loc.getBlockZ())
+        );
+    }
+
+    public String blockLocationFormat(Location loc) {
+        return blockLocationFormat(BukkitAdapter.asBlockVector(loc));
+    }
+
+    public String locationFormat(Location loc) {
+        String format = build("xyz.format");
+        return build(
+                "xyz",
+                String.format(format, loc.getX()),
+                String.format(format, loc.getY()),
+                String.format(format, loc.getZ())
+        );
+    }
+
+    public String yawPitchLocationFormat(Location loc) {
+        String format = build("xyz.format");
+        String ypformat = build("yawpitch.format");
+        return build(
+                "xyzyawpitch",
+                String.format(format, loc.getX()),
+                String.format(format, loc.getY()),
+                String.format(format, loc.getZ()),
+                String.format(ypformat, loc.getYaw()),
+                String.format(ypformat, loc.getPitch())
+        );
+    }
+
+    public String yawPitchLocationFormat(SpawnLocation sloc) {
+        return yawPitchLocationFormat(sloc.toLocation(null));
     }
 
     public String getVersion() {
