@@ -1,6 +1,7 @@
 package net.nekozouneko.anniv2.map;
 
 import com.google.common.base.Preconditions;
+import com.sk89q.worldedit.math.BlockVector3;
 import net.nekozouneko.anniv2.arena.team.ANNITeam;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -32,6 +33,14 @@ public class ANNIMap {
         this.id = id;
         this.world = world.getName();
         this.name = name;
+    }
+
+    public boolean canUseOnArena() {
+        return (
+                getBukkitWorld() != null
+                && nexus.size() >= 4
+                && spawn.size() >= 4
+        );
     }
 
     public String getId() {
@@ -82,5 +91,21 @@ public class ANNIMap {
 
     public void setDefaultSpawn(SpawnLocation location) {
         defaultSpawn = location;
+    }
+
+    public void setNexus(ANNITeam team, Nexus nexus) {
+        this.nexus.put(team, nexus);
+    }
+
+    public void setNexus(ANNITeam team, Location location) {
+        nexus.put(team, new Nexus(location));
+    }
+
+    public void setNexus(ANNITeam team, BlockVector3 vector3) {
+        nexus.put(team, new Nexus(vector3));
+    }
+
+    public void setSpawn(ANNITeam team, SpawnLocation slocation) {
+        spawn.put(team, slocation);
     }
 }
