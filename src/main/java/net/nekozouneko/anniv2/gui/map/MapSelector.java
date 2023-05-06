@@ -162,7 +162,8 @@ public class MapSelector extends AbstractGui {
 
         if (!continu) {
             unregisterAllGuiListeners(player);
-            if (onClose != null) onClose.accept(map);
+
+            if (onClose != null) Bukkit.getScheduler().runTask(plugin, () -> onClose.accept(map));
         }
         else continu = false;
     }
