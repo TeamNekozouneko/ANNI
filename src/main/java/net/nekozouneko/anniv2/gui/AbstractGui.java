@@ -24,7 +24,6 @@ public abstract class AbstractGui implements InventoryHolder, Listener {
     }
 
     public void open() {
-        unregisterAllGuiListeners(player);
         update();
         player.openInventory(inventory);
     }
@@ -41,13 +40,13 @@ public abstract class AbstractGui implements InventoryHolder, Listener {
     }
 
     public static void unregisterAllGuiListeners(Player player) {
-        HandlerList.getHandlerLists().forEach((hl) -> {
+        HandlerList.getHandlerLists().forEach((hl) ->
             Arrays.stream(hl.getRegisteredListeners())
                     .map(RegisteredListener::getListener)
                     .filter(listener -> listener instanceof AbstractGui)
                     .filter(listener -> ((AbstractGui) listener).getPlayer().equals(player))
-                    .forEach(HandlerList::unregisterAll);
-        });
+                    .forEach(HandlerList::unregisterAll)
+        );
     }
 
 }
