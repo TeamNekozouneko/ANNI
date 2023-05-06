@@ -62,6 +62,13 @@
   "gui.map_selector.map_lore.0": "&7ID: {0}",
   "gui.map_selector.map_lore.1": "&7ワールド: {1}",
 
+  "gui.map_editor.title": "マップエディター ({0})",
+  "gui.map_editor.tp_to_world": "ワールドにテレポートする",
+  "gui.map_editor.set_default_spawn": "デフォルトスポーン地点を設定",
+  "gui.map_editor.set_team_spawn": "各チームのスポーン地点を設定",
+  "gui.map_editor.set_nexus_location": "ネクサスの位置を設定",
+  "gui.map_editor.current_value": "設定値： {0}",
+
   "gui.next_page": "&a次のページ",
   "gui.prev_page": "&a前のページ",
 
@@ -72,6 +79,26 @@
 
   "command.usage": "&c使用方法: {0}",
 
-  "command.createmap.success": "&aマップが正常に作成されました。"
+  "command.createmap.success": "&aマップが正常に作成されました。",
 
+  "command.map.info.0": "---- マップ情報 ----",
+  "command.map.info.1": "&f表示名（ID）： {0} （{1}）",
+  "command.map.info.2": "&fワールド： {2}",
+  "command.map.info.3": "&fアリーナで利用可能か： {3}",
+  "command.map.info.4": "&fデフォルトスポーン地点： {4}",
+  "command.map.info.5": "&f赤チーム（ネクサス／スポーン地点）： &7{5} &f／ &7{9}",
+  "command.map.info.6": "&f青チーム（ネクサス／スポーン地点）： &7{6} &f／ &7{10}",
+  "command.map.info.7": "&f緑チーム（ネクサス／スポーン地点）： &7{7} &f／ &7{11}",
+  "command.map.info.8": "&f黄チーム（ネクサス／スポーン地点）： &7{8} &f／ &7{12}",
+
+  "command.map.info.2.avail": "&a利用可能",
+  "command.map.info.2.not_avail": "&c利用不可",
+  "command.map.info.3.using_world_spawn": " &o（ワールドのスポーン地点を使用中）",
+  "command.map.info.unset": "&8&o未設定",
+
+  "xyz": "{0} / {1} / {2}",
+  "xyz.format": "%.1f",
+  "xyz.blockformat": "%03d",
+  "xyzyawpitch": "{0} / {1} / {2} ({3} | {4})",
+  "yawpitch.format": "%.1f"
 }
