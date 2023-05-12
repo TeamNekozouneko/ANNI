@@ -9,8 +9,7 @@ public class PlayerJoinListener implements Listener {
 
     @EventHandler
     public void onJoin(PlayerJoinEvent e) {
-        ANNIPlugin.getInstance().getArenaManager().getArenas().values().iterator().next()
-                .join(e.getPlayer());
+        ANNIPlugin.getInstance().getCurrentGame().join(e.getPlayer());
     }
 
 }

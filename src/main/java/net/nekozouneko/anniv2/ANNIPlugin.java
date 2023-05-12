@@ -1,18 +1,22 @@
 package net.nekozouneko.anniv2;
 
 import com.google.gson.Gson;
-import net.nekozouneko.anniv2.arena.ArenaManager;
+import net.nekozouneko.anniv2.arena.ANNIArena;
 import net.nekozouneko.anniv2.board.BoardManager;
 import net.nekozouneko.anniv2.command.ANNIAdminCommand;
 import net.nekozouneko.anniv2.command.ANNICommand;
+import net.nekozouneko.anniv2.listener.BlockBreakListener;
 import net.nekozouneko.anniv2.listener.PlayerJoinListener;
 import net.nekozouneko.anniv2.listener.PlayerQuitListener;
 import net.nekozouneko.anniv2.map.MapManager;
 import net.nekozouneko.anniv2.message.MessageManager;
 import net.nekozouneko.anniv2.util.FileUtil;
+import org.bukkit.Location;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
@@ -30,8 +34,13 @@ public final class ANNIPlugin extends JavaPlugin {
 
     private MessageManager messageManager;
     private BoardManager boardManager;
-    private ArenaManager arenaManager;
     private MapManager mapManager;
+
+    private ANNIArena currentGame;
+
+    private File defaultMapsDir;
+
+    private Location lobby;
 
     public MessageManager getMessageManager() {
         return messageManager;
@@ -41,12 +50,25 @@ public final class ANNIPlugin extends JavaPlugin {
         return boardManager;
     }
 
-    public ArenaManager getArenaManager() {
-        return arenaManager;
-    }
-
     public MapManager getMapManager() {
         return mapManager;
+    }
+
+    public ANNIArena getCurrentGame() {
+        return currentGame;
+    }
+
+    public File getMapsDir() {
+        return defaultMapsDir;
+    }
+
+    public void setLobby(Location location) {
+        lobby = location.clone();
+        FileUtil.writeGson(new File(getDataFolder(), "lobby.json"), location, Location.class);
+    }
+
+    public Location getLobby() {
+        return lobby;
     }
 
     @Override
@@ -55,8 +77,8 @@ public final class ANNIPlugin extends JavaPlugin {
             getDataFolder().mkdir();
         }
 
-        File mapsd = new File(getDataFolder(), "maps");
-        mapsd.mkdir();
+        defaultMapsDir = new File(getDataFolder(), "maps");
+        defaultMapsDir.mkdir();
     }
 
     @Override
@@ -66,15 +88,18 @@ public final class ANNIPlugin extends JavaPlugin {
         setupMessageManager();
 
         boardManager = new BoardManager(this);
-        arenaManager = new ArenaManager(this);
-        mapManager = new MapManager();
+        mapManager = new MapManager(this);
 
-        mapManager.load(new File(getDataFolder(), "maps"));
+        mapManager.load(defaultMapsDir);
 
+        lobby = FileUtil.readGson(new File(getDataFolder(), "lobby.json"), Location.class);
+
+        getServer().getPluginManager().registerEvents(new BlockBreakListener(), this);
         getServer().getPluginManager().registerEvents(new PlayerJoinListener(), this);
         getServer().getPluginManager().registerEvents(new PlayerQuitListener(), this);
 
-        arenaManager.create().runTaskTimer(this, 0, 20);
+        currentGame = new ANNIArena(this, "current");
+        currentGame.runTaskTimer(this, 0, 20);
 
         getCommand("anni-admin").setExecutor(new ANNIAdminCommand());
         getCommand("anni").setExecutor(new ANNICommand());
@@ -82,7 +107,7 @@ public final class ANNIPlugin extends JavaPlugin {
 
     @Override
     public void onDisable() {
-        // Plugin shutdown logic
+        if (!currentGame.isCancelled()) currentGame.cancel();
     }
 
     @SuppressWarnings("unchecked")
