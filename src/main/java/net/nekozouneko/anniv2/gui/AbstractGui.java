@@ -24,6 +24,7 @@ public abstract class AbstractGui implements InventoryHolder, Listener {
     }
 
     public void open() {
+        player.closeInventory();
         update();
         player.openInventory(inventory);
     }
