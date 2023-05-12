@@ -5,14 +5,17 @@ import net.nekozouneko.anniv2.arena.team.ANNITeam;
 import net.nekozouneko.anniv2.command.ASubCommand;
 import net.nekozouneko.anniv2.gui.map.MapEditor;
 import net.nekozouneko.anniv2.gui.map.MapSelector;
+import net.nekozouneko.anniv2.listener.BlockBreakListener;
 import net.nekozouneko.anniv2.map.ANNIMap;
 import net.nekozouneko.anniv2.map.Nexus;
 import net.nekozouneko.anniv2.map.SpawnLocation;
 import net.nekozouneko.anniv2.message.MessageManager;
 import net.nekozouneko.anniv2.util.CmdUtil;
+import net.nekozouneko.anniv2.util.FileUtil;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import java.io.File;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -44,6 +47,7 @@ public class MapSubCommand extends ASubCommand {
             return true;
         }
 
+        // info command
         if (args.size() == 1) {
             String defSpawn = map.getDefaultSpawn() != null ?
                     mem.yawPitchLocationFormat(map.getDefaultSpawn()) :
@@ -70,8 +74,84 @@ public class MapSubCommand extends ASubCommand {
                     infoSpawnLoc(map, ANNITeam.YELLOW)
             ));
         }
-        else {
+        else { // other
+            switch (args.get(1)) {
+                case "defaultspawn": {
+                    if (args.size() == 7) {
+                        map.setDefaultSpawn(new SpawnLocation(
+                                Double.parseDouble(args.get(2)),
+                                Double.parseDouble(args.get(3)),
+                                Double.parseDouble(args.get(4)),
+                                Float.parseFloat(args.get(5)),
+                                Float.parseFloat(args.get(6))
+                        ));
+                        FileUtil.writeGson(new File(plugin.getMapsDir(), map.getId() + ".json"), map, ANNIMap.class);
+                        plugin.getMapManager().reload();
+                    }
+                    else if (args.size() == 5) {
+                        map.setDefaultSpawn(new SpawnLocation(
+                                Double.parseDouble(args.get(2)),
+                                Double.parseDouble(args.get(3)),
+                                Double.parseDouble(args.get(4))
+                        ));
+                        FileUtil.writeGson(new File(plugin.getMapsDir(), map.getId() + ".json"), map, ANNIMap.class);
+                        plugin.getMapManager().reload();
+                    }
+                    else {
+                        if (sender instanceof Player) {
+                            map.setDefaultSpawn(((Player) sender).getLocation());
+                            FileUtil.writeGson(new File(plugin.getMapsDir(), map.getId() + ".json"), map, ANNIMap.class);
+                            plugin.getMapManager().reload();
+                        }
+                        else sender.sendMessage(mem.build("command.err.player_only"));
+                    }
+                    break;
+                }
+                case "delete": {
+                    if (new File(plugin.getMapsDir(), map.getId() + ".json").delete()) {
+                        plugin.getMapManager().reload();
+                    }
+                    else sender.sendMessage(mem.build("command.err.ioe"));
+                    break;
+                }
+                case "editor": {
+                    if (sender instanceof Player) {
+                        new MapEditor(plugin, (Player) sender, map).open();
+                    }
+                    else sender.sendMessage(mem.build("command.err.player_only"));
+                    break;
+                }
+                case "spawn": {
+                    if (args.size() < 3) return false;
+                    if (!(sender instanceof Player)) {
+                        sender.sendMessage(mem.build("command.err.player_only"));
+                        return true;
+                    }
 
+                    map.setSpawn(
+                            ANNITeam.valueOf(args.get(2)),
+                            SpawnLocation.fromLocation(((Player) sender).getLocation()));
+                    FileUtil.writeGson(new File(plugin.getMapsDir(), map.getId() + ".json"), map, ANNIMap.class);
+                    plugin.getMapManager().reload();
+                    break;
+                }
+                case "nexus": {
+                    if (args.size() < 3) return false;
+                    if (!(sender instanceof Player)) {
+                        sender.sendMessage(mem.build("command.err.player_only"));
+                        return true;
+                    }
+
+                    BlockBreakListener.getQueuedOnDamageMap()
+                            .put(((Player) sender).getUniqueId(), block -> {
+                                        map.setNexus(ANNITeam.valueOf(args.get(2)), block.getLocation());
+                                        FileUtil.writeGson(new File(plugin.getMapsDir(), map.getId() + ".json"), map, ANNIMap.class);
+                                        plugin.getMapManager().reload();
+                                    }
+                            );
+                    break;
+                }
+            }
         }
 
         return true;
@@ -81,13 +161,23 @@ public class MapSubCommand extends ASubCommand {
     public List<String> tabComplete(CommandSender sender, List<String> args) {
         if (args.size() <= 1) {
             return CmdUtil.simpleTabComplete(args.get(0),
-                    ANNIPlugin.getInstance().getMapManager().getMaps().stream()
+                    plugin.getMapManager().getMaps().stream()
                             .map(ANNIMap::getId)
                             .collect(Collectors.toList())
             );
         }
         else if (args.size() == 2) {
-            return CmdUtil.simpleTabComplete(args.get(1), Arrays.asList("delete", "editor", "nexus", "spawn"));
+            return CmdUtil.simpleTabComplete(args.get(1), "defaultspawn", "delete", "editor", "nexus", "spawn");
+        }
+        else if (args.size() == 3) {
+            if (args.get(1).equals("nexus") || args.get(1).equals("spawn")) {
+                return CmdUtil.simpleTabComplete(
+                        args.get(2),
+                        Arrays.stream(ANNITeam.values())
+                                .map(ANNITeam::name)
+                                .collect(Collectors.toList())
+                );
+            }
         }
         return Collections.emptyList();
     }
