@@ -50,6 +50,7 @@ public class CreateMapSubCommand extends ASubCommand {
         File to = new File(new File(plugin.getDataFolder(), "maps"), id + ".json");
 
         if (FileUtil.writeGson(to, map, ANNIMap.class)) {
+            plugin.getMapManager().reload();
             sender.sendMessage(plugin.getMessageManager().build("command.createmap.success"));
         }
         else {
