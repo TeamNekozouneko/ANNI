@@ -45,8 +45,13 @@ public final class SpawnLocation implements Cloneable {
     }
 
     @Override
-    public SpawnLocation clone() throws CloneNotSupportedException {
-        return (SpawnLocation) super.clone();
+    public SpawnLocation clone() {
+        try {
+            return (SpawnLocation) super.clone();
+        }
+        catch (CloneNotSupportedException ignored) {}
+
+        return null;
     }
 
     public double getX() {
