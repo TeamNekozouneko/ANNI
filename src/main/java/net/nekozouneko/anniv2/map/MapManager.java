@@ -2,6 +2,7 @@ package net.nekozouneko.anniv2.map;
 
 import com.google.common.base.Preconditions;
 import com.google.gson.Gson;
+import net.nekozouneko.anniv2.ANNIPlugin;
 import net.nekozouneko.anniv2.util.FileUtil;
 
 import java.io.File;
@@ -17,9 +18,14 @@ import java.util.Map;
 public class MapManager {
 
     private final Map<String, ANNIMap> maps = new HashMap<>();
+    private final ANNIPlugin plugin;
+
+    public MapManager(ANNIPlugin plugin) {
+        this.plugin = plugin;
+    }
 
     public void load(File f) {
-        Preconditions.checkArgument(f != null && f.exists());
+        Preconditions.checkArgument(f != null && f.exists(), f + "");
 
         if (f.isDirectory()) {
             for (File f2 : f.listFiles()) {
@@ -45,6 +51,11 @@ public class MapManager {
         maps.keySet().forEach((s) -> {
             if (maps.get(s).equals(map)) maps.remove(s);
         });
+    }
+
+    public void reload() {
+        maps.clear();
+        load(plugin.getMapsDir());
     }
 
     public ANNIMap getMap(String id) {
