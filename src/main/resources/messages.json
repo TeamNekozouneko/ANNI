@@ -76,6 +76,7 @@
   "command.err.world_not_found": "&c「{0}」というワールドは見つかりませんでした。",
   "command.err.ioe": "&cファイルの入出力にエラーが発生しました。コンソールを確認してください。",
   "command.err.subcommand_not_found": "&c「{0}」というサブコマンドは見つかりませんでした。",
+  "command.err.player_only": "&cプレイヤーとして実行してください。",
 
   "command.usage": "&c使用方法: {0}",
 
@@ -98,7 +99,7 @@
 
   "xyz": "{0} / {1} / {2}",
   "xyz.format": "%.1f",
-  "xyz.blockformat": "%03d",
+  "xyz.blockformat": "%d",
   "xyzyawpitch": "{0} / {1} / {2} ({3} | {4})",
   "yawpitch.format": "%.1f"
 }
