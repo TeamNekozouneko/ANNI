@@ -5,6 +5,7 @@ import net.nekozouneko.anniv2.ANNIPlugin;
 import net.nekozouneko.anniv2.gui.AbstractGui;
 import net.nekozouneko.anniv2.map.ANNIMap;
 import net.nekozouneko.anniv2.map.MapManager;
+import net.nekozouneko.commons.spigot.inventory.ItemStackBuilder;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -13,7 +14,6 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataType;
 
 import java.util.ArrayList;
@@ -58,63 +58,56 @@ public class MapSelector extends AbstractGui {
                 )
             );
 
-        ItemStack back = new ItemStack(Material.GRAY_STAINED_GLASS_PANE);
-        ItemMeta backMeta = back.getItemMeta();
-        backMeta.setDisplayName(" ");
-        back.setItemMeta(backMeta);
+        ItemStack back = ItemStackBuilder.of(Material.GRAY_STAINED_GLASS_PANE)
+                .name(" ")
+                .build();
 
         for (int i = 27; i < 36; i++) inventory.setItem(i, back);
 
         if (page < getTotalPageCount()) {
-            ItemStack next = new ItemStack(Material.ARROW);
-            ItemMeta nextMeta = next.getItemMeta();
-            nextMeta.setDisplayName(plugin.getMessageManager().build("gui.next_page"));
-            nextMeta.getPersistentDataContainer()
-                    .set(
+            ItemStack next = ItemStackBuilder.of(Material.ARROW)
+                    .name(plugin.getMessageManager().build("gui.next_page"))
+                    .persistentData(
                             new NamespacedKey(plugin, "page"),
                             PersistentDataType.INTEGER,
-                            page + 1);
-            next.setItemMeta(nextMeta);
+                            page + 1
+                    )
+                    .build();
 
-            inventory.setItem(27, next);
+            inventory.setItem(35, next);
         }
         if (page > 1) {
-            ItemStack prev = new ItemStack(Material.ARROW);
-            ItemMeta prevMeta = prev.getItemMeta();
-            prevMeta.setDisplayName(plugin.getMessageManager().build("gui.prev_page"));
-            prevMeta.getPersistentDataContainer()
-                            .set(
-                                    new NamespacedKey(plugin, "page"),
-                                    PersistentDataType.INTEGER,
-                                    page - 1);
-            prev.setItemMeta(prevMeta);
+            ItemStack prev = ItemStackBuilder.of(Material.ARROW)
+                    .name(plugin.getMessageManager().build("gui.prev_page"))
+                    .persistentData(
+                            new NamespacedKey(plugin, "page"),
+                            PersistentDataType.INTEGER,
+                            page - 1
+                    )
+                    .build();
+
+            inventory.setItem(27, prev);
         }
 
         List<List<ANNIMap>> partitions = Lists.partition(new ArrayList<>(mapm.getMaps()), 27);
 
         if (!partitions.isEmpty()) {
             List<ItemStack> part = partitions.get(page - 1).stream()
-                    .map((map) -> {
-                        ItemStack mi = new ItemStack(Material.MAP);
-                        ItemMeta mim = mi.getItemMeta();
-                        mim.setDisplayName("§f" + map.getName());
-                        mim.setLore(plugin.getMessageManager()
-                                .buildList(
-                                        "gui.map_selector.map_lore",
-                                        map.getId(),
-                                        map.getWorld()
-                                )
-                        );
-                        mim.getPersistentDataContainer()
-                                .set(
-                                        new NamespacedKey(plugin, "map"),
-                                        PersistentDataType.STRING, map.getId()
-                                );
-
-                        mi.setItemMeta(mim);
-
-                        return mi;
-                    })
+                    .map((map) -> ItemStackBuilder.of(Material.MAP)
+                            .name("§f" + map.getName())
+                            .lore(plugin.getMessageManager()
+                                    .buildList(
+                                            "gui.map_selector.map_lore",
+                                            map.getId(),
+                                            map.getWorld()
+                                    )
+                            )
+                            .persistentData(
+                                    new NamespacedKey(plugin, "map"),
+                                    PersistentDataType.STRING, map.getId()
+                            )
+                            .build()
+                    )
                     .collect(Collectors.toList());
 
             for (int i = 0; i < part.size() && i < 27; i++) {
