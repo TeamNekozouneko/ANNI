@@ -4,11 +4,16 @@ import com.google.common.base.Preconditions;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.stream.JsonWriter;
+import com.sk89q.worldedit.math.BlockVector3;
 import net.nekozouneko.anniv2.arena.team.ANNITeam;
+import net.nekozouneko.anniv2.gson.BlockVector3Deserializer;
 import net.nekozouneko.anniv2.gson.EnumMapInstanceCreator;
+import net.nekozouneko.anniv2.gson.LocationInstanceCreator;
 import net.nekozouneko.anniv2.map.Nexus;
 import net.nekozouneko.anniv2.map.SpawnLocation;
+import net.nekozouneko.commons.lang.io.Files2;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.WorldCreator;
 
@@ -16,7 +21,9 @@ import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
-import java.util.*;
+import java.util.Arrays;
+import java.util.EnumMap;
+import java.util.List;
 
 public final class FileUtil {
 
@@ -34,6 +41,14 @@ public final class FileUtil {
                 .registerTypeAdapter(
                         EnumMap.class,
                         new EnumMapInstanceCreator<ANNITeam, Nexus>(ANNITeam.class)
+                )
+                .registerTypeAdapter(
+                        BlockVector3.class,
+                        new BlockVector3Deserializer()
+                )
+                .registerTypeAdapter(
+                        Location.class,
+                        new LocationInstanceCreator()
                 )
                 .serializeNulls();
 
@@ -118,21 +133,10 @@ public final class FileUtil {
         return WorldCreator.name(name).createWorld();
     }
 
-    public static void safeDeleteIfExists(Path path) throws IOException {
-        safeDeleteIfExists(path.toFile());
-    }
-
-    public static void safeDeleteIfExists(File file) throws IOException {
-        for (File f : Objects.requireNonNull(file.listFiles())) {
-            if (f.isDirectory()) safeDeleteIfExists(f);
-            else {
-                try {
-                    Files.deleteIfExists(f.toPath());
-                }
-                catch (IOException e) { e.printStackTrace(); }
-            }
-        }
-        Files.deleteIfExists(file.toPath());
+    public static void deleteWorld(World w) throws IOException {
+        File fold = w.getWorldFolder();
+        Bukkit.unloadWorld(w, false);
+        Files2.deleteIfExists(fold.toPath());
     }
 
 }
