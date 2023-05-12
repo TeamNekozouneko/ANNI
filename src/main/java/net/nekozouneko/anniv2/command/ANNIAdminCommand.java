@@ -4,6 +4,7 @@ import net.nekozouneko.anniv2.ANNIPlugin;
 import net.nekozouneko.anniv2.command.subcommand.admin.CreateMapSubCommand;
 import net.nekozouneko.anniv2.command.subcommand.admin.DebugSubCommand;
 import net.nekozouneko.anniv2.command.subcommand.admin.MapSubCommand;
+import net.nekozouneko.anniv2.command.subcommand.admin.SetLobbySubCommand;
 import net.nekozouneko.anniv2.util.CmdUtil;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -19,12 +20,14 @@ public class ANNIAdminCommand implements CommandExecutor, TabCompleter {
     private final ASubCommand debugSubCommand = new DebugSubCommand();
     private final ASubCommand mapSubCommand = new MapSubCommand();
     private final ASubCommand createMapSubCommand = new CreateMapSubCommand();
+    private final ASubCommand setLobbySubCommand = new SetLobbySubCommand();
 
     private final Map<String, ASubCommand> subcommands = new HashMap<String, ASubCommand>() {
         {
             put("debug", debugSubCommand);
             put("map", mapSubCommand);
             put("createMap", createMapSubCommand);
+            put("setlobby", setLobbySubCommand);
         }
     };
 
@@ -58,6 +61,7 @@ public class ANNIAdminCommand implements CommandExecutor, TabCompleter {
 
     @Override
     public List<String> onTabComplete(CommandSender sender, Command cmd, String label, String[] args) {
+        if (cmd.getPermission() != null && !sender.hasPermission(cmd.getPermission())) return Collections.emptyList();
         if (args.length <= 1) {
             List<String> subCommands = new ArrayList<>(subcommands.keySet());
             Collections.sort(subCommands);
