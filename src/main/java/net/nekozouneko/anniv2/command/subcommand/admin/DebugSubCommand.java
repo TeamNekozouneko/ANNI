@@ -1,9 +1,10 @@
 package net.nekozouneko.anniv2.command.subcommand.admin;
 
 import net.nekozouneko.anniv2.ANNIPlugin;
-import net.nekozouneko.anniv2.arena.ArenaManager;
+import net.nekozouneko.anniv2.arena.ANNIArena;
 import net.nekozouneko.anniv2.arena.ArenaState;
 import net.nekozouneko.anniv2.command.ASubCommand;
+import net.nekozouneko.anniv2.listener.BlockBreakListener;
 import net.nekozouneko.anniv2.util.CmdUtil;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -16,13 +17,28 @@ import java.util.stream.Collectors;
 public class DebugSubCommand extends ASubCommand {
     @Override
     public boolean execute(CommandSender sender, List<String> args) {
-        ArenaManager am = ANNIPlugin.getInstance().getArenaManager();
+        ANNIArena ar = ANNIPlugin.getInstance().getCurrentGame();
 
         switch (args.get(0)) {
             case "set-state": {
-                am.getArenaByPlayer((Player) sender).setState(ArenaState.valueOf(args.get(1)));
+                ArenaState stat = ArenaState.valueOf(args.get(1));
+                if (stat.nextPhaseIn() > 0) ar.setTimer(stat.nextPhaseIn());
+                ar.setState(stat);
                 break;
             }
+            case "set-timer": {
+                ar.setTimer(Long.parseLong(args.get(1)));
+                break;
+            }
+            case "clear-queued":
+                BlockBreakListener.getQueuedOnDamageMap().remove(((Player) sender).getUniqueId());
+                break;
+            case "reload-map":
+                ANNIPlugin.getInstance().getMapManager().reload();
+                break;
+            case "start":
+                ANNIPlugin.getInstance().getCurrentGame().start();
+                break;
         }
 
         return true;
@@ -31,7 +47,7 @@ public class DebugSubCommand extends ASubCommand {
     @Override
     public List<String> tabComplete(CommandSender sender, List<String> args) {
         if (args.size() <= 1) {
-            return CmdUtil.simpleTabComplete(args.get(0), "set-state");
+            return CmdUtil.simpleTabComplete(args.get(0), "clear-queued", "reload-map", "set-state", "set-timer", "start");
         }
         else {
             switch (args.get(0)) {
