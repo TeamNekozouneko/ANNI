@@ -23,7 +23,7 @@ public class Nexus {
 
         World w = loc.getWorld();
 
-        w.spawnParticle(Particle.EXPLOSION_HUGE, 10, 1, 1, 1, 0);
+        w.spawnParticle(Particle.EXPLOSION_HUGE, loc, 10, 1, 1, 1);
         w.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, 1.5f, 0);
     }
 
