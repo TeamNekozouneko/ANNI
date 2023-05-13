@@ -40,6 +40,8 @@
   "nexus.status.active": "&a●",
   "nexus.health.format": "%,d",
   "nexus.health.none": "&8---",
+  "nexus.now_cant_destroy": "&c現在のフェーズではネクサスを破壊できません。",
+  "nexus.cant_destroy_self": "&c自チームのネクサスは破壊できません。",
 
   "bossbar.timer": "{0} {1}",
   "bossbar.timer.state.1": "フェーズ1",
@@ -68,6 +70,8 @@
   "gui.map_editor.set_team_spawn": "各チームのスポーン地点を設定",
   "gui.map_editor.set_nexus_location": "ネクサスの位置を設定",
   "gui.map_editor.current_value": "設定値： {0}",
+
+  "gui.arena_dashboard.title": "アリーナダッシュボード ({0})",
 
   "gui.next_page": "&a次のページ",
   "gui.prev_page": "&a前のページ",
