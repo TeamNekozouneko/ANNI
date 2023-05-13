@@ -90,7 +90,7 @@ public class ANNIArena extends BukkitRunnable {
         if (players.contains(player)) return;
 
         players.add(player);
-        player.setScoreboard(plugin.getServer().getScoreboardManager().getNewScoreboard());
+        player.setScoreboard(plugin.getPluginBoard());
     }
 
     public void leave(Player player) {
@@ -104,10 +104,14 @@ public class ANNIArena extends BukkitRunnable {
         return Collections.unmodifiableSet(players);
     }
 
+    public boolean isJoined(Player player) {
+        return players.contains(player);
+    }
+
     // Team
 
     private void createTeams() {
-        final Scoreboard sb = Bukkit.getScoreboardManager().getNewScoreboard();
+        final Scoreboard sb = plugin.getPluginBoard();
         final MessageManager mm = plugin.getMessageManager();
 
         Team r = sb.registerNewTeam(id + "-red");
@@ -116,13 +120,13 @@ public class ANNIArena extends BukkitRunnable {
         Team y = sb.registerNewTeam(id + "-yellow");
 
         r.setDisplayName(mm.build("team.red.display"));
-        r.setPrefix("team.red.prefix");
+        r.setPrefix(mm.build("team.red.prefix"));
         r.setColor(ChatColor.RED);
         r.setAllowFriendlyFire(false);
         r.setCanSeeFriendlyInvisibles(true);
 
         b.setDisplayName(mm.build("team.blue.display"));
-        b.setPrefix("team.blue.prefix");
+        b.setPrefix(mm.build("team.blue.prefix"));
         b.setColor(ChatColor.BLUE);
         b.setAllowFriendlyFire(false);
         b.setCanSeeFriendlyInvisibles(true);
@@ -180,6 +184,11 @@ public class ANNIArena extends BukkitRunnable {
 
     public ANNITeam getTeam(Team team) {
         return teams.inverse().get(team);
+    }
+
+    public ANNITeam getTeamByPlayer(Player player) {
+        Team t = plugin.getPluginBoard().getPlayerTeam(player);
+        return t != null ? getTeam(t) : null;
     }
 
     public BiMap<ANNITeam, Team> getTeams() {
@@ -385,7 +394,7 @@ public class ANNIArena extends BukkitRunnable {
                                 CmnUtil.secminTimer(timer)
                         )
                 );
-                bb.setProgress(state.nextPhase() != null ? CmnUtil.bossBarProgress(state.nextPhaseIn(), timer) : 1);
+                bb.setProgress(state.nextPhaseIn() > 0 ? CmnUtil.bossBarProgress(state.nextPhaseIn(), timer) : 1);
                 break;
             }
             case PHASE_FIVE: {
@@ -483,7 +492,7 @@ public class ANNIArena extends BukkitRunnable {
             case WAITING: {
                 if (players.size() >= getTeams().size() * 2) {
                     enableTimer();
-                    setTimer(60);
+                    setTimer(ArenaState.STARTING.nextPhaseIn());
                     setState(ArenaState.STARTING);
                 }
                 break;

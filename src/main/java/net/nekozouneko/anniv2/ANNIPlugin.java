@@ -6,6 +6,7 @@ import net.nekozouneko.anniv2.board.BoardManager;
 import net.nekozouneko.anniv2.command.ANNIAdminCommand;
 import net.nekozouneko.anniv2.command.ANNICommand;
 import net.nekozouneko.anniv2.listener.BlockBreakListener;
+import net.nekozouneko.anniv2.listener.BlockPlaceListener;
 import net.nekozouneko.anniv2.listener.PlayerJoinListener;
 import net.nekozouneko.anniv2.listener.PlayerQuitListener;
 import net.nekozouneko.anniv2.map.MapManager;
@@ -13,6 +14,7 @@ import net.nekozouneko.anniv2.message.MessageManager;
 import net.nekozouneko.anniv2.util.FileUtil;
 import org.bukkit.Location;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.scoreboard.Scoreboard;
 
 import java.io.File;
 import java.io.IOException;
@@ -37,10 +39,9 @@ public final class ANNIPlugin extends JavaPlugin {
     private MapManager mapManager;
 
     private ANNIArena currentGame;
-
     private File defaultMapsDir;
-
     private Location lobby;
+    private Scoreboard pluginBoard;
 
     public MessageManager getMessageManager() {
         return messageManager;
@@ -71,6 +72,10 @@ public final class ANNIPlugin extends JavaPlugin {
         return lobby;
     }
 
+    public Scoreboard getPluginBoard() {
+        return pluginBoard;
+    }
+
     @Override
     public void onLoad() {
         if (!getDataFolder().exists()) {
@@ -94,7 +99,10 @@ public final class ANNIPlugin extends JavaPlugin {
 
         lobby = FileUtil.readGson(new File(getDataFolder(), "lobby.json"), Location.class);
 
+        pluginBoard = getServer().getScoreboardManager().getNewScoreboard();
+
         getServer().getPluginManager().registerEvents(new BlockBreakListener(), this);
+        getServer().getPluginManager().registerEvents(new BlockPlaceListener(), this);
         getServer().getPluginManager().registerEvents(new PlayerJoinListener(), this);
         getServer().getPluginManager().registerEvents(new PlayerQuitListener(), this);
 
