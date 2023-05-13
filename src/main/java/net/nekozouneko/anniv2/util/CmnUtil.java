@@ -77,7 +77,7 @@ public final class CmnUtil {
     }
 
     public static double bossBarProgress(double max, double val) {
-        Preconditions.checkArgument(max <= 0, "max is zero or negative value");
+        Preconditions.checkArgument(max >= 0, "max is negative value");
         double prg = val / max;
 
         if (prg > 1) prg = 1;
