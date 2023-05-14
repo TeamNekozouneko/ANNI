@@ -49,6 +49,8 @@ public class BlockBreakListener implements Listener {
                         ent.getValue().getLocation()
                 );
                 if (e.getBlock().getLocation().equals(loc)) {
+                    e.setDropItems(false);
+                    e.setExpToDrop(0);
                     if (current.isNexusLost(ent.getKey())) e.setCancelled(true);
 
                     // 破壊しようとしてるのは自チームかどうか
