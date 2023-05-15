@@ -50,6 +50,7 @@
   "bossbar.timer.state.4": "フェーズ4",
   "bossbar.timer.state.5": "フェーズ5",
   "bossbar.timer.state.restarting": "再起動まで",
+  "bossbar.damaged_nexus": "{0} が {1} のネクサスにダメージを与えました！",
 
   "team.red.display": "赤チーム",
   "team.red.prefix": "[R]",
@@ -78,6 +79,8 @@
 
   "command.err.map_not_found": "&c「{0}」というマップは見つかりませんでした。",
   "command.err.world_not_found": "&c「{0}」というワールドは見つかりませんでした。",
+  "command.err.team_undefined": "&c「{0}」というチームは存在しません。",
+  "command.err.no_more_teams_can_be_disabled": "&cこれ以上チームを無効化することはできません。",
   "command.err.ioe": "&cファイルの入出力にエラーが発生しました。コンソールを確認してください。",
   "command.err.subcommand_not_found": "&c「{0}」というサブコマンドは見つかりませんでした。",
   "command.err.player_only": "&cプレイヤーとして実行してください。",
@@ -101,9 +104,18 @@
   "command.map.info.3.using_world_spawn": " &o（ワールドのスポーン地点を使用中）",
   "command.map.info.unset": "&8&o未設定",
 
+  "command.arena.disabled_team": "&a「{0}」というチームを無効化しました。",
+  "command.arena.enabled_team": "&a「{0}」というチームを有効化しました。",
+
   "xyz": "{0} / {1} / {2}",
   "xyz.format": "%.1f",
   "xyz.blockformat": "%d",
   "xyzyawpitch": "{0} / {1} / {2} ({3} | {4})",
-  "yawpitch.format": "%.1f"
+  "yawpitch.format": "%.1f",
+
+  "kill.default": "{0}&r &6&l<<&r {1}",
+  "kill.void": "{0}&r &6&l<<&r &7&o(奈落)",
+  "kill.fall": "{0}&r &6&l<<&r &7&o(落下)",
+  "kill.mob": "{0}&r &6&l<<&r &7&o(mob)",
+  "kill.game": "{0}&r &6&l<<&r &7&o(ゲームの仕様)"
 }
