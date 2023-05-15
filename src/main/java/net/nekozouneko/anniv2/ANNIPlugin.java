@@ -5,10 +5,7 @@ import net.nekozouneko.anniv2.arena.ANNIArena;
 import net.nekozouneko.anniv2.board.BoardManager;
 import net.nekozouneko.anniv2.command.ANNIAdminCommand;
 import net.nekozouneko.anniv2.command.ANNICommand;
-import net.nekozouneko.anniv2.listener.BlockBreakListener;
-import net.nekozouneko.anniv2.listener.BlockPlaceListener;
-import net.nekozouneko.anniv2.listener.PlayerJoinListener;
-import net.nekozouneko.anniv2.listener.PlayerQuitListener;
+import net.nekozouneko.anniv2.listener.*;
 import net.nekozouneko.anniv2.map.MapManager;
 import net.nekozouneko.anniv2.message.MessageManager;
 import net.nekozouneko.anniv2.util.FileUtil;
@@ -103,6 +100,7 @@ public final class ANNIPlugin extends JavaPlugin {
 
         getServer().getPluginManager().registerEvents(new BlockBreakListener(), this);
         getServer().getPluginManager().registerEvents(new BlockPlaceListener(), this);
+        getServer().getPluginManager().registerEvents(new PlayerDeathListener(), this);
         getServer().getPluginManager().registerEvents(new PlayerJoinListener(), this);
         getServer().getPluginManager().registerEvents(new PlayerQuitListener(), this);
 
