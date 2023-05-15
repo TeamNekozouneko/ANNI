@@ -21,6 +21,7 @@ import net.nekozouneko.anniv2.util.CmnUtil;
 import net.nekozouneko.anniv2.util.FileUtil;
 import net.nekozouneko.commons.spigot.world.Worlds;
 import org.bukkit.*;
+import org.bukkit.block.Block;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
 import org.bukkit.boss.KeyedBossBar;
@@ -32,6 +33,7 @@ import org.bukkit.scoreboard.Team;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class ANNIArena extends BukkitRunnable {
 
@@ -199,7 +201,7 @@ public class ANNIArena extends BukkitRunnable {
         BiMap<ANNITeam, Team> res = EnumHashBiMap.create(ANNITeam.class);
 
         teams.entrySet().stream()
-                .filter(t -> enabledOnly && enabledTeams.getOrDefault(t.getKey(), true))
+                .filter(t -> !enabledOnly || enabledTeams.getOrDefault(t.getKey(), true))
                 .forEach(e -> res.put(e.getKey(), e.getValue()));
 
         return res;
@@ -262,6 +264,14 @@ public class ANNIArena extends BukkitRunnable {
             int health = nexus.get(team) - damage;
             nexus.put(team, health <= 0 ? null : health);
 
+            if (player != null) {
+                bb.setProgress(1);
+                bb.setTitle(ANNIPlugin.getInstance().getMessageManager().build(
+                        "bossbar.damaged_nexus",
+                        player.getName(), team.getTeamName()
+                ));
+            }
+
             if (isNexusLost(team)) {
                 Bukkit.broadcastMessage(team.name() + " was nexus lost");
             }
@@ -301,6 +311,8 @@ public class ANNIArena extends BukkitRunnable {
             if (map == null) map = plugin.getMapManager().getMaps().iterator().next();
 
             copy = Worlds.copyWorld(map.getBukkitWorld(), id + "-anni");
+            if (copy == null) return false;
+
             RegionContainer rc = WorldGuard.getInstance().getPlatform().getRegionContainer();
             RegionManager copyrm = rc.get(BukkitAdapter.adapt(copy));
             RegionManager origrm = rc.get(BukkitAdapter.adapt(map.getBukkitWorld()));
@@ -323,6 +335,14 @@ public class ANNIArena extends BukkitRunnable {
                     copyrm.addRegion(reg);
                 });
             }
+
+            getTeams(false).keySet()
+                    .forEach(at -> {
+                        Block bl = BukkitAdapter.adapt(copy, map.getNexus(at).getLocation()).getBlock();
+                        if (!isEnabledTeam(at))
+                            bl.setType(Material.BEDROCK);
+                        else bl.setType(Material.END_STONE);
+                    });
 
             CmnUtil.assignAtEquality(players, getTeams().values(), true);
             nexus.clear();
@@ -359,11 +379,41 @@ public class ANNIArena extends BukkitRunnable {
         catch (IOException e) { e.printStackTrace(); }
     }
 
+    public void broadcast(String message) {
+        players.forEach(p -> p.sendMessage(message));
+    }
+
+    public void broadcast(String message, ANNITeam team) {
+        getTeamPlayers(team).forEach(p -> p.sendMessage(message));
+    }
+
     @Override
     public void run() {
         updateBossBar();
         updateScoreboard();
         tickTimer();
+
+        if (state.getId() > 0) {
+            // ネクサスを失っていないチーム数を調べる
+            List<ANNITeam> living = getTeams().keySet().stream()
+                    .filter(team -> !isNexusLost(team))
+                    .collect(Collectors.toList());
+
+            // もし1以下なら
+            if (living.size() <= 1) {
+                // もし1なら
+                if (living.size() == 1) {
+                    ANNITeam won = living.get(0);
+
+                    Bukkit.broadcastMessage(won.getTeamName() + "が勝利"); //TODO 翻訳可能なメッセージ化
+                } else { // ではない (0 ~ (Integer.MIN_VALUE)) なら
+                    Bukkit.broadcastMessage("すべてのチームのネクサスが破壊されたため引き分け的ななにか"); //TODO 翻訳可能なメッセージ化
+                }
+
+                setTimer(ArenaState.GAME_OVER.nextPhaseIn());
+                setState(ArenaState.GAME_OVER);
+            }
+        }
     }
 
     @Override
