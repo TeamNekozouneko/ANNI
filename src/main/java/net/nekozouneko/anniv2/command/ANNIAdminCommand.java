@@ -1,10 +1,7 @@
 package net.nekozouneko.anniv2.command;
 
 import net.nekozouneko.anniv2.ANNIPlugin;
-import net.nekozouneko.anniv2.command.subcommand.admin.CreateMapSubCommand;
-import net.nekozouneko.anniv2.command.subcommand.admin.DebugSubCommand;
-import net.nekozouneko.anniv2.command.subcommand.admin.MapSubCommand;
-import net.nekozouneko.anniv2.command.subcommand.admin.SetLobbySubCommand;
+import net.nekozouneko.anniv2.command.subcommand.admin.*;
 import net.nekozouneko.anniv2.util.CmdUtil;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -21,6 +18,7 @@ public class ANNIAdminCommand implements CommandExecutor, TabCompleter {
     private final ASubCommand mapSubCommand = new MapSubCommand();
     private final ASubCommand createMapSubCommand = new CreateMapSubCommand();
     private final ASubCommand setLobbySubCommand = new SetLobbySubCommand();
+    private final ASubCommand arenaSubCommand = new ArenaSubCommand();
 
     private final Map<String, ASubCommand> subcommands = new HashMap<String, ASubCommand>() {
         {
@@ -28,6 +26,7 @@ public class ANNIAdminCommand implements CommandExecutor, TabCompleter {
             put("map", mapSubCommand);
             put("createMap", createMapSubCommand);
             put("setlobby", setLobbySubCommand);
+            put("arena", arenaSubCommand);
         }
     };
 
