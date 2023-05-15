@@ -51,7 +51,10 @@ public class BlockBreakListener implements Listener {
                 if (e.getBlock().getLocation().equals(loc)) {
                     e.setDropItems(false);
                     e.setExpToDrop(0);
-                    if (current.isNexusLost(ent.getKey())) e.setCancelled(true);
+                    if (current.isNexusLost(ent.getKey())) {
+                        e.setCancelled(true);
+                        return;
+                    }
 
                     // 破壊しようとしてるのは自チームかどうか
                     if (current.getTeamByPlayer(e.getPlayer()).equals(ent.getKey())) {
