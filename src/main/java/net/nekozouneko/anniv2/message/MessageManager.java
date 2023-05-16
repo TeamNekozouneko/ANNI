@@ -28,6 +28,7 @@ public class MessageManager {
         if (args != null && args.length != 0) {
             for (int i = 0; i < args.length; i++) {
                 Object arg = args[i];
+                if (arg == null) continue;
 
                 if (arg instanceof Integer) {
                     int numb = (int) arg;
