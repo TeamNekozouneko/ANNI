@@ -9,9 +9,9 @@ public enum ArenaState {
     PHASE_FOUR(4, "bossbar.timer.state.4", 2, 600, PHASE_FIVE),
     PHASE_THREE(3, "bossbar.timer.state.3", 1, 600, PHASE_FOUR),
     PHASE_TWO(2, "bossbar.timer.state.2", 1, 600, PHASE_THREE),
-    PHASE_ONE(1, "bossbar.timer.state.1", 0, 600, PHASE_TWO),
+    PHASE_ONE(1, "bossbar.timer.state.1", null, 600, PHASE_TWO),
 
-    GAME_OVER(0, "bossbar.timer.state.restarting", 0, 30, null),
+    GAME_OVER(0, "bossbar.timer.state.restarting", null, 30, null),
 
     STOPPED(-3, null, null, 0, null);
 
@@ -41,8 +41,8 @@ public enum ArenaState {
         return nexusDamage != null;
     }
 
-    public Integer getNexusDamage() {
-        return nexusDamage;
+    public int getNexusDamage() {
+        return nexusDamage != null ? nexusDamage : 0;
     }
 
     public long nextPhaseIn() {
