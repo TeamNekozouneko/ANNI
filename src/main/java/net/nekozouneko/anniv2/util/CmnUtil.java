@@ -1,13 +1,9 @@
 package net.nekozouneko.anniv2.util;
 
 import com.google.common.base.Preconditions;
-import net.nekozouneko.commons.lang.collect.Collections3;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.scoreboard.Team;
-
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
 
 public final class CmnUtil {
 
@@ -44,38 +40,6 @@ public final class CmnUtil {
         return player.getScoreboard().getPlayerTeam(player);
     }
 
-    public static void assignAtEquality(Set<Player> players, Set<Team> teams, boolean allowReplaceCurrTeam) {
-        Preconditions.checkArgument(!players.isEmpty(), "Player Set is empty");
-        Preconditions.checkArgument(!teams.isEmpty(), "Teams Set is empty");
-
-        players.stream() // もしplayerがチームに入ってないもしくはteamsにないチームに参加しているならtrue (allowReplaceCurrTeamがtrueなら全部許可)
-                .filter(player -> {
-                    Team t = getJoinedTeam(player);
-                    return (t == null || !teams.contains(t)) || allowReplaceCurrTeam;
-                })
-                .forEach(player -> {
-                    Map<Team, Integer> teamSize = new HashMap<>();
-                    teams.forEach(team -> teamSize.put(team, team.getSize()));
-
-                    if ( // 全部の値が一緒なら
-                            Collections3.allValueEquals(
-                                    teamSize.values(),
-                                    teamSize.values().iterator().next() // チーム人数リストの最初の要素
-                            )
-                    ) teams.iterator().next().addPlayer(player); // 最初の要素 (チーム)に参加させる
-                    else { // 一緒じゃなければ均等に分散させる
-                        Map.Entry<Team, Integer> minTeam = null; // 人数が少ないチーム
-
-                        for (Map.Entry<Team, Integer> entry : teamSize.entrySet()) {
-                            if (minTeam == null || minTeam.getValue() > entry.getValue())
-                                minTeam = entry; // minTeamがnullもしくはminTeamの人数より少なければentryに置き換える
-                        }
-
-                        minTeam.getKey().addPlayer(player);
-                    }
-                });
-    }
-
     public static double bossBarProgress(double max, double val) {
         Preconditions.checkArgument(max >= 0, "max is negative value");
         double prg = val / max;
@@ -84,6 +48,12 @@ public final class CmnUtil {
         if (prg < 0) prg = 0;
 
         return prg;
+    }
+
+    public static void giveOrDrop(Player player, ItemStack... items) {
+        player.getInventory().addItem(items).values().forEach(item ->
+            player.getWorld().dropItemNaturally(player.getLocation(), item)
+        );
     }
 
 }

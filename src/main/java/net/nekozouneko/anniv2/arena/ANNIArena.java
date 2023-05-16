@@ -19,6 +19,7 @@ import net.nekozouneko.anniv2.map.ANNIMap;
 import net.nekozouneko.anniv2.message.MessageManager;
 import net.nekozouneko.anniv2.util.CmnUtil;
 import net.nekozouneko.anniv2.util.FileUtil;
+import net.nekozouneko.commons.lang.collect.Collections3;
 import net.nekozouneko.commons.spigot.world.Worlds;
 import org.bukkit.*;
 import org.bukkit.block.Block;
@@ -40,6 +41,7 @@ public class ANNIArena extends BukkitRunnable {
     private static final Random rand = new Random();
 
     private final ANNIPlugin plugin;
+    private final MessageManager mm;
     private final String id;
 
     private final Set<Player> players = new HashSet<>();
@@ -64,6 +66,7 @@ public class ANNIArena extends BukkitRunnable {
         Preconditions.checkArgument(id.length() < 9, "Id length limit is 8! (" + id.length() + ")");
 
         this.plugin = plugin;
+        this.mm = plugin.getMessageManager();
         this.id = id;
 
         this.bb = Bukkit.createBossBar(
@@ -93,6 +96,11 @@ public class ANNIArena extends BukkitRunnable {
 
         players.add(player);
         player.setScoreboard(plugin.getPluginBoard());
+
+        if (getState().getId() > 0) {
+            assignAtEquality(player);
+            player.teleport(map.getSpawnOrDefault(getTeamByPlayer(player)).toLocation(copy));
+        }
     }
 
     public void leave(Player player) {
@@ -114,7 +122,6 @@ public class ANNIArena extends BukkitRunnable {
 
     private void createTeams() {
         final Scoreboard sb = plugin.getPluginBoard();
-        final MessageManager mm = plugin.getMessageManager();
 
         Team r = sb.registerNewTeam(id + "-red");
         Team b = sb.registerNewTeam(id + "-blue");
@@ -273,10 +280,12 @@ public class ANNIArena extends BukkitRunnable {
             }
 
             if (isNexusLost(team)) {
-                Bukkit.broadcastMessage(team.name() + " was nexus lost");
+                if (player != null)
+                    broadcast(mm.build("notify.lost_nexus_by_player", team.getTeamName(), player.getName()));
+                else broadcast(mm.build("notify.lost_nexus_by_player", team.getTeamName()));
             }
         }
-        else throw new IllegalStateException("Team " + team.name() + " is nexus lost.");
+        else throw new IllegalStateException("Team " + team.name() + " is already nexus lost.");
     }
 
     public boolean isNexusLost(ANNITeam team) {
@@ -344,7 +353,7 @@ public class ANNIArena extends BukkitRunnable {
                         else bl.setType(Material.END_STONE);
                     });
 
-            CmnUtil.assignAtEquality(players, getTeams().values(), true);
+            players.forEach(this::assignAtEquality);
             nexus.clear();
             getTeams().forEach((at, team) -> {
                 setNexusHealth(at, 100);
@@ -394,6 +403,14 @@ public class ANNIArena extends BukkitRunnable {
         tickTimer();
 
         if (state.getId() > 0) {
+            // プレイヤー数が0のチームを退場させる
+            getTeams().keySet().forEach(at -> {
+                if (!isNexusLost(at) && getTeamPlayers(at).isEmpty()) {
+                    nexus.put(at, null);
+                    broadcast(plugin.getMessageManager().build("notify.no_player_team", at.getTeamName()));
+                }
+            });
+
             // ネクサスを失っていないチーム数を調べる
             List<ANNITeam> living = getTeams().keySet().stream()
                     .filter(team -> !isNexusLost(team))
@@ -405,9 +422,9 @@ public class ANNIArena extends BukkitRunnable {
                 if (living.size() == 1) {
                     ANNITeam won = living.get(0);
 
-                    Bukkit.broadcastMessage(won.getTeamName() + "が勝利"); //TODO 翻訳可能なメッセージ化
+                    broadcast(won.getTeamName() + "が勝利"); //TODO 翻訳可能なメッセージ化
                 } else { // ではない (0 ~ (Integer.MIN_VALUE)) なら
-                    Bukkit.broadcastMessage("すべてのチームのネクサスが破壊されたため引き分け的ななにか"); //TODO 翻訳可能なメッセージ化
+                    broadcast("すべてのチームのネクサスが破壊されたため引き分け的ななにか"); //TODO 翻訳可能なメッセージ化
                 }
 
                 setTimer(ArenaState.GAME_OVER.nextPhaseIn());
@@ -428,7 +445,6 @@ public class ANNIArena extends BukkitRunnable {
     }
 
     private void updateBossBar() {
-        MessageManager mm = plugin.getMessageManager();
         players.forEach(bb::addPlayer);
 
         switch (state) {
@@ -461,7 +477,6 @@ public class ANNIArena extends BukkitRunnable {
     }
 
     private void updateScoreboard() {
-        MessageManager mm = plugin.getMessageManager();
         BoardManager bm = plugin.getBoardManager();
 
         for (Player pl : players) {
@@ -474,7 +489,7 @@ public class ANNIArena extends BukkitRunnable {
                 case STARTING: {
                     String mapname = map != null ? map.getName() : mm.build("scoreboard.waiting.5.vote");
                     String news = state == ArenaState.STARTING ?
-                            mm.build("scoreboard.waiting.2.starting") :
+                            mm.build("scoreboard.waiting.2.starting", CmnUtil.secminTimer(getTimer())) :
                             mm.build("scoreboard.waiting.2.more_player", (
                                     enabledTeams.entrySet().stream()
                                             .filter(Map.Entry::getValue)
@@ -522,14 +537,12 @@ public class ANNIArena extends BukkitRunnable {
 
     private String sbNexusHealth(ANNITeam team) {
         Integer nh = getNexusHealth(team);
-        MessageManager mm = plugin.getMessageManager();
         return nh != null ? // ネクサスの体力が0なら
                 String.format(mm.build("nexus.health.format"), nh) // フォーマット適応済みの体力
                 : mm.build("nexus.health.none"); // 体力なしのメッセージ
     }
 
     private String sbNexusState(ANNITeam team) {
-        MessageManager mm = plugin.getMessageManager();
         return isNexusLost(team) ? mm.build("nexus.status.lost") : mm.build("nexus.status.active");
     }
 
@@ -590,6 +603,32 @@ public class ANNIArena extends BukkitRunnable {
                     setState(ArenaState.WAITING);
                 }
                 break;
+        }
+    }
+
+    private void assignAtEquality(Player player) {
+        if (player.getScoreboard() != plugin.getPluginBoard())
+            player.setScoreboard(plugin.getPluginBoard());
+        if (CmnUtil.getJoinedTeam(player) != null) return;
+
+        Map<Team, Integer> teamSize = new HashMap<>();
+        getTeams().values().forEach(team -> teamSize.put(team, team.getSize()));
+
+        if ( // 全部の値が一緒なら
+                Collections3.allValueEquals(
+                        teamSize.values(),
+                        teamSize.values().iterator().next() // チーム人数リストの最初の要素
+                )
+        ) teams.values().iterator().next().addPlayer(player); // 最初の要素 (チーム)に参加させる
+        else { // 一緒じゃなければ均等に分散させる
+            Map.Entry<Team, Integer> minTeam = null; // 人数が少ないチーム
+
+            for (Map.Entry<Team, Integer> entry : teamSize.entrySet()) {
+                if (minTeam == null || minTeam.getValue() > entry.getValue())
+                    minTeam = entry; // minTeamがnullもしくはminTeamの人数より少なければentryに置き換える
+            }
+
+            minTeam.getKey().addPlayer(player);
         }
     }
 }
