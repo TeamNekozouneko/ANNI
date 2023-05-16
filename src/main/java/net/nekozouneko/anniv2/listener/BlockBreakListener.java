@@ -5,15 +5,20 @@ import net.nekozouneko.anniv2.ANNIPlugin;
 import net.nekozouneko.anniv2.arena.ANNIArena;
 import net.nekozouneko.anniv2.arena.team.ANNITeam;
 import net.nekozouneko.anniv2.map.Nexus;
+import net.nekozouneko.anniv2.util.CmnUtil;
 import org.bukkit.Bukkit;
+import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.block.data.BlockData;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.inventory.ItemStack;
 
+import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -22,9 +27,22 @@ import java.util.function.Consumer;
 public class BlockBreakListener implements Listener {
 
     private static final Map<UUID, Consumer<Block>> queuedOnDamage = new HashMap<>();
+    private static final Map<Material, Long> cooldown = new EnumMap<>(Material.class);
 
     public static Map<UUID, Consumer<Block>> getQueuedOnDamageMap() {
         return queuedOnDamage;
+    }
+
+    static {
+        cooldown.put(Material.COAL_ORE, 100L);
+        cooldown.put(Material.DIAMOND_ORE, 600L);
+        cooldown.put(Material.EMERALD_ORE, 600L);
+        cooldown.put(Material.GOLD_ORE, 400L);
+        cooldown.put(Material.IRON_ORE, 200L);
+        cooldown.put(Material.LAPIS_ORE, 200L);
+        cooldown.put(Material.NETHER_GOLD_ORE, 400L);
+        cooldown.put(Material.NETHER_QUARTZ_ORE, 200L);
+        cooldown.put(Material.REDSTONE_ORE, 200L);
     }
 
     @EventHandler(priority = EventPriority.HIGH)
@@ -80,18 +98,32 @@ public class BlockBreakListener implements Listener {
                 }
             }
 
-            switch (e.getBlock().getType()) {
-                case COAL_ORE:
-                case DIAMOND_ORE:
-                case EMERALD_ORE:
-                case GOLD_ORE:
-                case IRON_ORE:
-                case LAPIS_ORE:
-                case NETHER_GOLD_ORE:
-                case NETHER_QUARTZ_ORE:
-                case REDSTONE_ORE: {
-                    break;
+            if (cooldown.containsKey(e.getBlock().getType()) && e.getPlayer().getGameMode() != GameMode.CREATIVE) {
+                ItemStack mainHand = e.getPlayer().getInventory().getItemInMainHand();
+                if (e.getBlock().getDrops(mainHand).isEmpty()) {
+                    e.setCancelled(true);
+                    return;
                 }
+                CmnUtil.giveOrDrop(
+                        e.getPlayer(),
+                        e.getBlock().getDrops(mainHand).toArray(new ItemStack[0])
+                );
+
+                e.setDropItems(false);
+                e.getPlayer().giveExp(e.getExpToDrop());
+                e.setExpToDrop(0);
+
+                BlockData cloned = e.getBlock().getBlockData().clone(); // ブロックデータを複製
+                Material typ = e.getBlock().getType();
+                Bukkit.getScheduler().runTask(plugin, () -> {
+                    e.getBlock().setType(Material.COBBLESTONE);
+                    Bukkit.getScheduler().runTaskLater(plugin, () -> {
+                        e.getBlock().setType(typ); // クールダウン終了後再生成
+                        e.getBlock().setBlockData(cloned); // 複製したデータに変更
+                    }, cooldown.get(typ) - 1);
+                });
+
+                return;
             }
         }
     }

@@ -40,7 +40,7 @@ public final class BlockPlaceListener implements Listener {
         Player p = e.getPlayer();
         ANNIArena current = plugin.getCurrentGame();
 
-        if (current.isJoined(p)) {
+        if (current.getState().getId() > 0 && current.isJoined(p)) {
             // ゲーム中に置かないでほしいブロックをおけなくする
             if (p.getGameMode() != GameMode.CREATIVE && BLACKLIST.contains(e.getItemInHand().getType()))
                 e.setCancelled(true);
