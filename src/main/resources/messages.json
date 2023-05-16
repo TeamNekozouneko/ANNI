@@ -117,5 +117,10 @@
   "kill.void": "{0}&r &6&l<<&r &7&o(奈落)",
   "kill.fall": "{0}&r &6&l<<&r &7&o(落下)",
   "kill.mob": "{0}&r &6&l<<&r &7&o(mob)",
-  "kill.game": "{0}&r &6&l<<&r &7&o(ゲームの仕様)"
+  "kill.game": "{0}&r &6&l<<&r &7&o(ゲームの仕様)",
+
+  "notify.removed_invisibility": "&c透明化がダメージにより解除されました。",
+  "notify.no_player_team": "&c「&r{0}&c」にオンラインのプレイヤーがいないため自動的に敗退しました。",
+  "notify.lost_nexus_by_player": "「{0}」のネクサスは、{1} により失われました！",
+  "notify.lost_nexus": "「{0}」のネクサスは失われました！"
 }
