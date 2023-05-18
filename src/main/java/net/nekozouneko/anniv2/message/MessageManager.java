@@ -4,7 +4,6 @@ import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.math.BlockVector3;
 import net.nekozouneko.anniv2.map.SpawnLocation;
 import net.nekozouneko.anniv2.util.CmnUtil;
-
 import org.bukkit.Location;
 
 import java.util.*;
@@ -20,15 +19,15 @@ public class MessageManager {
     }
 
     public String build(String key, Object... args) {
-        String s = map.get(key);
-
-        if (s == null)
+        if (!map.containsKey(key))
             throw new RuntimeException("Message of key '" + key + "' is not defined.");
+
+        String s = map.get(key);
 
         if (args != null && args.length != 0) {
             for (int i = 0; i < args.length; i++) {
                 Object arg = args[i];
-                if (arg == null) continue;
+                if (arg == null) arg = "";
 
                 if (arg instanceof Integer) {
                     int numb = (int) arg;
@@ -44,7 +43,7 @@ public class MessageManager {
                         s = s.replace(format1, args2[numb]);
                     }
                 }
-                else s = s.replace("{" + i + "}", Objects.toString(arg));
+                else s = s != null ? s.replace("{" + i + "}", Objects.toString(arg)) : "";
             }
         }
 
@@ -55,7 +54,7 @@ public class MessageManager {
         List<String> l = new ArrayList<>();
 
         for (int i = 0; true; i++) {
-            if (map.get(key + "." + i) != null) {
+            if (map.containsKey(key + "." + i)) {
                 l.add(build(key + "." + i, args));
             }
             else break;
@@ -64,8 +63,28 @@ public class MessageManager {
         return l;
     }
 
+    public String[] buildArray(String key, Object... args) {
+        return buildList(key, args).toArray(new String[0]);
+    }
+
     public String buildLines(String key, Object... args) {
         return String.join("\n", buildList(key, args));
+    }
+
+    public String[] buildBigChar(char chara, String color, Object... args) {
+        List<Object> l = new LinkedList<>();
+        for (Object obj : args) {
+            if (obj instanceof String) {
+                String s = (String) obj;
+                l.addAll(Arrays.asList(s.split("\n")));
+            }
+            else l.add(obj);
+        }
+        args = l.toArray();
+
+        return buildList("big." + chara, args).stream()
+                .map(str -> str.replace("&-", (color != null || !color.isEmpty()) ? "§" + color : ""))
+                .toArray(String[]::new);
     }
 
     public String blockLocationFormat(BlockVector3 loc) {
