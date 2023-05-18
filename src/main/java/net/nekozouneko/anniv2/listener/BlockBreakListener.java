@@ -104,6 +104,12 @@ public class BlockBreakListener implements Listener {
                     e.setCancelled(true);
                     return;
                 }
+                if ((e.getBlock().getType() == Material.DIAMOND_ORE || e.getBlock().getType() == Material.EMERALD_ORE) && current.getState().getId() >= 3) {
+                    e.getPlayer().sendMessage(ANNIPlugin.getInstance().getMessageManager().build("notify.cant_mine_now", e.getBlock().getTranslationKey()));
+                    e.setCancelled(true);
+                    return;
+                }
+
                 CmnUtil.giveOrDrop(
                         e.getPlayer(),
                         e.getBlock().getDrops(mainHand).toArray(new ItemStack[0])
