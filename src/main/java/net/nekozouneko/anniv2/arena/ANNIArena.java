@@ -100,6 +100,10 @@ public class ANNIArena extends BukkitRunnable {
         if (getState().getId() > 0) {
             assignAtEquality(player);
             player.teleport(map.getSpawnOrDefault(getTeamByPlayer(player)).toLocation(copy));
+            ANNITeam at = getTeamByPlayer(player);
+            player.sendMessage(mm.buildBigChar(CmnUtil.numberToChar(state.getId()), Character.toString(at.getCCChar()),
+                    (Object[]) mm.buildArray("notify.big.mid_join", at.getTeamName())
+            ));
         }
     }
 
@@ -130,25 +134,25 @@ public class ANNIArena extends BukkitRunnable {
 
         r.setDisplayName(mm.build("team.red.display"));
         r.setPrefix(mm.build("team.red.prefix"));
-        r.setColor(ChatColor.RED);
+        r.setColor(org.bukkit.ChatColor.RED);
         r.setAllowFriendlyFire(false);
         r.setCanSeeFriendlyInvisibles(true);
 
         b.setDisplayName(mm.build("team.blue.display"));
         b.setPrefix(mm.build("team.blue.prefix"));
-        b.setColor(ChatColor.BLUE);
+        b.setColor(org.bukkit.ChatColor.BLUE);
         b.setAllowFriendlyFire(false);
         b.setCanSeeFriendlyInvisibles(true);
 
         g.setDisplayName(mm.build("team.green.display"));
         g.setPrefix(mm.build("team.green.prefix"));
-        g.setColor(ChatColor.GREEN);
+        g.setColor(org.bukkit.ChatColor.GREEN);
         g.setAllowFriendlyFire(false);
         g.setCanSeeFriendlyInvisibles(true);
 
         y.setDisplayName(mm.build("team.yellow.display"));
         y.setPrefix(mm.build("team.yellow.prefix"));
-        y.setColor(ChatColor.YELLOW);
+        y.setColor(org.bukkit.ChatColor.YELLOW);
         y.setAllowFriendlyFire(false);
         y.setCanSeeFriendlyInvisibles(true);
 
@@ -362,6 +366,9 @@ public class ANNIArena extends BukkitRunnable {
                         .filter(OfflinePlayer::isOnline)
                         .map(offp -> Bukkit.getPlayer(offp.getUniqueId()))
                         .forEach(p -> p.teleport(sl));
+                for (String s : mm.buildBigChar('1', Character.toString(at.getCCChar()),
+                        (Object[]) mm.buildArray("notify.big.started", at.getTeamName())
+                )) broadcast(s, at);
             });
 
             setState(ArenaState.PHASE_ONE);
@@ -456,7 +463,7 @@ public class ANNIArena extends BukkitRunnable {
                 bb.setVisible(true);
                 bb.setTitle(
                         mm.build("bossbar.timer",
-                                mm.build(state.getTimerStateKey()),
+                                mm.build(state.getName()),
                                 CmnUtil.secminTimer(timer)
                         )
                 );
@@ -465,7 +472,7 @@ public class ANNIArena extends BukkitRunnable {
             }
             case PHASE_FIVE: {
                 bb.setVisible(true);
-                bb.setTitle(mm.build(state.getTimerStateKey()));
+                bb.setTitle(mm.build(state.getName()));
                 bb.setProgress(1);
                 break;
             }
@@ -586,6 +593,19 @@ public class ANNIArena extends BukkitRunnable {
             case PHASE_FOUR: {
                 enableTimer();
                 if (timer <= 0) {
+                    getTeams().forEach((at, t) -> {
+                        for (String s : mm.buildBigChar(
+                                CmnUtil.numberToChar(state.nextPhase().getId()),
+                                Character.toString(at.getCCChar()),
+                                (Object[]) mm.buildArray("notify.big.next_phase",
+                                    mm.build(state.nextPhase().getName()),
+                                    mm.build(state.nextPhase().getDescription())
+                                )
+                        )) {
+                            broadcast(s, at);
+                        }
+                    });
+                    players.forEach(p -> p.playSound(p.getLocation(), Sound.ENTITY_WITHER_SPAWN, 1, 2));
                     setTimer(state.nextPhaseIn());
                     setState(state.nextPhase());
                 }
