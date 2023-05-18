@@ -4,6 +4,10 @@ import com.google.common.base.Preconditions;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scoreboard.Team;
+import org.jetbrains.annotations.Range;
+
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public final class CmnUtil {
 
@@ -54,6 +58,18 @@ public final class CmnUtil {
         player.getInventory().addItem(items).values().forEach(item ->
             player.getWorld().dropItemNaturally(player.getLocation(), item)
         );
+    }
+
+    public static char numberToChar(@Range(from = 0, to = 9) int i) {
+        return (char) (i + 0x30);
+    }
+
+    public static int count(String s, String regex) {
+        Matcher m = Pattern.compile(regex).matcher(s);
+        int i = 0;
+        while (m.find()) i++;
+
+        return i;
     }
 
 }
