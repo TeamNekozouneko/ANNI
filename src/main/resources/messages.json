@@ -18,6 +18,19 @@
   "scoreboard.waiting.2.starting": "開始まであと {0}",
   "scoreboard.waiting.5.vote": "&o投票中 (/vote <map>)",
 
+  "scoreboard.waiting_voting.0": "&8{0}",
+  "scoreboard.waiting_voting.1": "",
+  "scoreboard.waiting_voting.2": "{1}",
+  "scoreboard.waiting_voting.3": "",
+  "scoreboard.waiting_voting.4": "プレイヤー: {2}",
+  "scoreboard.waiting_voting.5": "マップ: '/vote <map>' で投票！",
+  "scoreboard.waiting_voting.6": "",
+  "scoreboard.waiting_voting.7": "{3}",
+  "scoreboard.waiting_voting.8": "{4}",
+  "scoreboard.waiting_voting.9": "{5}",
+  "scoreboard.waiting_voting.10": "",
+  "scoreboard.waiting_voting.11": "&9www.nekozouneko.net",
+
   "scoreboard.playing.0": "&8{0}",
   "scoreboard.playing.1": "",
   "scoreboard.playing.2": "&7[&r{1}&7] &c赤チーム&f: {5}",
@@ -84,6 +97,7 @@
   "command.err.ioe": "&cファイルの入出力にエラーが発生しました。コンソールを確認してください。",
   "command.err.subcommand_not_found": "&c「{0}」というサブコマンドは見つかりませんでした。",
   "command.err.player_only": "&cプレイヤーとして実行してください。",
+  "command.err.cant_vote_now": "&c今は投票できません。",
 
   "command.usage": "&c使用方法: {0}",
 
@@ -106,6 +120,8 @@
 
   "command.arena.disabled_team": "&a「{0}」というチームを無効化しました。",
   "command.arena.enabled_team": "&a「{0}」というチームを有効化しました。",
+
+  "command.vote.voted": "&a「{0}」に投票しました。",
 
   "xyz": "{0} / {1} / {2}",
   "xyz.format": "%.1f",
