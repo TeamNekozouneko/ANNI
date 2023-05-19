@@ -10,10 +10,7 @@ import java.io.IOException;
 import java.io.Reader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 public class MapManager {
 
@@ -62,8 +59,8 @@ public class MapManager {
         return maps.get(id);
     }
 
-    public Collection<ANNIMap> getMaps() {
-        return Collections.unmodifiableCollection(maps.values());
+    public List<ANNIMap> getMaps() {
+        return Collections.unmodifiableList(new ArrayList<>(maps.values()));
     }
 
 }
