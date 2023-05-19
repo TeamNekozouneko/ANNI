@@ -4,6 +4,7 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.EnumHashBiMap;
 import com.google.common.collect.HashBiMap;
+import com.google.common.collect.Multimap;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.protection.managers.RegionManager;
@@ -19,9 +20,11 @@ import net.nekozouneko.anniv2.map.ANNIMap;
 import net.nekozouneko.anniv2.message.MessageManager;
 import net.nekozouneko.anniv2.util.CmnUtil;
 import net.nekozouneko.anniv2.util.FileUtil;
+import net.nekozouneko.anniv2.vote.VoteManager;
 import net.nekozouneko.commons.lang.collect.Collections3;
 import net.nekozouneko.commons.spigot.world.Worlds;
 import org.bukkit.*;
+import org.bukkit.attribute.Attribute;
 import org.bukkit.block.Block;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
@@ -319,9 +322,12 @@ public class ANNIArena extends BukkitRunnable {
 
     public boolean start() {
         if (plugin.getLobby() == null) return false;
+        if (plugin.getMapManager().getMaps().isEmpty()) return false;
 
         try {
-            if (map == null) map = plugin.getMapManager().getMaps().iterator().next();
+            if (map == null)
+                map = plugin.getMapManager().getMaps()
+                        .get(rand.nextInt(plugin.getMapManager().getMaps().size()));
 
             copy = Worlds.copyWorld(map.getBukkitWorld(), id + "-anni");
             if (copy == null) return false;
@@ -365,7 +371,10 @@ public class ANNIArena extends BukkitRunnable {
                 team.getPlayers().stream()
                         .filter(OfflinePlayer::isOnline)
                         .map(offp -> Bukkit.getPlayer(offp.getUniqueId()))
-                        .forEach(p -> p.teleport(sl));
+                        .forEach(p -> {
+                            p.teleport(sl);
+                            initPlayer(p);
+                        });
                 for (String s : mm.buildBigChar('1', Character.toString(at.getCCChar()),
                         (Object[]) mm.buildArray("notify.big.started", at.getTeamName())
                 )) broadcast(s, at);
@@ -405,6 +414,32 @@ public class ANNIArena extends BukkitRunnable {
 
     @Override
     public void run() {
+        if (state == ArenaState.WAITING || state == ArenaState.STARTING) {
+            if (map == null) {
+                if (state == ArenaState.STARTING && getTimer() <= 10) {
+                    if (VoteManager.isNowVoting(id)) {
+                        List<Map.Entry<ANNIMap, Integer>> l = getMapRanking(VoteManager.endVote(id));
+                        if (l.isEmpty() || Collections3.allValueEquals(l, l.get(0))) {
+                            map = plugin.getMapManager().getMaps().get(rand.nextInt(plugin.getMapManager().getMaps().size()));
+                        }
+                        else map = l.get(0).getKey();
+                    }
+                }
+                else {
+                    Set<Object> choices = plugin.getMapManager().getMaps().stream()
+                            .map(m -> (Object) m.getId())
+                            .collect(Collectors.toSet());
+
+                    if (VoteManager.isNowVoting(id)) {
+                        VoteManager.updateChoices(
+                                id, choices
+                        );
+                    } else VoteManager.startVote(id, choices);
+                }
+            }
+            else if (VoteManager.isNowVoting(id)) VoteManager.endVote(id);
+        }
+
         updateBossBar();
         updateScoreboard();
         tickTimer();
@@ -494,7 +529,6 @@ public class ANNIArena extends BukkitRunnable {
             switch (state) {
                 case WAITING:
                 case STARTING: {
-                    String mapname = map != null ? map.getName() : mm.build("scoreboard.waiting.5.vote");
                     String news = state == ArenaState.STARTING ?
                             mm.build("scoreboard.waiting.2.starting", CmnUtil.secminTimer(getTimer())) :
                             mm.build("scoreboard.waiting.2.more_player", (
@@ -504,12 +538,25 @@ public class ANNIArena extends BukkitRunnable {
                                             - players.size())
                             );
 
-                    fb.updateLines(mm.buildList("scoreboard.waiting",
-                            df.format(Calendar.getInstance().getTime()),
-                            news,
-                            players.size() + " / 120",
-                            mapname
-                    ));
+                    if (map != null) {
+                        fb.updateLines(mm.buildList("scoreboard.waiting",
+                                df.format(Calendar.getInstance().getTime()),
+                                news,
+                                players.size() + " / 120",
+                                map.getName()
+                        ));
+                    }
+                    else {
+                        List<Map.Entry<ANNIMap, Integer>> nowRes = getMapRanking(VoteManager.getResult(id));
+                        fb.updateLines(mm.buildList("scoreboard.waiting_voting",
+                                df.format(Calendar.getInstance().getTime()),
+                                news,
+                                players.size() + " / 120",
+                                nowRes.size() > 0 ? nowRes.get(0).getKey().getName() + " - " + nowRes.get(0).getValue(): "",
+                                nowRes.size() > 1 ? nowRes.get(1).getKey().getName() + " - " + nowRes.get(1).getValue(): "",
+                                nowRes.size() > 2 ? nowRes.get(2).getKey().getName() + " - " + nowRes.get(2).getValue(): ""
+                        ));
+                    }
                     break;
                 }
                 case PHASE_ONE:
@@ -650,5 +697,30 @@ public class ANNIArena extends BukkitRunnable {
 
             minTeam.getKey().addPlayer(player);
         }
+    }
+
+    private List<Map.Entry<ANNIMap, Integer>> getMapRanking(Multimap<Object, OfflinePlayer> multimap) {
+        Map<ANNIMap, Integer> rank = new HashMap<>();
+        multimap.keySet().forEach((obj) -> {
+            if (!(obj instanceof String)) return;
+            ANNIMap ma = plugin.getMapManager().getMap((String) obj);
+            if (ma != null)
+                rank.put(ma, multimap.get(obj).size());
+        });
+
+
+        LinkedList<Map.Entry<ANNIMap, Integer>> ll = new LinkedList<>(rank.entrySet());
+        ll.sort(Map.Entry.comparingByValue(Comparator.reverseOrder()));
+
+        return ll;
+    }
+
+    private void initPlayer(Player player) {
+        player.setHealth(player.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue());
+        player.setFoodLevel(20);
+        player.getInventory().clear();
+        player.getEnderChest().clear();
+        player.setLevel(0);
+        player.setExp(0);
     }
 }
