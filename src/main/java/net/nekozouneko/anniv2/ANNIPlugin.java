@@ -5,6 +5,7 @@ import net.nekozouneko.anniv2.arena.ANNIArena;
 import net.nekozouneko.anniv2.board.BoardManager;
 import net.nekozouneko.anniv2.command.ANNIAdminCommand;
 import net.nekozouneko.anniv2.command.ANNICommand;
+import net.nekozouneko.anniv2.command.VoteCommand;
 import net.nekozouneko.anniv2.listener.*;
 import net.nekozouneko.anniv2.map.MapManager;
 import net.nekozouneko.anniv2.message.MessageManager;
@@ -111,6 +112,7 @@ public final class ANNIPlugin extends JavaPlugin {
 
         getCommand("anni-admin").setExecutor(new ANNIAdminCommand());
         getCommand("anni").setExecutor(new ANNICommand());
+        getCommand("vote").setExecutor(new VoteCommand());
     }
 
     @Override

@@ -18,3 +18,7 @@ commands:
   anni:
     description: "ANNI command"
     permission: anniv2.command.anni
+  vote:
+    description: "Vote command"
+    permission: anniv2.command.vote
+    usage: "/<command> <arg>"
