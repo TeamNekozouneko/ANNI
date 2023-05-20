@@ -7,6 +7,7 @@ import com.google.common.collect.Multimap;
 import org.bukkit.OfflinePlayer;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -32,6 +33,7 @@ public class VoteManager {
                 throw new IllegalArgumentException(obj + " is not contain choices");
         }
 
+        new HashSet<>(vote.get(id).keySet()).forEach(obj1 -> vote.get(id).remove(obj1, player));
         vote.get(id).put(obj, player);
     }
 
@@ -39,6 +41,14 @@ public class VoteManager {
         Preconditions.checkArgument(id != null);
 
         VoteManager.choices.put(id, choices);
+    }
+
+    public static boolean hasChoices(String id) {
+        return isNowVoting(id) && choices.get(id) != null && !choices.get(id).isEmpty();
+    }
+
+    public static Set<Object> getChoices(String id) {
+        return choices.get(id);
     }
 
     public static Multimap<Object, OfflinePlayer> endVote(String id) {
