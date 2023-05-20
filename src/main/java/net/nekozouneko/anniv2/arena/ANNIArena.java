@@ -274,6 +274,7 @@ public class ANNIArena extends BukkitRunnable {
     }
 
     public void damageNexusHealth(ANNITeam team, int damage, Player player) {
+        if (damage <= 0) return;
         if (!isNexusLost(team)) {
             int health = nexus.get(team) - damage;
             nexus.put(team, health <= 0 ? null : health);
@@ -287,9 +288,18 @@ public class ANNIArena extends BukkitRunnable {
             }
 
             if (isNexusLost(team)) {
-                if (player != null)
-                    broadcast(mm.build("notify.lost_nexus_by_player", team.getTeamName(), player.getName()));
-                else broadcast(mm.build("notify.lost_nexus_by_player", team.getTeamName()));
+                for (String s :
+                        mm.buildBigChar(
+                                team.getBigChar(),
+                                Character.toString(getTeamByPlayer(player).getCCChar()),
+                                (Object[]) mm.buildArray("notify.big.lost_nexus",
+                                        team.getColorCode() + team.getTeamName(),
+                                        player != null ? player.getName() : "-----"
+                                )
+                        )
+                ) {
+                    broadcast(s);
+                }
             }
         }
         else throw new IllegalStateException("Team " + team.name() + " is already nexus lost.");
@@ -338,10 +348,12 @@ public class ANNIArena extends BukkitRunnable {
 
             if (copyrm != null && origrm != null) {
                 origrm.getRegions().forEach((s, pr) -> {
-                    if (pr.getType() == RegionType.GLOBAL)
-                        copyrm.getRegion(s).setFlags(pr.getFlags());
-                    else {
-                        copyrm.addRegion(pr);
+                    if (copyrm.getRegion(s) != null) {
+                        if (pr.getType() == RegionType.GLOBAL)
+                            copyrm.getRegion(s).setFlags(pr.getFlags());
+                        else {
+                            copyrm.addRegion(pr);
+                        }
                     }
                 });
                 map.getNexuses().forEach((at, nexus) -> {
@@ -400,6 +412,7 @@ public class ANNIArena extends BukkitRunnable {
             if (copy != null) {
                 FileUtil.deleteWorld(copy);
             }
+            if (VoteManager.isNowVoting(id)) VoteManager.endVote(id);
         }
         catch (IOException e) { e.printStackTrace(); }
     }
@@ -427,6 +440,7 @@ public class ANNIArena extends BukkitRunnable {
                 }
                 else {
                     Set<Object> choices = plugin.getMapManager().getMaps().stream()
+                            .filter(ANNIMap::canUseOnArena)
                             .map(m -> (Object) m.getId())
                             .collect(Collectors.toSet());
 
