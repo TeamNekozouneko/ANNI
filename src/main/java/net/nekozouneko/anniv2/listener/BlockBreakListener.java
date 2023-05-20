@@ -1,6 +1,9 @@
 package net.nekozouneko.anniv2.listener;
 
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
+import com.sk89q.worldguard.WorldGuard;
+import com.sk89q.worldguard.protection.regions.ProtectedRegion;
+import com.sk89q.worldguard.protection.regions.RegionContainer;
 import net.nekozouneko.anniv2.ANNIPlugin;
 import net.nekozouneko.anniv2.arena.ANNIArena;
 import net.nekozouneko.anniv2.arena.team.ANNITeam;
@@ -18,39 +21,49 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.EnumMap;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.function.Consumer;
 
 public class BlockBreakListener implements Listener {
 
-    private static final Map<UUID, Consumer<Block>> queuedOnDamage = new HashMap<>();
-    private static final Map<Material, Long> cooldown = new EnumMap<>(Material.class);
+    private static final Map<UUID, Consumer<Block>> QUEUED_ON_DAMAGE = new HashMap<>();
+    private static final Map<Material, Long> COOLDOWN = new EnumMap<>(Material.class);
+    private static final Map<Material, Long> NO_BLOCK_COOLDOWN = new EnumMap<>(Material.class);
+    private static final List<Material> WOODS = Arrays.asList(
+            Material.ACACIA_LOG, Material.BIRCH_LOG, Material.DARK_OAK_LOG,
+            Material.JUNGLE_LOG, Material.OAK_LOG, Material.SPRUCE_LOG,
+            Material.CRIMSON_STEM, Material.WARPED_STEM,
+            Material.STRIPPED_ACACIA_LOG, Material.STRIPPED_BIRCH_LOG,
+            Material.STRIPPED_DARK_OAK_LOG, Material.STRIPPED_JUNGLE_LOG,
+            Material.STRIPPED_OAK_LOG, Material.STRIPPED_SPRUCE_LOG,
+            Material.STRIPPED_CRIMSON_STEM, Material.STRIPPED_WARPED_STEM
+    );
 
     public static Map<UUID, Consumer<Block>> getQueuedOnDamageMap() {
-        return queuedOnDamage;
+        return QUEUED_ON_DAMAGE;
     }
 
     static {
-        cooldown.put(Material.COAL_ORE, 100L);
-        cooldown.put(Material.DIAMOND_ORE, 600L);
-        cooldown.put(Material.EMERALD_ORE, 600L);
-        cooldown.put(Material.GOLD_ORE, 400L);
-        cooldown.put(Material.IRON_ORE, 200L);
-        cooldown.put(Material.LAPIS_ORE, 200L);
-        cooldown.put(Material.NETHER_GOLD_ORE, 400L);
-        cooldown.put(Material.NETHER_QUARTZ_ORE, 200L);
-        cooldown.put(Material.REDSTONE_ORE, 200L);
+        COOLDOWN.put(Material.COAL_ORE, 100L);
+        COOLDOWN.put(Material.DIAMOND_ORE, 600L);
+        COOLDOWN.put(Material.EMERALD_ORE, 600L);
+        COOLDOWN.put(Material.GOLD_ORE, 400L);
+        COOLDOWN.put(Material.GRAVEL, 100L);
+        COOLDOWN.put(Material.IRON_ORE, 200L);
+        COOLDOWN.put(Material.LAPIS_ORE, 200L);
+        COOLDOWN.put(Material.NETHER_GOLD_ORE, 400L);
+        COOLDOWN.put(Material.NETHER_QUARTZ_ORE, 200L);
+        COOLDOWN.put(Material.REDSTONE_ORE, 200L);
+
+        NO_BLOCK_COOLDOWN.put(Material.MELON, 100L);
     }
 
     @EventHandler(priority = EventPriority.HIGH)
     public void onBreak(BlockBreakEvent e) {
-        Consumer<Block> cb = queuedOnDamage.get(e.getPlayer().getUniqueId());
+        Consumer<Block> cb = QUEUED_ON_DAMAGE.get(e.getPlayer().getUniqueId());
         if (cb != null) {
             cb.accept(e.getBlock());
-            queuedOnDamage.remove(e.getPlayer().getUniqueId());
+            QUEUED_ON_DAMAGE.remove(e.getPlayer().getUniqueId());
             e.setCancelled(true);
             return;
         }
@@ -58,8 +71,7 @@ public class BlockBreakListener implements Listener {
         ANNIPlugin plugin = ANNIPlugin.getInstance();
         ANNIArena current = plugin.getCurrentGame();
 
-        if (current.getState().getId() > 0) {
-            // ネクサス
+        if (current.getCopyWorld() != null && current.getMap() != null) {
             for (Map.Entry<ANNITeam, Nexus> ent : current.getMap().getNexuses().entrySet()) {
                 if (!current.getTeams().containsKey(ent.getKey())) continue;
                 Location loc = BukkitAdapter.adapt(
@@ -78,9 +90,8 @@ public class BlockBreakListener implements Listener {
                     if (current.getTeamByPlayer(e.getPlayer()).equals(ent.getKey())) {
                         e.getPlayer().sendMessage(plugin.getMessageManager().build("nexus.cant_destroy_self"));
                         e.setCancelled(true);
-                    }
-                    else if (current.getState().canDestroyNexus()) { // 現在のフェーズで破壊できるなら
-                        current.damageNexusHealth(ent.getKey(), 1, e.getPlayer());
+                    } else if (current.getState().canDestroyNexus()) { // 現在のフェーズで破壊できるなら
+                        current.damageNexusHealth(ent.getKey(), current.getState().getNexusDamage(), e.getPlayer());
                         if (current.isNexusLost(ent.getKey())) {
                             Nexus.finalDestroyEffects(loc);
                             Bukkit.getScheduler().runTask(plugin, () -> e.getBlock().setType(Material.BEDROCK));
@@ -88,8 +99,7 @@ public class BlockBreakListener implements Listener {
                             Nexus.destroyEffects(loc);
                             Bukkit.getScheduler().runTaskLater(plugin, () -> e.getBlock().setType(Material.END_STONE), 3);
                         }
-                    }
-                    else { // 現在のフェーズで破壊できないなら
+                    } else { // 現在のフェーズで破壊できないなら
                         e.getPlayer().sendMessage(plugin.getMessageManager().build("nexus.now_cant_destroy"));
                         e.setCancelled(true);
                     }
@@ -97,39 +107,132 @@ public class BlockBreakListener implements Listener {
                     return;
                 }
             }
+        }
 
-            if (cooldown.containsKey(e.getBlock().getType()) && e.getPlayer().getGameMode() != GameMode.CREATIVE) {
-                ItemStack mainHand = e.getPlayer().getInventory().getItemInMainHand();
-                if (e.getBlock().getDrops(mainHand).isEmpty()) {
-                    e.setCancelled(true);
-                    return;
-                }
-                if ((e.getBlock().getType() == Material.DIAMOND_ORE || e.getBlock().getType() == Material.EMERALD_ORE) && current.getState().getId() >= 3) {
-                    e.getPlayer().sendMessage(ANNIPlugin.getInstance().getMessageManager().build("notify.cant_mine_now", e.getBlock().getTranslationKey()));
-                    e.setCancelled(true);
-                    return;
-                }
-
-                CmnUtil.giveOrDrop(
-                        e.getPlayer(),
-                        e.getBlock().getDrops(mainHand).toArray(new ItemStack[0])
+        if (current.getState().getId() > 0) {
+            /*// ネクサス
+            for (Map.Entry<ANNITeam, Nexus> ent : current.getMap().getNexuses().entrySet()) {
+                if (!current.getTeams().containsKey(ent.getKey())) continue;
+                Location loc = BukkitAdapter.adapt(
+                        current.getCopyWorld(),
+                        ent.getValue().getLocation()
                 );
+                if (e.getBlock().getLocation().equals(loc)) {
+                    e.setDropItems(false);
+                    e.setExpToDrop(0);
+                    if (current.isNexusLost(ent.getKey())) {
+                        e.setCancelled(true);
+                        return;
+                    }
 
-                e.setDropItems(false);
-                e.getPlayer().giveExp(e.getExpToDrop());
-                e.setExpToDrop(0);
+                    // 破壊しようとしてるのは自チームかどうか
+                    if (current.getTeamByPlayer(e.getPlayer()).equals(ent.getKey())) {
+                        e.getPlayer().sendMessage(plugin.getMessageManager().build("nexus.cant_destroy_self"));
+                        e.setCancelled(true);
+                    } else if (current.getState().canDestroyNexus()) { // 現在のフェーズで破壊できるなら
+                        current.damageNexusHealth(ent.getKey(), current.getState().getNexusDamage(), e.getPlayer());
+                        if (current.isNexusLost(ent.getKey())) {
+                            Nexus.finalDestroyEffects(loc);
+                            Bukkit.getScheduler().runTask(plugin, () -> e.getBlock().setType(Material.BEDROCK));
+                        } else {
+                            Nexus.destroyEffects(loc);
+                            Bukkit.getScheduler().runTaskLater(plugin, () -> e.getBlock().setType(Material.END_STONE), 3);
+                        }
+                    } else { // 現在のフェーズで破壊できないなら
+                        e.getPlayer().sendMessage(plugin.getMessageManager().build("nexus.now_cant_destroy"));
+                        e.setCancelled(true);
+                    }
 
-                BlockData cloned = e.getBlock().getBlockData().clone(); // ブロックデータを複製
-                Material typ = e.getBlock().getType();
-                Bukkit.getScheduler().runTask(plugin, () -> {
-                    e.getBlock().setType(Material.COBBLESTONE);
+                    return;
+                }
+            }*/
+
+            if (e.getPlayer().getGameMode() != GameMode.CREATIVE) {
+                ItemStack mainHand = e.getPlayer().getInventory().getItemInMainHand();
+
+                if (COOLDOWN.containsKey(e.getBlock().getType())) {
+                    if (e.getBlock().getDrops(mainHand).isEmpty()) {
+                        e.setCancelled(true);
+                        return;
+                    }
+                    if (((e.getBlock().getType() == Material.DIAMOND_ORE || e.getBlock().getType() == Material.EMERALD_ORE)) && current.getState().getId() < 3) {
+                        e.getPlayer().sendMessage(ANNIPlugin.getInstance().getMessageManager().build("notify.cant_mine_now", e.getBlock().getTranslationKey()));
+                        e.setCancelled(true);
+                        return;
+                    }
+
+                    CmnUtil.giveOrDrop(
+                            e.getPlayer(),
+                            e.getBlock().getDrops(mainHand).toArray(new ItemStack[0])
+                    );
+
+                    e.setDropItems(false);
+                    e.getPlayer().giveExp(e.getExpToDrop());
+                    e.setExpToDrop(0);
+
+                    BlockData cloned = e.getBlock().getBlockData().clone(); // ブロックデータを複製
+                    Material typ = e.getBlock().getType();
+                    Bukkit.getScheduler().runTask(plugin, () -> {
+                        e.getBlock().setType(Material.COBBLESTONE);
+                        Bukkit.getScheduler().runTaskLater(plugin, () -> {
+                            e.getBlock().setType(typ); // クールダウン終了後再生成
+                            e.getBlock().setBlockData(cloned); // 複製したデータに変更
+                        }, COOLDOWN.get(typ) - 1);
+                    });
+                }
+                else if (NO_BLOCK_COOLDOWN.containsKey(e.getBlock().getType())) {
+                    if (e.getBlock().getDrops(mainHand).isEmpty()) {
+                        e.setCancelled(true);
+                        return;
+                    }
+
+                    CmnUtil.giveOrDrop(
+                            e.getPlayer(),
+                            e.getBlock().getDrops(mainHand).toArray(new ItemStack[0])
+                    );
+
+                    e.setDropItems(false);
+                    e.getPlayer().giveExp(e.getExpToDrop());
+                    e.setExpToDrop(0);
+
+                    BlockData cloned = e.getBlock().getBlockData().clone(); // ブロックデータを複製
+                    Material typ = e.getBlock().getType();
                     Bukkit.getScheduler().runTaskLater(plugin, () -> {
                         e.getBlock().setType(typ); // クールダウン終了後再生成
                         e.getBlock().setBlockData(cloned); // 複製したデータに変更
-                    }, cooldown.get(typ) - 1);
-                });
+                    }, NO_BLOCK_COOLDOWN.get(typ));
+                }
+                else if (WOODS.contains(e.getBlock().getType())) { // 木の処理
+                    RegionContainer rc = WorldGuard.getInstance().getPlatform().getRegionContainer();
 
-                return;
+                    for (
+                            ProtectedRegion pr : rc.get(BukkitAdapter.adapt(current.getCopyWorld())).getRegions().values()
+                    ) {
+                        if (pr.getId().startsWith("anni-wood") && pr.contains(BukkitAdapter.asBlockVector(e.getBlock().getLocation()))) {
+                            if (e.getBlock().getDrops(mainHand).isEmpty()) {
+                                e.setCancelled(true);
+                                return;
+                            }
+
+                            CmnUtil.giveOrDrop(
+                                    e.getPlayer(),
+                                    e.getBlock().getDrops(mainHand).toArray(new ItemStack[0])
+                            );
+
+                            e.setDropItems(false);
+                            e.getPlayer().giveExp(e.getExpToDrop());
+                            e.setExpToDrop(0);
+
+                            BlockData cloned = e.getBlock().getBlockData().clone(); // ブロックデータを複製
+                            Material typ = e.getBlock().getType();
+                            Bukkit.getScheduler().runTaskLater(plugin, () -> {
+                                e.getBlock().setType(typ); // クールダウン終了後再生成
+                                e.getBlock().setBlockData(cloned); // 複製したデータに変更
+                            }, 100);
+                            break;
+                        }
+                    }
+                }
             }
         }
     }
