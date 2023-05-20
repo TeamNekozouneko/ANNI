@@ -12,22 +12,24 @@ import java.util.Map;
 public enum ANNITeam {
 
     @SerializedName("red")
-    RED("team.red.display", "team.red.prefix", ChatColor.RED),
+    RED("team.red.display", "team.red.prefix", ChatColor.RED, 'r'),
     @SerializedName("blue")
-    BLUE("team.blue.display", "team.blue.prefix", ChatColor.BLUE),
+    BLUE("team.blue.display", "team.blue.prefix", ChatColor.BLUE, 'b'),
     @SerializedName("green")
-    GREEN("team.green.display", "team.green.prefix", ChatColor.GREEN),
+    GREEN("team.green.display", "team.green.prefix", ChatColor.GREEN, 'g'),
     @SerializedName("yellow")
-    YELLOW("team.yellow.display", "team.yellow.prefix", ChatColor.YELLOW);
+    YELLOW("team.yellow.display", "team.yellow.prefix", ChatColor.YELLOW, 'y');
 
     private final String name;
     private final String prefix;
     private final ChatColor cc;
+    private final char bigChar;
 
-    private ANNITeam(String name, String prefix, ChatColor cc) {
+    private ANNITeam(String name, String prefix, ChatColor cc, char bigChar) {
         this.name = name;
         this.prefix = prefix;
         this.cc = cc;
+        this.bigChar = bigChar;
     }
 
     public String getTeamName() {
@@ -66,6 +68,10 @@ public enum ANNITeam {
         }
 
         throw new RuntimeException(iae);
+    }
+
+    public char getBigChar() {
+        return bigChar;
     }
 
 }
