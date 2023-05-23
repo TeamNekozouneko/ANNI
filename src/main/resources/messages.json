@@ -142,6 +142,7 @@
   "notify.lost_nexus": "「{0}」のネクサスは失われました！",
   "notify.cant_mine_now": "&cこのフェーズでは、「{0}&c」を採掘することはできません。",
   "notify.draw": "",
+  "notify.stun": "&cもちっと&fスタン&cしてしまった！",
 
   "phase.name.1": "フェーズ 1",
   "phase.name.2": "フェーズ 2",
@@ -308,5 +309,25 @@
   "big.y.6": "&7▒▒▒▒&-▒▒&7▒▒▒▒&r {6}",
   "big.y.7": "&7▒▒▒▒&-▒▒&7▒▒▒▒&r {7}",
   "big.y.8": "&7▒▒▒▒&-▒▒&7▒▒▒▒&r {8}",
-  "big.y.9": "&7▒▒▒▒▒▒▒▒▒▒&r {9}"
+  "big.y.9": "&7▒▒▒▒▒▒▒▒▒▒&r {9}",
+
+  "kit.assault.name": "アサルトキット",
+  "kit.default.name": "標準キット",
+  "kit.defense.name": "防衛キット",
+  "kit.mochimochi.name": "もちもちキット",
+
+  "item.stun_grenade.name": "&cもちっと&bスタングレネード",
+  "item.stun_grenade.lore.0": "&7ある高齢の職人が作ったもちっとスタンさせるグレネード。",
+  "item.stun_grenade.lore.1": "",
+  "item.stun_grenade.lore.2": "&9効果：",
+  "item.stun_grenade.lore.3": "&9* 盾が10秒間使用できないようにします。",
+  "item.stun_grenade.lore.4": "&9* 敵が10秒間遅くなります",
+  "item.stun_grenade.lore.5": "&9* 敵の視界が一瞬真っ黒になります。",
+
+  "actionbar.nexus_alert": "&c{0} によってネクサスが破壊されています！",
+
+  "chat.global": "&8(全体)&r {0}&a:&f {1}",
+  "chat.global.format": "&8(全体)&7 {0}%s&a:&f %s",
+  "chat.team": "&8(チーム)&r {0}&a:&f {1}",
+  "chat.team.format": "&8(チーム)&r {0}%s&a:&f %s"
 }
