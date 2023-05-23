@@ -30,7 +30,8 @@ public final class BlockPlaceListener implements Listener {
             Material.LAPIS_ORE,
             Material.NETHER_GOLD_ORE,
             Material.NETHER_QUARTZ_ORE,
-            Material.REDSTONE_ORE
+            Material.REDSTONE_ORE,
+            Material.GRAVEL
     );
 
     private final ANNIPlugin plugin = ANNIPlugin.getInstance();
