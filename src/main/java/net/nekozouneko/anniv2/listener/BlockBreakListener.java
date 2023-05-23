@@ -110,43 +110,6 @@ public class BlockBreakListener implements Listener {
         }
 
         if (current.getState().getId() > 0) {
-            /*// ネクサス
-            for (Map.Entry<ANNITeam, Nexus> ent : current.getMap().getNexuses().entrySet()) {
-                if (!current.getTeams().containsKey(ent.getKey())) continue;
-                Location loc = BukkitAdapter.adapt(
-                        current.getCopyWorld(),
-                        ent.getValue().getLocation()
-                );
-                if (e.getBlock().getLocation().equals(loc)) {
-                    e.setDropItems(false);
-                    e.setExpToDrop(0);
-                    if (current.isNexusLost(ent.getKey())) {
-                        e.setCancelled(true);
-                        return;
-                    }
-
-                    // 破壊しようとしてるのは自チームかどうか
-                    if (current.getTeamByPlayer(e.getPlayer()).equals(ent.getKey())) {
-                        e.getPlayer().sendMessage(plugin.getMessageManager().build("nexus.cant_destroy_self"));
-                        e.setCancelled(true);
-                    } else if (current.getState().canDestroyNexus()) { // 現在のフェーズで破壊できるなら
-                        current.damageNexusHealth(ent.getKey(), current.getState().getNexusDamage(), e.getPlayer());
-                        if (current.isNexusLost(ent.getKey())) {
-                            Nexus.finalDestroyEffects(loc);
-                            Bukkit.getScheduler().runTask(plugin, () -> e.getBlock().setType(Material.BEDROCK));
-                        } else {
-                            Nexus.destroyEffects(loc);
-                            Bukkit.getScheduler().runTaskLater(plugin, () -> e.getBlock().setType(Material.END_STONE), 3);
-                        }
-                    } else { // 現在のフェーズで破壊できないなら
-                        e.getPlayer().sendMessage(plugin.getMessageManager().build("nexus.now_cant_destroy"));
-                        e.setCancelled(true);
-                    }
-
-                    return;
-                }
-            }*/
-
             if (e.getPlayer().getGameMode() != GameMode.CREATIVE) {
                 ItemStack mainHand = e.getPlayer().getInventory().getItemInMainHand();
 
