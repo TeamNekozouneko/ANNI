@@ -6,11 +6,16 @@ import net.nekozouneko.anniv2.board.BoardManager;
 import net.nekozouneko.anniv2.command.ANNIAdminCommand;
 import net.nekozouneko.anniv2.command.ANNICommand;
 import net.nekozouneko.anniv2.command.VoteCommand;
+import net.nekozouneko.anniv2.kit.items.StunGrenade;
 import net.nekozouneko.anniv2.listener.*;
 import net.nekozouneko.anniv2.map.MapManager;
 import net.nekozouneko.anniv2.message.MessageManager;
 import net.nekozouneko.anniv2.util.FileUtil;
+import net.nekozouneko.commons.spigot.inventory.ItemStackBuilder;
 import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
+import org.bukkit.inventory.ShapelessRecipe;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scoreboard.Scoreboard;
 
@@ -107,17 +112,22 @@ public final class ANNIPlugin extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new PlayerQuitListener(), this);
         getServer().getPluginManager().registerEvents(new PlayerRespawnListener(), this);
 
+        getServer().getPluginManager().registerEvents(new StunGrenade(), this);
+
         currentGame = new ANNIArena(this, "current");
         currentGame.runTaskTimer(this, 0, 20);
 
         getCommand("anni-admin").setExecutor(new ANNIAdminCommand());
         getCommand("anni").setExecutor(new ANNICommand());
         getCommand("vote").setExecutor(new VoteCommand());
+
+        registerRecipe();
     }
 
     @Override
     public void onDisable() {
         if (!currentGame.isCancelled()) currentGame.cancel();
+        unregisterRecipe();
     }
 
     @SuppressWarnings("unchecked")
@@ -157,5 +167,23 @@ public final class ANNIPlugin extends JavaPlugin {
 
             setEnabled(false);
         }
+    }
+
+    private void registerRecipe() {
+        NamespacedKey g2f = new NamespacedKey(this, "gravel_to_flint");
+
+        if (getServer().getRecipe(g2f) == null) {
+            getServer().addRecipe(
+                    new ShapelessRecipe(
+                            g2f, ItemStackBuilder.of(Material.FLINT).build()
+                    ).addIngredient(Material.GRAVEL)
+            );
+        }
+    }
+    private void unregisterRecipe() {
+        NamespacedKey g2f = new NamespacedKey(this, "gravel_to_flint");
+
+        if (getServer().getRecipe(g2f) != null)
+            getServer().removeRecipe(g2f);
     }
 }
