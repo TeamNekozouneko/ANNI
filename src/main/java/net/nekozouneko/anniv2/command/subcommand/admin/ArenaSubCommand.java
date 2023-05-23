@@ -5,6 +5,7 @@ import net.nekozouneko.anniv2.ANNIPlugin;
 import net.nekozouneko.anniv2.arena.ANNIArena;
 import net.nekozouneko.anniv2.arena.team.ANNITeam;
 import net.nekozouneko.anniv2.command.ASubCommand;
+import net.nekozouneko.anniv2.map.ANNIMap;
 import net.nekozouneko.anniv2.message.MessageManager;
 import net.nekozouneko.anniv2.util.CmdUtil;
 import org.bukkit.command.CommandSender;
@@ -51,6 +52,18 @@ public class ArenaSubCommand extends ASubCommand {
                 }
                 break;
             }
+            case "set-map": {
+                ANNIMap map = plugin.getMapManager().getMap(args.get(1));
+                if (map == null) {
+                    sender.sendMessage(mm.build("command.err.map_not_found", args.get(1)));
+                    return true;
+                }
+
+                if (!(plugin.getCurrentGame().getState().getId() >= 0)) {
+                    plugin.getCurrentGame().setMap(map);
+                }
+                break;
+            }
         }
 
         return true;
@@ -59,20 +72,29 @@ public class ArenaSubCommand extends ASubCommand {
     @Override
     public List<String> tabComplete(CommandSender sender, List<String> args) {
         if (args.size() == 1) {
-            return CmdUtil.simpleTabComplete(args.get(0), "disable-team", "enable-team");
+            return CmdUtil.simpleTabComplete(args.get(0), "disable-team", "enable-team", "set-map");
+        }
+        if (args.size() == 2) {
+            switch (args.get(0)) {
+                case "disable-team":
+                case "enable-team":
+                    return CmdUtil.simpleTabComplete(
+                            args.get(1),
+                            Arrays.stream(ANNITeam.values())
+                                    .map(ANNITeam::name)
+                                    .collect(Collectors.toList())
+                    );
+                case "set-map":
+                    return CmdUtil.simpleTabComplete(
+                            args.get(1),
+                            plugin.getMapManager().getMaps().stream()
+                                    .map(ANNIMap::getId)
+                                    .collect(Collectors.toList())
+                    );
+            }
         }
 
-        switch (args.get(0)) {
-            case "disable-team":
-            case "enable-team":
-                return CmdUtil.simpleTabComplete(
-                        args.get(1),
-                        Arrays.stream(ANNITeam.values())
-                                .map(ANNITeam::name)
-                                .collect(Collectors.toList())
-                );
-            default: return Collections.emptyList();
-        }
+        return Collections.emptyList();
     }
 
     @Override
