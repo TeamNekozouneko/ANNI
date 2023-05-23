@@ -4,8 +4,11 @@ import net.nekozouneko.anniv2.ANNIPlugin;
 import net.nekozouneko.anniv2.arena.ANNIArena;
 import net.nekozouneko.anniv2.arena.ArenaState;
 import net.nekozouneko.anniv2.command.ASubCommand;
+import net.nekozouneko.anniv2.kit.ANNIKit;
+import net.nekozouneko.anniv2.kit.items.StunGrenade;
 import net.nekozouneko.anniv2.listener.BlockBreakListener;
 import net.nekozouneko.anniv2.util.CmdUtil;
+import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -38,6 +41,12 @@ public class DebugSubCommand extends ASubCommand {
                 break;
             case "start":
                 ANNIPlugin.getInstance().getCurrentGame().start();
+                break;
+            case "set-kit":
+                ANNIPlugin.getInstance().getCurrentGame().setKit(Bukkit.getPlayer(args.get(1)), ANNIKit.getKitById(args.get(2)));
+                break;
+            case "get-stung":
+                ((Player) sender).getInventory().addItem(StunGrenade.get(16));
                 break;
         }
 
