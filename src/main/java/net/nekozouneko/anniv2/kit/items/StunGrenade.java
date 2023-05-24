@@ -5,11 +5,13 @@ import net.nekozouneko.anniv2.message.MessageManager;
 import net.nekozouneko.anniv2.util.CmnUtil;
 import net.nekozouneko.commons.spigot.inventory.ItemStackBuilder;
 import org.bukkit.*;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
+import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.persistence.PersistentDataContainer;
@@ -32,6 +34,8 @@ public class StunGrenade implements Listener {
                         new NamespacedKey(ANNIPlugin.getInstance(), "special-item"),
                         PersistentDataType.STRING, "stun-grenade"
                 )
+                .itemFlags(ItemFlag.HIDE_ENCHANTS)
+                .enchant(Enchantment.DURABILITY, 1, false)
                 .amount(Math.max(amount, 1))
                 .build();
     }
@@ -76,51 +80,49 @@ public class StunGrenade implements Listener {
         ) {
             if (e.getHitEntity() != null && e.getHitEntity() instanceof Player) {
                 Player hit = ((Player) e.getHitEntity());
-                hit.damage(1, e.getEntity());
 
-                hit.setCooldown(Material.SHIELD, 200);
-                if (hit.isBlocking()) {
-                    hit.playSound(hit.getLocation(), Sound.ENTITY_ITEM_BREAK, 1, 1);
+                if (!(e.getEntity().getShooter() instanceof Player) || CmnUtil.canDamage((Player) e.getEntity().getShooter(), hit)) {
+                    hit.damage(1, e.getEntity());
 
-                    ItemStack shield;
-                    AtomicBoolean isOff = new AtomicBoolean(false);
-                    PlayerInventory pi = hit.getInventory();
-                    if (pi.getItemInMainHand().getType() == Material.SHIELD && pi.getItemInOffHand().getType() == Material.SHIELD) {
-                        shield = pi.getItemInMainHand();
-                        pi.setItemInMainHand(null);
-                    }
-                    else if (pi.getItemInMainHand().getType() == Material.SHIELD) {
-                        shield = pi.getItemInMainHand();
-                        pi.setItemInMainHand(null);
-                    }
-                    else if (pi.getItemInOffHand().getType() == Material.SHIELD) {
-                        shield = pi.getItemInOffHand();
-                        pi.setItemInOffHand(null);
-                        isOff.set(true);
-                    } else {
-                        shield = null;
-                    }
+                    hit.setCooldown(Material.SHIELD, 200);
+                    if (hit.isBlocking()) {
+                        hit.playSound(hit.getLocation(), Sound.ENTITY_ITEM_BREAK, 1, 1);
 
-                    if (shield != null) {
-                        Bukkit.getScheduler().runTask(ANNIPlugin.getInstance(), () -> {
-                            if (isOff.get()) {
-                                if (!pi.getItemInOffHand().getType().isAir()) {
-                                    CmnUtil.giveOrDrop(hit, shield);
+                        ItemStack shield;
+                        AtomicBoolean isOff = new AtomicBoolean(false);
+                        PlayerInventory pi = hit.getInventory();
+                        if (pi.getItemInMainHand().getType() == Material.SHIELD && pi.getItemInOffHand().getType() == Material.SHIELD) {
+                            shield = pi.getItemInMainHand();
+                            pi.setItemInMainHand(null);
+                        } else if (pi.getItemInMainHand().getType() == Material.SHIELD) {
+                            shield = pi.getItemInMainHand();
+                            pi.setItemInMainHand(null);
+                        } else if (pi.getItemInOffHand().getType() == Material.SHIELD) {
+                            shield = pi.getItemInOffHand();
+                            pi.setItemInOffHand(null);
+                            isOff.set(true);
+                        } else {
+                            shield = null;
+                        }
+
+                        if (shield != null) {
+                            Bukkit.getScheduler().runTask(ANNIPlugin.getInstance(), () -> {
+                                if (isOff.get()) {
+                                    if (!pi.getItemInOffHand().getType().isAir()) {
+                                        CmnUtil.giveOrDrop(hit, shield);
+                                    } else pi.setItemInOffHand(shield);
+                                } else {
+                                    if (!pi.getItemInMainHand().getType().isAir()) {
+                                        CmnUtil.giveOrDrop(hit, shield);
+                                    } else pi.setItemInMainHand(shield);
                                 }
-                                else pi.setItemInOffHand(shield);
-                            }
-                            else {
-                                if (!pi.getItemInMainHand().getType().isAir()) {
-                                    CmnUtil.giveOrDrop(hit, shield);
-                                }
-                                else pi.setItemInMainHand(shield);
-                            }
-                        });
+                            });
+                        }
                     }
+
+                    hit.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 200, 1));
+                    hit.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 20, 1));
                 }
-
-                hit.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 200, 1));
-                hit.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 20, 1));
             }
         }
     }
