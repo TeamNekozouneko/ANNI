@@ -44,6 +44,10 @@ public enum ANNITeam {
         return cc;
     }
 
+    public String getColoredName() {
+        return cc + getTeamName();
+    }
+
     @SuppressWarnings("unchecked")
     public char getCCChar() {
         IllegalAccessException iae = null;
