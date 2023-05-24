@@ -26,6 +26,11 @@ public class CreateMapSubCommand extends ASubCommand {
         }
 
         String id = args.get(0);
+        if (id.startsWith("@")) {
+            sender.sendMessage(plugin.getMessageManager().build("command.err.cant_use_char"));
+            return true;
+        }
+
         World world = Bukkit.getWorld(args.get(1));
         String display;
 
