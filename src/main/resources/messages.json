@@ -95,6 +95,7 @@
   "gui.team_selector.random": "&fランダム",
 
   "gui.kit_selector.title": "キットを選択...",
+  "gui.kit_selector.using": "&a「&7{0}&a」を選択しました。",
 
   "gui.next_page": "&a次のページ",
   "gui.prev_page": "&a前のページ",
