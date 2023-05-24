@@ -76,7 +76,7 @@ public class StunGrenade implements Listener {
         ) {
             if (e.getHitEntity() != null && e.getHitEntity() instanceof Player) {
                 Player hit = ((Player) e.getHitEntity());
-                hit.damage(0.5);
+                hit.damage(1, e.getEntity());
 
                 hit.setCooldown(Material.SHIELD, 200);
                 if (hit.isBlocking()) {
