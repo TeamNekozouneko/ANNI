@@ -349,7 +349,7 @@ public class ANNIArena extends BukkitRunnable {
 
         try {
             if (map == null) {
-                if (VoteManager.isNowVoting(id)) {
+                if (VoteManager.isNowVoting(id) && !VoteManager.getResult(id).isEmpty()) {
                     map = getMapRanking(VoteManager.endVote(id)).get(0).getKey();
                 }
                 else map = plugin.getMapManager().getMaps()
@@ -366,23 +366,16 @@ public class ANNIArena extends BukkitRunnable {
             if (copyrm != null && origrm != null) {
                 // 保護領域のコピー
                 origrm.getRegions().forEach((s, pr) -> {
-                    Bukkit.broadcastMessage("Now region id is: " + pr.getId());
                     if (pr.getType() == RegionType.GLOBAL) {
-                        Bukkit.broadcastMessage("This region type is global.");
                         copyrm.getRegions().values().forEach(pr1 -> {
-                            Bukkit.broadcastMessage("Searching copy world's global region... | now region id is: " + pr1.getId());
                             if (pr.getId().equals(s) && pr1.getType() == RegionType.GLOBAL) {
-                                Bukkit.broadcastMessage("Detected! id: " + pr1.getId());
-                                Bukkit.broadcastMessage("Setting flags: " + pr.getFlags());
                                 pr1.setFlags(new HashMap<>(pr.getFlags()));
                             }
                         });
                     }
                     else {
-                        Bukkit.broadcastMessage("This region type is poly / cuboid.");
                         ProtectedRegion newpr;
                         if (pr.getType() == RegionType.POLYGON) {
-                            Bukkit.broadcastMessage("This region type is poly.");
                             newpr = new ProtectedPolygonalRegion(s,
                                     pr.getPoints(),
                                     pr.getMinimumPoint().getY(),
@@ -390,15 +383,12 @@ public class ANNIArena extends BukkitRunnable {
                             );
                         }
                         else {
-                            Bukkit.broadcastMessage("This region type is cuboid.");
                             newpr = new ProtectedCuboidRegion(s, pr.getMinimumPoint(), pr.getMaximumPoint());
                         }
 
-                        Bukkit.broadcastMessage("Setting flags: " + pr.getFlags());
                         newpr.setFlags(pr.getFlags());
 
                         if (s.startsWith("anni-wood")) {
-                            Bukkit.broadcastMessage("This wood region!");
                             newpr.setFlag(Flags.BLOCK_BREAK, StateFlag.State.ALLOW);
                             newpr.setFlag(Flags.BLOCK_PLACE, StateFlag.State.DENY);
                         }
@@ -784,7 +774,10 @@ public class ANNIArena extends BukkitRunnable {
         if (CmnUtil.getJoinedTeam(player) != null) return;
 
         Map<Team, Integer> teamSize = new HashMap<>();
-        getTeams().values().forEach(team -> teamSize.put(team, team.getSize()));
+        getTeams().entrySet().stream()
+                .filter(ent -> !isNexusLost(ent.getKey()))
+                .map(Map.Entry::getValue)
+                .forEach(t -> teamSize.put(t, t.getSize()));
 
         if ( // 全部の値が一緒なら
                 Collections3.allValueEquals(
