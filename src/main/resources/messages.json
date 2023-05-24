@@ -79,13 +79,22 @@
   "gui.map_selector.map_lore.1": "&7ワールド: {1}",
 
   "gui.map_editor.title": "マップエディター ({0})",
-  "gui.map_editor.tp_to_world": "ワールドにテレポートする",
-  "gui.map_editor.set_default_spawn": "デフォルトスポーン地点を設定",
-  "gui.map_editor.set_team_spawn": "各チームのスポーン地点を設定",
-  "gui.map_editor.set_nexus_location": "ネクサスの位置を設定",
-  "gui.map_editor.current_value": "設定値： {0}",
+  "gui.map_editor.tp_to_world": "&fワールドにテレポートする",
+  "gui.map_editor.default_spawn": "&fデフォルトスポーン地点を設定",
+  "gui.map_editor.team_spawn": "{0}&fのスポーン地点",
+  "gui.map_editor.team_nexus": "{0}&fのネクサスの位置",
+  "gui.map_editor.current_value": "&7設定値： &f{0}",
+  "gui.map_editor.please_click_a_block": "&aブロックをクリックして設定します。&7('cancel'とチャットに送信することでキャンセルできます。)",
+  "gui.map_editor.set_your_location": "&aデフォルトのスポーン地点をあなたの位置に設定しました。&7({0})",
+  "gui.map_editor.set_your_location_team": "&f{0}&aのスポーン地点をあなたの位置に設定しました。&7({1})",
+  "gui.map_editor.set_team_nexus_loc": "&f{0}&aのネクサスの位置を設定しました。&7({1})",
 
   "gui.arena_dashboard.title": "アリーナダッシュボード ({0})",
+
+  "gui.team_selector.title": "チームを選択...",
+  "gui.team_selector.random": "&fランダム",
+
+  "gui.kit_selector.title": "キットを選択...",
 
   "gui.next_page": "&a次のページ",
   "gui.prev_page": "&a前のページ",
@@ -94,11 +103,13 @@
   "command.err.world_not_found": "&c「{0}」というワールドは見つかりませんでした。",
   "command.err.team_undefined": "&c「{0}」というチームは存在しません。",
   "command.err.no_more_teams_can_be_disabled": "&cこれ以上チームを無効化することはできません。",
+  "command.err.cant_use_char": "&c使用できない文字が入っています。",
   "command.err.ioe": "&cファイルの入出力にエラーが発生しました。コンソールを確認してください。",
   "command.err.subcommand_not_found": "&c「{0}」というサブコマンドは見つかりませんでした。",
   "command.err.player_only": "&cプレイヤーとして実行してください。",
   "command.err.cant_vote_now": "&c今は投票できません。",
   "command.err.invalid_vote": "&c「{0}」は投票できません。",
+  "command.err.game_start_failed": "&cゲームを開始できませんでした。",
 
   "command.usage": "&c使用方法: {0}",
 
@@ -121,6 +132,9 @@
 
   "command.arena.disabled_team": "&a「{0}」というチームを無効化しました。",
   "command.arena.enabled_team": "&a「{0}」というチームを有効化しました。",
+  "command.arena.set_map": "&aマップを「{0}」に設定しました。",
+  "command.arena.map_random": "&aマップを投票による選択に設定しました。",
+  "command.arena.starting": "&aゲームを開始しています...",
 
   "command.vote.voted": "&a「{0}」に投票しました。",
 
