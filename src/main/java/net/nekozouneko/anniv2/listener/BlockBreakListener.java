@@ -9,11 +9,13 @@ import net.nekozouneko.anniv2.arena.ANNIArena;
 import net.nekozouneko.anniv2.arena.team.ANNITeam;
 import net.nekozouneko.anniv2.map.Nexus;
 import net.nekozouneko.anniv2.util.CmnUtil;
+import net.nekozouneko.commons.spigot.inventory.ItemStackBuilder;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.block.data.Ageable;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -195,6 +197,27 @@ public class BlockBreakListener implements Listener {
                             break;
                         }
                     }
+                }
+                else if (e.getBlock().getType() == Material.WHEAT) {
+                    e.setDropItems(false);
+                    Ageable ageab = ((Ageable) e.getBlock().getBlockData());
+
+                    if (ageab.getAge() >= ageab.getMaximumAge()) {
+                        if (new Random().nextDouble() < 0.05) {
+                            CmnUtil.giveOrDrop(e.getPlayer(), ItemStackBuilder.of(Material.APPLE).build());
+                        }
+                    }
+
+                    ItemStack[] arr = e.getBlock().getDrops(e.getPlayer().getInventory().getItemInMainHand()).stream()
+                            .filter(is -> is.getType() != Material.WHEAT_SEEDS)
+                            .toArray(ItemStack[]::new);
+
+                    Location loc = e.getBlock().getLocation().clone();
+                    Bukkit.getScheduler().runTaskLater(plugin, () ->
+                        loc.getBlock().setType(Material.WHEAT)
+                    , 20);
+
+                    CmnUtil.giveOrDrop(e.getPlayer(), arr);
                 }
             }
         }
