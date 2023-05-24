@@ -22,3 +22,7 @@ commands:
     description: "Vote command"
     permission: anniv2.command.vote
     usage: "/<command> <arg>"
+  kit:
+    description: "Kit command"
+    permission: anniv2.command.kit
+    usage: "/<command>"

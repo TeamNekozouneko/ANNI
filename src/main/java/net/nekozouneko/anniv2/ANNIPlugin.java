@@ -5,6 +5,7 @@ import net.nekozouneko.anniv2.arena.ANNIArena;
 import net.nekozouneko.anniv2.board.BoardManager;
 import net.nekozouneko.anniv2.command.ANNIAdminCommand;
 import net.nekozouneko.anniv2.command.ANNICommand;
+import net.nekozouneko.anniv2.command.KitCommand;
 import net.nekozouneko.anniv2.command.VoteCommand;
 import net.nekozouneko.anniv2.kit.items.StunGrenade;
 import net.nekozouneko.anniv2.listener.*;
@@ -121,6 +122,7 @@ public final class ANNIPlugin extends JavaPlugin {
         getCommand("anni-admin").setExecutor(new ANNIAdminCommand());
         getCommand("anni").setExecutor(new ANNICommand());
         getCommand("vote").setExecutor(new VoteCommand());
+        getCommand("kit").setExecutor(new KitCommand());
 
         registerRecipe();
     }
