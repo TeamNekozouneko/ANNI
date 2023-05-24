@@ -14,6 +14,14 @@ public class AsyncPlayerChatListener implements Listener {
 
     @EventHandler
     public void onChat(AsyncPlayerChatEvent e) {
+        if (BlockBreakListener.getQueuedOnDamageMap().containsKey(e.getPlayer().getUniqueId())) {
+            if (e.getMessage().equalsIgnoreCase("cancel")) {
+                BlockBreakListener.getQueuedOnDamageMap().remove(e.getPlayer().getUniqueId());
+                e.setCancelled(true);
+                return;
+            }
+        }
+
         ANNITeam at = plugin.getCurrentGame().getTeamByPlayer(e.getPlayer());
         if (at != null && !e.getMessage().startsWith("!")) {
             Team t = plugin.getCurrentGame().getTeam(at);
@@ -68,7 +76,7 @@ public class AsyncPlayerChatListener implements Listener {
                         username,
                         e.getMessage()
                 );
-                plugin.getCurrentGame().broadcast(mes, at);
+                plugin.getCurrentGame().broadcast(mes);
                 plugin.getLogger().info(mes);
             }
         }
