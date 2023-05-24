@@ -39,9 +39,6 @@ public class DebugSubCommand extends ASubCommand {
             case "reload-map":
                 ANNIPlugin.getInstance().getMapManager().reload();
                 break;
-            case "start":
-                ANNIPlugin.getInstance().getCurrentGame().start();
-                break;
             case "set-kit":
                 ANNIPlugin.getInstance().getCurrentGame().setKit(Bukkit.getPlayer(args.get(1)), ANNIKit.getKitById(args.get(2)));
                 break;
@@ -56,7 +53,7 @@ public class DebugSubCommand extends ASubCommand {
     @Override
     public List<String> tabComplete(CommandSender sender, List<String> args) {
         if (args.size() <= 1) {
-            return CmdUtil.simpleTabComplete(args.get(0), "clear-queued", "reload-map", "set-state", "set-timer", "start");
+            return CmdUtil.simpleTabComplete(args.get(0), "clear-queued", "get-stung", "reload-map", "set-kit", "set-state", "set-timer");
         }
         else {
             switch (args.get(0)) {

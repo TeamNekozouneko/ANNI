@@ -53,6 +53,12 @@ public class ArenaSubCommand extends ASubCommand {
                 break;
             }
             case "set-map": {
+                if (args.get(1).equals("@vote")) {
+                    plugin.getCurrentGame().setMap(null);
+                    sender.sendMessage(mm.build("command.arena.map_random"));
+                    return true;
+                }
+
                 ANNIMap map = plugin.getMapManager().getMap(args.get(1));
                 if (map == null) {
                     sender.sendMessage(mm.build("command.err.map_not_found", args.get(1)));
@@ -61,6 +67,16 @@ public class ArenaSubCommand extends ASubCommand {
 
                 if (!(plugin.getCurrentGame().getState().getId() >= 0)) {
                     plugin.getCurrentGame().setMap(map);
+                    sender.sendMessage(mm.build("command.arena.set_map", args.get(1)));
+                }
+                break;
+            }
+            case "start": {
+                if (plugin.getCurrentGame().start()) {
+                    sender.sendMessage(mm.build("command.arena.starting"));
+                }
+                else {
+                    sender.sendMessage(mm.build("command.err.game_start_failed"));
                 }
                 break;
             }
@@ -72,7 +88,7 @@ public class ArenaSubCommand extends ASubCommand {
     @Override
     public List<String> tabComplete(CommandSender sender, List<String> args) {
         if (args.size() == 1) {
-            return CmdUtil.simpleTabComplete(args.get(0), "disable-team", "enable-team", "set-map");
+            return CmdUtil.simpleTabComplete(args.get(0), "disable-team", "enable-team", "set-map", "start");
         }
         if (args.size() == 2) {
             switch (args.get(0)) {
@@ -99,6 +115,6 @@ public class ArenaSubCommand extends ASubCommand {
 
     @Override
     public String getUsage() {
-        return "(disable-team|enable-team) [<args>]";
+        return "(disable-team|enable-team|set-map|start) [<args>]";
     }
 }
