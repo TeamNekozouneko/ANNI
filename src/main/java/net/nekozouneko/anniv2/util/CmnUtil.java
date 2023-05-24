@@ -73,7 +73,7 @@ public final class CmnUtil {
     }
 
     public static boolean canDamage(Player from, Player target) {
-        if (from.equals(target)) return false;
+        if (from.equals(target)) return true;
         if (getJoinedTeam(from) != null) {
             Team ft = getJoinedTeam(from);
             if (ft.equals(getJoinedTeam(target)) && !ft.allowFriendlyFire()) {
