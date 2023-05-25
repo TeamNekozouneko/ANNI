@@ -8,20 +8,22 @@ authors: [Taitaitatata]
 description: '${project.description}'
 website: '${project.url}'
 
-depend: [WorldEdit, WorldGuard]
+depend: [Vault, WorldEdit, WorldGuard]
 
 commands:
   anni-admin:
     aliases: ["anniadmin"]
     description: "ANNI administration command"
     permission: anniv2.command.admin
+    usage: "/<command> (arena|createMap|debug|map|set-lobby) <args>"
   anni:
     description: "ANNI command"
     permission: anniv2.command.anni
+    usage: "/<command> (help|version)"
   vote:
     description: "Vote command"
     permission: anniv2.command.vote
-    usage: "/<command> <arg>"
+    usage: "/<command> <map>"
   kit:
     description: "Kit command"
     permission: anniv2.command.kit

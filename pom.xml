@@ -89,6 +89,11 @@
         </repository>
 
         <repository>
+            <id>jitpack</id>
+            <url>https://jitpack.io/</url>
+        </repository>
+
+        <repository>
             <id>enginehub</id>
             <url>https://maven.enginehub.org/repo/</url>
         </repository>
@@ -142,6 +147,19 @@
                 <exclusion>
                     <groupId>com.sk89q.worldedit</groupId>
                     <artifactId>worldedit-bukkit</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+        <dependency>
+            <groupId>com.github.MilkBowl</groupId>
+            <artifactId>VaultAPI</artifactId>
+            <version>1.7</version>
+            <scope>provided</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.spigotmc</groupId>
+                    <artifactId>spigot-api</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
