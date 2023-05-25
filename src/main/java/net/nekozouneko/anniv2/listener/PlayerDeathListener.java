@@ -3,6 +3,7 @@ package net.nekozouneko.anniv2.listener;
 import net.nekozouneko.anniv2.ANNIPlugin;
 import net.nekozouneko.anniv2.message.MessageManager;
 import net.nekozouneko.anniv2.util.CmnUtil;
+import net.nekozouneko.anniv2.util.VaultUtil;
 import org.bukkit.ChatColor;
 import org.bukkit.NamespacedKey;
 import org.bukkit.event.EventHandler;
@@ -24,24 +25,35 @@ public class PlayerDeathListener implements Listener {
         ChatColor cc = CmnUtil.getJoinedTeam(e.getEntity()) != null ?
                 CmnUtil.getJoinedTeam(e.getEntity()).getColor() : ChatColor.WHITE;
 
+        String deadName = cc + e.getEntity().getName() + "(" + plugin.getCurrentGame().getKit(e.getEntity()).getShortName() + ")";
+
         if (e.getEntity().getKiller() != null) {
             ChatColor cck = CmnUtil.getJoinedTeam(e.getEntity().getKiller()) != null ?
                     CmnUtil.getJoinedTeam(e.getEntity().getKiller()).getColor() : ChatColor.WHITE;
-            e.setDeathMessage(mm.build("kill.default", cc + e.getEntity().getName(), cck + e.getEntity().getKiller().getName()));
+            String killerName = cc + e.getEntity().getName() + "(" + plugin.getCurrentGame().getKit(e.getEntity().getKiller()).getShortName() + ")";
+
+            e.setDeathMessage(mm.build("kill.default", deadName, killerName));
+
+            VaultUtil.ifAvail((eco) -> {
+                eco.depositPlayer(e.getEntity().getKiller(), 10);
+                e.getEntity().getKiller().sendMessage(
+                        mm.build("notify.deposit_points", "10", mm.build("gui.shop.full_ext"))
+                );
+            });
         }
         else {
             switch (e.getEntity().getLastDamageCause().getCause()) {
                 case FALL:
-                    e.setDeathMessage(mm.build("kill.fall", cc + e.getEntity().getName()));
+                    e.setDeathMessage(mm.build("kill.fall", deadName));
                     break;
                 case VOID:
-                    e.setDeathMessage(mm.build("kill.void", cc + e.getEntity().getName()));
+                    e.setDeathMessage(mm.build("kill.void", deadName));
                     break;
                 case ENTITY_ATTACK:
-                    e.setDeathMessage(mm.build("kill.mob", cc + e.getEntity().getName()));
+                    e.setDeathMessage(mm.build("kill.mob", deadName));
                     break;
                 default: {
-                    e.setDeathMessage(mm.build("kill.game", cc + e.getEntity().getName()));
+                    e.setDeathMessage(mm.build("kill.game", deadName));
                     break;
                 }
             }
