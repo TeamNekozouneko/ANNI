@@ -51,7 +51,6 @@ public class ANNICommand implements CommandExecutor, TabCompleter {
             }
         }
         else {
-            //TODO あとで言語化する
             sender.sendMessage(plugin.getMessageManager().build(
                     "command.usage",
                     "§c" + cmd.getUsage()
