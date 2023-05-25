@@ -56,13 +56,13 @@
   "nexus.now_cant_destroy": "&c現在のフェーズではネクサスを破壊できません。",
   "nexus.cant_destroy_self": "&c自チームのネクサスは破壊できません。",
 
-  "bossbar.timer": "{0} {1}",
+  "bossbar.timer": "{0} - {1}",
   "bossbar.timer.state.1": "フェーズ1",
   "bossbar.timer.state.2": "フェーズ2",
   "bossbar.timer.state.3": "フェーズ3",
   "bossbar.timer.state.4": "フェーズ4",
   "bossbar.timer.state.5": "フェーズ5",
-  "bossbar.timer.state.restarting": "再起動まで",
+  "bossbar.timer.state.restarting": "再起動",
   "bossbar.damaged_nexus": "{0} が {1} のネクサスにダメージを与えました！",
 
   "team.red.display": "赤チーム",
@@ -96,6 +96,14 @@
 
   "gui.kit_selector.title": "キットを選択...",
   "gui.kit_selector.using": "&a「&7{0}&a」を選択しました。",
+
+  "gui.combat_shop.title": "戦闘ショップ",
+  "gui.potion_shop.title": "ポーションショップ",
+  "gui.shop.full_ext": "Annihilation Point",
+  "gui.shop.ext": "AP",
+  "gui.shop.more_points": "&c{0} {1}&c不足しています。",
+  "gui.shop.purchased": "&a購入しました！（-{0} {1}）",
+  "gui.shop.price": "&7価格： &f{0}&f {1}",
 
   "gui.next_page": "&a次のページ",
   "gui.prev_page": "&a前のページ",
@@ -139,6 +147,20 @@
 
   "command.vote.voted": "&a「{0}」に投票しました。",
 
+  "command.version.0": "&cA&9N&aN&eI&7v2 &oVer.{0}",
+  "command.version.1": "&7by Taitaitatata",
+
+  "command.rule.0": "&7**** &cAnnihilationの遊び方&7 ****&r",
+  "command.rule.1": "&7・&f相手の拠点に侵入し、ネクサスを壊そう！",
+  "command.rule.2": "&7・&fあなたのチームのネクサスが破壊されたらリスポーンできない。",
+  "command.rule.3": "&7・&fフェーズ1ではネクサスを壊せないから、その間に準備をしておこう。",
+  "command.rule.4": "&7・&fフェーズ2からネクサスが壊せます。",
+  "command.rule.5": "&7・&fフェーズ3ではダイヤモンドやエメラルドといった希少な鉱石が採掘できるようになります。",
+  "command.rule.6": "&7・&fフェーズ4になるとネクサスに対してのダメージが2に増加します。守りも固めておこう。",
+  "command.rule.7": "&7・&fフェーズ5になると1秒ごとにネクサスのダメージが1になるまで減り続ける。",
+  "command.rule.8": "&7・&f/kitを打つとキットが選択できる。好きなキットを使って戦ってみよう。",
+  "command.rule.9": "&7・&f/vote <map>でゲーム開始前にマップが投票できる。気になるマップなどに投票してみよう。",
+
   "xyz": "{0} / {1} / {2}",
   "xyz.format": "%.1f",
   "xyz.blockformat": "%d",
@@ -156,8 +178,9 @@
   "notify.lost_nexus_by_player": "「{0}」のネクサスは、{1} により失われました！",
   "notify.lost_nexus": "「{0}」のネクサスは失われました！",
   "notify.cant_mine_now": "&cこのフェーズでは、「{0}&c」を採掘することはできません。",
-  "notify.draw": "",
+  "notify.draw": "&6生存チームが0以下のため引き分けとなります。",
   "notify.stun": "&cもちっと&fスタン&cしてしまった！",
+  "notify.deposit_points": "&a+{0} {1}",
 
   "phase.name.1": "フェーズ 1",
   "phase.name.2": "フェーズ 2",
@@ -215,6 +238,19 @@
   "notify.big.lost_nexus.7": null,
   "notify.big.lost_nexus.8": null,
   "notify.big.lost_nexus.9": null,
+
+  "notify.big.won.0": null,
+  "notify.big.won.1": null,
+  "notify.big.won.2": null,
+  "notify.big.won.3": null,
+  "notify.big.won.4": "&f{0} &7が勝利しました！",
+  "notify.big.won.5": "&7皆さんお疲れ様です！",
+  "notify.big.won.6": null,
+  "notify.big.won.7": null,
+  "notify.big.won.8": null,
+  "notify.big.won.9": null,
+
+
 
   "big.no_char.0": "&7▒▒▒▒▒▒▒▒▒▒&r {0}",
   "big.no_char.1": "&7▒▒▒▒▒▒▒▒▒▒&r {1}",
@@ -292,6 +328,17 @@
   "big.b.7": "&7▒▒&-▒&7▒▒▒▒&-▒&7▒▒&r {7}",
   "big.b.8": "&7▒▒&-▒▒▒▒▒&7▒▒▒&r {8}",
   "big.b.9": "&7▒▒▒▒▒▒▒▒▒▒&r {9}",
+
+  "big.e.0": "&7▒▒▒▒▒▒▒▒▒▒&r {0}",
+  "big.e.1": "&7▒▒&-▒▒▒▒▒▒&7▒▒&r {1}",
+  "big.e.2": "&7▒▒&-▒&7▒▒▒▒▒▒▒&r {2}",
+  "big.e.3": "&7▒▒&-▒&7▒▒▒▒▒▒▒&r {3}",
+  "big.e.4": "&7▒▒&-▒▒▒▒▒&7▒▒▒&r {4}",
+  "big.e.5": "&7▒▒&-▒&7▒▒▒▒▒▒▒&r {5}",
+  "big.e.6": "&7▒▒&-▒&7▒▒▒▒▒▒▒&r {6}",
+  "big.e.7": "&7▒▒&-▒&7▒▒▒▒▒▒▒&r {7}",
+  "big.e.8": "&7▒▒&-▒▒▒▒▒▒&7▒▒&r {8}",
+  "big.e.9": "&7▒▒▒▒▒▒▒▒▒▒&r {9}",
 
   "big.g.0": "&7▒▒▒▒▒▒▒▒▒▒&r {0}",
   "big.g.1": "&7▒▒▒&-▒▒▒▒&7▒▒▒&r {1}",
