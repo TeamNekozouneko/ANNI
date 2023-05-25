@@ -83,6 +83,9 @@ public class KitSelector extends AbstractGui {
                 case "DEFENSE":
                     k = ANNIKit.DEFENSE;
                     break;
+                case "MOCHI_MOCHI":
+                    k = ANNIKit.MOCHI_MOCHI;
+                    break;
                 default: {
                     k = ANNIKit.DEFAULT;
                     break;
