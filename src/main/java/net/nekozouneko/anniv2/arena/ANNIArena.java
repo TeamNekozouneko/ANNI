@@ -23,6 +23,7 @@ import net.nekozouneko.anniv2.map.ANNIMap;
 import net.nekozouneko.anniv2.message.MessageManager;
 import net.nekozouneko.anniv2.util.CmnUtil;
 import net.nekozouneko.anniv2.util.FileUtil;
+import net.nekozouneko.anniv2.util.VaultUtil;
 import net.nekozouneko.anniv2.vote.VoteManager;
 import net.nekozouneko.commons.lang.collect.Collections3;
 import net.nekozouneko.commons.spigot.world.Worlds;
@@ -468,12 +469,16 @@ public class ANNIArena extends BukkitRunnable {
                                 .getRegionContainer().get(
                                         BukkitAdapter.adapt(copy)
                         );
-                rm.getRegions().values().forEach((pr) -> {
-                    if (pr.getType() != RegionType.GLOBAL)
-                        rm.removeRegion(pr.getId());
-                    else pr.setFlags(new HashMap<>());
-                });
+                try {
+                    rm.getRegions().values().forEach((pr) -> {
+                        if (pr.getType() != RegionType.GLOBAL)
+                            rm.removeRegion(pr.getId());
+                        else pr.setFlags(new HashMap<>());
+                    });
+                }
+                catch (NullPointerException e) { e.printStackTrace(); }
                 FileUtil.deleteWorld(copy);
+                copy = null;
             }
             if (VoteManager.isNowVoting(id)) VoteManager.endVote(id);
         }
@@ -559,9 +564,18 @@ public class ANNIArena extends BukkitRunnable {
                 if (living.size() == 1) {
                     ANNITeam won = living.get(0);
 
-                    broadcast(won.getTeamName() + "が勝利"); //TODO 翻訳可能なメッセージ化
+                    for (String s : mm.buildBigChar(
+                            'e', Character.toString(won.getCCChar()),
+                            (Object[]) mm.buildArray("notify.big.won",
+                                    won.getColoredName()
+                            ))
+                    ) broadcast(s);
+                    VaultUtil.ifAvail((eco) -> players.forEach(p -> {
+                            eco.depositPlayer(p, 3000);
+                            p.sendMessage(mm.build("notify.deposit_points", "3000", mm.build("gui.shop.full_ext")));
+                    }));
                 } else { // ではない (0 ~ (Integer.MIN_VALUE)) なら
-                    broadcast("すべてのチームのネクサスが破壊されたため引き分け的ななにか"); //TODO 翻訳可能なメッセージ化
+                    broadcast(mm.build("notify.draw"));
                 }
 
                 setTimer(ArenaState.GAME_OVER.nextPhaseIn());
@@ -775,7 +789,7 @@ public class ANNIArena extends BukkitRunnable {
 
         Map<Team, Integer> teamSize = new HashMap<>();
         getTeams().entrySet().stream()
-                .filter(ent -> !isNexusLost(ent.getKey()))
+                .filter(ent -> state.getId() < 0 || !isNexusLost(ent.getKey()))
                 .map(Map.Entry::getValue)
                 .forEach(t -> teamSize.put(t, t.getSize()));
 
