@@ -11,7 +11,7 @@ import java.util.List;
 public class DefenseKit extends AbsANNIKit{
 
     DefenseKit() {
-        super("defense", "DEFS", "kit.defense.name");
+        super("defense", "DEF", "kit.defense.name");
     }
 
     @Override
