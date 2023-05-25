@@ -68,7 +68,7 @@ public class AsyncPlayerChatListener implements Listener {
                 e.getRecipients().addAll(plugin.getCurrentGame().getTeamPlayers(at));
                 String form = plugin.getMessageManager().build("chat.global.format", prefix);
                 e.setFormat(form);
-                plugin.getLogger().info(String.format(form, e.getPlayer().getName(), e.getMessage()));
+                plugin.getLogger().info(String.format(form, username, e.getMessage()));
             }
             catch (Exception e1) {
                 e.setCancelled(true);
