@@ -24,8 +24,8 @@ public class ANNIAdminCommand implements CommandExecutor, TabCompleter {
         {
             put("debug", debugSubCommand);
             put("map", mapSubCommand);
-            put("createMap", createMapSubCommand);
-            put("setlobby", setLobbySubCommand);
+            put("create-map", createMapSubCommand);
+            put("set-lobby", setLobbySubCommand);
             put("arena", arenaSubCommand);
         }
     };
@@ -52,8 +52,11 @@ public class ANNIAdminCommand implements CommandExecutor, TabCompleter {
             }
         }
         else {
-            // あとで言語化する
-            sender.sendMessage("Help?");
+            //TODO あとで言語化する
+            sender.sendMessage(plugin.getMessageManager().build(
+                    "command.usage",
+                    "§c" + cmd.getUsage()
+            ));
         }
         return true;
     }
