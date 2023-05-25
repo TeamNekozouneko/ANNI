@@ -111,7 +111,7 @@ public class BlockBreakListener implements Listener {
             }
         }
 
-        if (current.getState().getId() > 0) {
+        if (current.getState().getId() >= 0) {
             if (e.getPlayer().getGameMode() != GameMode.CREATIVE) {
                 ItemStack mainHand = e.getPlayer().getInventory().getItemInMainHand();
 
@@ -203,7 +203,7 @@ public class BlockBreakListener implements Listener {
                     Ageable ageab = ((Ageable) e.getBlock().getBlockData());
 
                     if (ageab.getAge() >= ageab.getMaximumAge()) {
-                        if (new Random().nextDouble() < 0.05) {
+                        if (new Random().nextDouble() < 0.01) { // 1%
                             CmnUtil.giveOrDrop(e.getPlayer(), ItemStackBuilder.of(Material.APPLE).build());
                         }
                     }
