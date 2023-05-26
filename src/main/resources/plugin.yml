@@ -20,6 +20,16 @@ commands:
     description: "ANNI command"
     permission: anniv2.command.anni
     usage: "/<command> (help|version)"
+  combat-shop:
+    aliases: ["cshop", "shop-combat"]
+    description: "Combat Shop command"
+    permission: "anniv2.command.combatshop"
+    usage: "/<command>"
+  potion-shop:
+    aliases: ["pshop", "shop-potion"]
+    description: "Potion Shop Command"
+    permission: "anniv2.command.potionshop"
+    usage: "/<command>"
   vote:
     description: "Vote command"
     permission: anniv2.command.vote
