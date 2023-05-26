@@ -119,6 +119,7 @@
   "command.err.cant_vote_now": "&c今は投票できません。",
   "command.err.invalid_vote": "&c「{0}」は投票できません。",
   "command.err.game_start_failed": "&cゲームを開始できませんでした。",
+  "command.err.player_not_found": "「{0}」というプレイヤーは見つかりませんでした。",
 
   "command.usage": "&c使用方法: {0}",
 
