@@ -570,7 +570,7 @@ public class ANNIArena extends BukkitRunnable {
                                     won.getColoredName()
                             ))
                     ) broadcast(s);
-                    VaultUtil.ifAvail((eco) -> players.forEach(p -> {
+                    VaultUtil.ifAvail((eco) -> getTeamPlayers(won).forEach(p -> {
                             eco.depositPlayer(p, 3000);
                             p.sendMessage(mm.build("notify.deposit_points", "3000", mm.build("gui.shop.full_ext")));
                     }));
