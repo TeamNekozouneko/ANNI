@@ -8,6 +8,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.NamespacedKey;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
@@ -30,7 +31,7 @@ public class PlayerDeathListener implements Listener {
         if (e.getEntity().getKiller() != null) {
             ChatColor cck = CmnUtil.getJoinedTeam(e.getEntity().getKiller()) != null ?
                     CmnUtil.getJoinedTeam(e.getEntity().getKiller()).getColor() : ChatColor.WHITE;
-            String killerName = cc + e.getEntity().getName() + "(" + plugin.getCurrentGame().getKit(e.getEntity().getKiller()).getShortName() + ")";
+            String killerName = cck + e.getEntity().getKiller().getName() + "(" + plugin.getCurrentGame().getKit(e.getEntity().getKiller()).getShortName() + ")";
 
             e.setDeathMessage(mm.build("kill.default", deadName, killerName));
 
@@ -42,7 +43,8 @@ public class PlayerDeathListener implements Listener {
             });
         }
         else {
-            switch (e.getEntity().getLastDamageCause().getCause()) {
+            EntityDamageEvent ede = e.getEntity().getLastDamageCause();
+            switch (ede != null ? ede.getCause() : EntityDamageEvent.DamageCause.VOID) {
                 case FALL:
                     e.setDeathMessage(mm.build("kill.fall", deadName));
                     break;
