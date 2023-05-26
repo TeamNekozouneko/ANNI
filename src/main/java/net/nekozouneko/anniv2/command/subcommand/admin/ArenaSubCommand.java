@@ -8,7 +8,9 @@ import net.nekozouneko.anniv2.command.ASubCommand;
 import net.nekozouneko.anniv2.map.ANNIMap;
 import net.nekozouneko.anniv2.message.MessageManager;
 import net.nekozouneko.anniv2.util.CmdUtil;
+import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -80,6 +82,43 @@ public class ArenaSubCommand extends ASubCommand {
                 }
                 break;
             }
+            case "move:": {
+                if (args.size() >= 2) {
+                    ANNITeam at = Enums.getIfPresent(ANNITeam.class, args.get(1)).orNull();
+
+                    if (!args.get(1).equals("@leave") && at == null) {
+                        sender.sendMessage(mm.build("command.err.team_not_found", args.get(1)));
+                        return true;
+                    }
+
+                    Player target;
+                    if (args.size() >= 3) {
+                        target = Bukkit.getPlayer(args.get(2));
+
+                        if (target == null) {
+                            sender.sendMessage(mm.build("command.err.player_not_found", args.get(2)));
+                            return true;
+                        }
+                    }
+                    else {
+                        if (!(sender instanceof Player)) {
+                            sender.sendMessage(mm.build("command.err.player_only"));
+                            return true;
+                        }
+                        target = (Player) sender;
+                    }
+
+                    current.setTeam(target, at);
+
+                    if (current.getState().getId() >= 0) {
+                        target.getInventory().clear();
+                        target.getEnderChest().clear();
+                        target.setHealth(0);
+                    }
+                }
+                else return false;
+                break;
+            }
         }
 
         return true;
@@ -88,12 +127,13 @@ public class ArenaSubCommand extends ASubCommand {
     @Override
     public List<String> tabComplete(CommandSender sender, List<String> args) {
         if (args.size() == 1) {
-            return CmdUtil.simpleTabComplete(args.get(0), "disable-team", "enable-team", "set-map", "start");
+            return CmdUtil.simpleTabComplete(args.get(0), "disable-team", "enable-team", "move", "set-map", "start");
         }
         if (args.size() == 2) {
             switch (args.get(0)) {
                 case "disable-team":
                 case "enable-team":
+                case "move":
                     return CmdUtil.simpleTabComplete(
                             args.get(1),
                             Arrays.stream(ANNITeam.values())
@@ -109,12 +149,23 @@ public class ArenaSubCommand extends ASubCommand {
                     );
             }
         }
+        if (args.size() == 3) {
+            switch (args.get(0)) {
+                case "move":
+                    return CmdUtil.simpleTabComplete(
+                            args.get(2),
+                            Bukkit.getOnlinePlayers().stream()
+                                    .map(Player::getName)
+                                    .collect(Collectors.toList())
+                    );
+            }
+        }
 
         return Collections.emptyList();
     }
 
     @Override
     public String getUsage() {
-        return "(disable-team|enable-team|set-map|start) [<args>]";
+        return "(disable-team|enable-team|move|set-map|start) [<args>]";
     }
 }
