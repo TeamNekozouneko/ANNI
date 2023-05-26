@@ -21,7 +21,6 @@ import java.util.Random;
 import java.util.Set;
 import java.util.function.Consumer;
 
-//TODO 途中まで作ったんだろ?
 public class TeamSelector extends AbstractGui {
 
     private final Consumer<ANNITeam> onSelect;
