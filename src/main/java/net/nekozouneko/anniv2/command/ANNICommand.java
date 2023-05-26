@@ -53,7 +53,7 @@ public class ANNICommand implements CommandExecutor, TabCompleter {
         else {
             sender.sendMessage(plugin.getMessageManager().build(
                     "command.usage",
-                    "§c" + cmd.getUsage()
+                    "§c" + cmd.getUsage().replace("<command>", label)
             ));
         }
         return true;
