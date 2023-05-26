@@ -52,6 +52,13 @@ public class KitSelector extends AbstractGui {
         );
 
         inventory.setItem(3,
+                ItemStackBuilder.of(Material.BOW)
+                        .name("§r" + ANNIKit.BOW.getKit().getName())
+                        .persistentData(kin, PersistentDataType.STRING, ANNIKit.BOW.name())
+                        .build()
+        );
+
+        inventory.setItem(4,
                 SkullBuilder.of(Material.PLAYER_HEAD)
                         .name("§r" + ANNIKit.MOCHI_MOCHI.getKit().getName())
                         .persistentData(kin, PersistentDataType.STRING, ANNIKit.MOCHI_MOCHI.name())
@@ -76,6 +83,9 @@ public class KitSelector extends AbstractGui {
             switch (pdc.getOrDefault(kin, PersistentDataType.STRING, "")) {
                 case "ASSAULT":
                     k = ANNIKit.ASSAULT;
+                    break;
+                case "BOW":
+                    k = ANNIKit.BOW;
                     break;
                 case "DEFAULT":
                     k = ANNIKit.DEFAULT;
