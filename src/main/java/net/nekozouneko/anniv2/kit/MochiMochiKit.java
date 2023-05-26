@@ -19,11 +19,11 @@ public class MochiMochiKit extends AbsANNIKit{
     public ItemStack[] getKitContents() {
         ItemStack[] inv = new ItemStack[41];
 
-        inv[0] = ItemStackBuilder.of(Material.GOLDEN_SWORD).build();
-        inv[1] = ItemStackBuilder.of(Material.WOODEN_PICKAXE).build();
-        inv[2] = ItemStackBuilder.of(Material.WOODEN_AXE).build();
-        inv[3] = ItemStackBuilder.of(Material.WOODEN_SHOVEL).build();
-        inv[8] = StunGrenade.get(3);
+        inv[0] = ItemStackBuilder.of(Material.WOODEN_SWORD).build();
+        inv[1] = ItemStackBuilder.of(Material.STONE_PICKAXE).build();
+        inv[2] = ItemStackBuilder.of(Material.STONE_AXE).build();
+        inv[3] = ItemStackBuilder.of(Material.STONE_SHOVEL).build();
+        inv[8] = StunGrenade.get(10);
 
         inv[39] = LeatherArmorBuilder.of(Material.LEATHER_HELMET).build();
         inv[38] = LeatherArmorBuilder.of(Material.LEATHER_CHESTPLATE).build();
