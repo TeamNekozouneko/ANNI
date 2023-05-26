@@ -4,8 +4,6 @@ import net.nekozouneko.anniv2.ANNIPlugin;
 import net.nekozouneko.anniv2.arena.ANNIArena;
 import net.nekozouneko.anniv2.arena.ArenaState;
 import net.nekozouneko.anniv2.command.ASubCommand;
-import net.nekozouneko.anniv2.gui.shop.CombatShop;
-import net.nekozouneko.anniv2.gui.shop.PotionShop;
 import net.nekozouneko.anniv2.kit.ANNIKit;
 import net.nekozouneko.anniv2.kit.items.StunGrenade;
 import net.nekozouneko.anniv2.listener.BlockBreakListener;
@@ -46,12 +44,6 @@ public class DebugSubCommand extends ASubCommand {
                 break;
             case "get-stung":
                 ((Player) sender).getInventory().addItem(StunGrenade.get(16));
-                break;
-            case "potion":
-                new PotionShop(ANNIPlugin.getInstance(), (Player) sender).open();
-                break;
-            case "combat":
-                new CombatShop(ANNIPlugin.getInstance(), (Player) sender).open();
                 break;
         }
 
