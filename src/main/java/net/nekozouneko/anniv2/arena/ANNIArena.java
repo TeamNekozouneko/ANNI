@@ -14,6 +14,7 @@ import com.sk89q.worldguard.protection.regions.*;
 import fr.mrmicky.fastboard.FastBoard;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
+import net.nekozouneko.anniv2.ANNIConfig;
 import net.nekozouneko.anniv2.ANNIPlugin;
 import net.nekozouneko.anniv2.arena.team.ANNITeam;
 import net.nekozouneko.anniv2.board.BoardManager;
@@ -85,6 +86,11 @@ public class ANNIArena extends BukkitRunnable {
         );
 
         createTeams();
+
+        for (ANNITeam at : ANNITeam.values()) {
+            if (!ANNIConfig.isTeamEnabled(at))
+                disableTeam(at);
+        }
     }
 
     public String getId() {
@@ -429,7 +435,7 @@ public class ANNIArena extends BukkitRunnable {
             players.forEach(this::assignAtEquality);
             nexus.clear();
             getTeams().forEach((at, team) -> {
-                setNexusHealth(at, 100);
+                setNexusHealth(at, ANNIConfig.getDefaultHealth());
                 Location sl = map.getSpawnOrDefault(at).toLocation(copy);
                 team.getPlayers().stream()
                         .filter(OfflinePlayer::isOnline)
@@ -643,7 +649,7 @@ public class ANNIArena extends BukkitRunnable {
                             mm.build("scoreboard.waiting.2.more_player", (
                                     enabledTeams.entrySet().stream()
                                             .filter(Map.Entry::getValue)
-                                            .count() * 2
+                                            .count() * ANNIConfig.getTeamMinPlayers()
                                             - players.size())
                             );
 
@@ -660,7 +666,7 @@ public class ANNIArena extends BukkitRunnable {
                         fb.updateLines(mm.buildList("scoreboard.waiting_voting",
                                 df.format(Calendar.getInstance().getTime()),
                                 news,
-                                players.size() + " / 120",
+                                players.size() + " / " + (ANNIConfig.getTeamMaxPlayers() * getEnabledTeams().size()),
                                 nowRes.size() > 0 ? nowRes.get(0).getKey().getName() + " - " + nowRes.get(0).getValue(): "",
                                 nowRes.size() > 1 ? nowRes.get(1).getKey().getName() + " - " + nowRes.get(1).getValue(): "",
                                 nowRes.size() > 2 ? nowRes.get(2).getKey().getName() + " - " + nowRes.get(2).getValue(): ""

@@ -1,9 +1,10 @@
-arena-default:
+default-arena:
   enabled-teams:
     red: true
     blue: true
-    green: false
-    yellow: false
+    green: true
+    yellow: true
 
-  max-players: 120
+  team-min-players: 2
+  team-max-players: 30
   default-health: 100

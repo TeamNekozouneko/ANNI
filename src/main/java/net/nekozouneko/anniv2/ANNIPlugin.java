@@ -91,6 +91,9 @@ public final class ANNIPlugin extends JavaPlugin {
     public void onEnable() {
         plugin = this;
 
+        saveDefaultConfig();
+        ANNIConfig.setConfig(getConfig());
+
         setupMessageManager();
 
         boardManager = new BoardManager(this);
@@ -182,6 +185,7 @@ public final class ANNIPlugin extends JavaPlugin {
             );
         }
     }
+
     private void unregisterRecipe() {
         NamespacedKey g2f = new NamespacedKey(this, "gravel_to_flint");
 

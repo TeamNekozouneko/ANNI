@@ -1,0 +1,50 @@
+package net.nekozouneko.anniv2;
+
+import com.google.common.base.Preconditions;
+import net.nekozouneko.anniv2.arena.team.ANNITeam;
+import org.bukkit.configuration.file.FileConfiguration;
+
+public class ANNIConfig {
+
+    private static FileConfiguration conf;
+
+    static void setConfig(FileConfiguration conf) {
+        ANNIConfig.conf = conf;
+    }
+
+    public static boolean isTeamEnabled(ANNITeam at) {
+        Preconditions.checkArgument(at != null);
+
+        StringBuilder sb = new StringBuilder("default-arena.enabled-teams.");
+
+        switch (at) {
+            case RED:
+                sb.append("red");
+                break;
+            case BLUE:
+                sb.append("blue");
+                break;
+            case GREEN:
+                sb.append("green");
+                break;
+            case YELLOW:
+                sb.append("yellow");
+                break;
+        }
+
+        return conf.getBoolean(sb.toString());
+    }
+
+    public static int getTeamMinPlayers() {
+        return conf.getInt("default-arena.team-min-players");
+    }
+
+    public static int getTeamMaxPlayers() {
+        return conf.getInt("default-arena.team-max-players");
+    }
+
+    public static int getDefaultHealth() {
+        return conf.getInt("default-arena.default-health");
+    }
+
+}
