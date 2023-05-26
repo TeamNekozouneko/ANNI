@@ -13,6 +13,7 @@ import net.nekozouneko.commons.spigot.inventory.ItemStackBuilder;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
+import org.bukkit.inventory.ShapedRecipe;
 import org.bukkit.inventory.ShapelessRecipe;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scoreboard.Scoreboard;
@@ -110,6 +111,7 @@ public final class ANNIPlugin extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new BlockPlaceListener(), this);
         getServer().getPluginManager().registerEvents(new PlayerDamageListener(), this);
         getServer().getPluginManager().registerEvents(new PlayerDeathListener(), this);
+        getServer().getPluginManager().registerEvents(new PlayerDenyActionListener(), this);
         getServer().getPluginManager().registerEvents(new PlayerJoinListener(), this);
         getServer().getPluginManager().registerEvents(new PlayerQuitListener(), this);
         getServer().getPluginManager().registerEvents(new PlayerRespawnListener(), this);
@@ -175,7 +177,8 @@ public final class ANNIPlugin extends JavaPlugin {
     }
 
     private void registerRecipe() {
-        NamespacedKey g2f = new NamespacedKey(this, "gravel_to_flint");
+        NamespacedKey g2f = new NamespacedKey(this, "flint");
+        NamespacedKey ega = new NamespacedKey(this, "senchanted_golden_apple");
 
         if (getServer().getRecipe(g2f) == null) {
             getServer().addRecipe(
@@ -184,12 +187,27 @@ public final class ANNIPlugin extends JavaPlugin {
                     ).addIngredient(Material.GRAVEL)
             );
         }
+        if (getServer().getRecipe(ega) == null) {
+            getServer().addRecipe(
+                    new ShapedRecipe(ega, ItemStackBuilder.of(Material.ENCHANTED_GOLDEN_APPLE).build())
+                            .shape(
+                                    "GGG",
+                                    "GAG",
+                                    "GGG"
+                            )
+                            .setIngredient('G', Material.GOLD_BLOCK)
+                            .setIngredient('A', Material.APPLE)
+            );
+        }
     }
 
     private void unregisterRecipe() {
-        NamespacedKey g2f = new NamespacedKey(this, "gravel_to_flint");
+        NamespacedKey g2f = new NamespacedKey(this, "flint");
+        NamespacedKey ega = new NamespacedKey(this, "enchanted_golden_apple");
 
         if (getServer().getRecipe(g2f) != null)
             getServer().removeRecipe(g2f);
+        if (getServer().getRecipe(ega) != null)
+            getServer().removeRecipe(ega);
     }
 }
