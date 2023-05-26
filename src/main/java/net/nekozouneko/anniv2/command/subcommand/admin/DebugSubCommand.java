@@ -73,6 +73,6 @@ public class DebugSubCommand extends ASubCommand {
 
     @Override
     public String getUsage() {
-        return "set-state <state>";
+        return "(clear-queued|get-stung|reload-map|set-kit|set-state|set-timer) [<args>]";
     }
 }
