@@ -39,6 +39,7 @@ public class MapEditor extends AbstractGui {
                     this, 27,
                     mm.build("gui.map_editor.title", map.getId())
             );
+        inventory.clear();
 
         for (int i = 0; i < inventory.getSize(); i++)
             inventory.setItem(i,

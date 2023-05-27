@@ -27,6 +27,7 @@ public class KitSelector extends AbstractGui {
     public void update() {
         if (inventory == null)
             inventory = Bukkit.createInventory(this, 27, mm.build("gui.kit_selector.title"));
+        inventory.clear();
 
         NamespacedKey kin = new NamespacedKey(plugin, "kit");
 

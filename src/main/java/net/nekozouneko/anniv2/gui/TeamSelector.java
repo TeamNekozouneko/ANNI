@@ -41,6 +41,7 @@ public class TeamSelector extends AbstractGui {
     public void update() {
         if (inventory == null)
             inventory = Bukkit.createInventory(this, 9, mm.build("gui.team_selector.title"));
+        inventory.clear();
 
         for (int i = 0; i < inventory.getSize(); i++)
             inventory.setItem(i, ItemStackBuilder.of(Material.GRAY_STAINED_GLASS_PANE)

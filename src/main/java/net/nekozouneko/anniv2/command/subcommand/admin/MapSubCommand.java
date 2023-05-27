@@ -151,6 +151,7 @@ public class MapSubCommand extends ASubCommand {
                             );
                     break;
                 }
+                default: return false;
             }
         }
 

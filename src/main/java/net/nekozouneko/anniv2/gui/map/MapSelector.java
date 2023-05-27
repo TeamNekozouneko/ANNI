@@ -57,6 +57,7 @@ public class MapSelector extends AbstractGui {
                         Objects.toString(getTotalPageCount())
                 )
             );
+        inventory.clear();
 
         ItemStack back = ItemStackBuilder.of(Material.GRAY_STAINED_GLASS_PANE)
                 .name(" ")
