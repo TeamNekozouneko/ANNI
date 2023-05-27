@@ -5,6 +5,7 @@ import net.nekozouneko.anniv2.ANNIPlugin;
 import net.nekozouneko.anniv2.arena.ANNIArena;
 import net.nekozouneko.anniv2.arena.team.ANNITeam;
 import net.nekozouneko.anniv2.command.ASubCommand;
+import net.nekozouneko.anniv2.gui.arena.ArenaDashboard;
 import net.nekozouneko.anniv2.map.ANNIMap;
 import net.nekozouneko.anniv2.message.MessageManager;
 import net.nekozouneko.anniv2.util.CmdUtil;
@@ -25,7 +26,11 @@ public class ArenaSubCommand extends ASubCommand {
     @Override
     public boolean execute(CommandSender sender, List<String> args) {
         if (args.size() == 0) {
-            return false;
+            if (sender instanceof Player) {
+                new ArenaDashboard(plugin, (Player) sender).open();
+                return true;
+            }
+            else return false;
         }
 
         ANNIArena current = plugin.getCurrentGame();
@@ -180,6 +185,6 @@ public class ArenaSubCommand extends ASubCommand {
 
     @Override
     public String getUsage() {
-        return "(disable-team|enable-team|move|set-map|start) [<args>]";
+        return "[(disable-team|enable-team|move|set-map|start) [<args>]]";
     }
 }
