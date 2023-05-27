@@ -90,6 +90,12 @@
   "gui.map_editor.set_team_nexus_loc": "&f{0}&aのネクサスの位置を設定しました。&7({1})",
 
   "gui.arena_dashboard.title": "アリーナダッシュボード ({0})",
+  "gui.arena_dashboard.select_map": "&fマップを選択",
+  "gui.arena_dashboard.disabled_nexus": "&c無効化されています。",
+  "gui.arena_dashboard.enabled_nexus": "&a有効化されています。",
+  "gui.arena_dashboard.launch.start": "&a今すぐ開始",
+  "gui.arena_dashboard.launch.end_now": "&c今すぐ終了",
+  "gui.arena_dashboard.launch.restore": "&4復帰",
 
   "gui.team_selector.title": "チームを選択...",
   "gui.team_selector.random": "&fランダム",
@@ -107,6 +113,7 @@
 
   "gui.next_page": "&a次のページ",
   "gui.prev_page": "&a前のページ",
+  "gui.random": "&fランダム",
 
   "command.err.map_not_found": "&c「{0}」というマップは見つかりませんでした。",
   "command.err.world_not_found": "&c「{0}」というワールドは見つかりませんでした。",
