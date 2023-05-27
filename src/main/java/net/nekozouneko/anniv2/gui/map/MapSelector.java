@@ -29,14 +29,15 @@ public class MapSelector extends AbstractGui {
 
     private int page;
     private boolean continu;
-    private ANNIMap map = null;
+    private boolean rand;
 
-    public MapSelector(ANNIPlugin plugin, Player player, int page, Consumer<ANNIMap> onClose) {
+    public MapSelector(ANNIPlugin plugin, Player player, int page, boolean random, Consumer<ANNIMap> onClose) {
         super(plugin, player);
 
         this.mapm = plugin.getMapManager();
         this.onClose = onClose;
         this.page = page < 1 || getTotalPageCount() < page ? 1 : page;
+        this.rand = random;
         continu = false;
     }
 
@@ -64,6 +65,15 @@ public class MapSelector extends AbstractGui {
                 .build();
 
         for (int i = 27; i < 36; i++) inventory.setItem(i, back);
+
+        if (rand) {
+            inventory.setItem(31,
+                    ItemStackBuilder.of(Material.PAPER)
+                            .name(plugin.getMessageManager().build("gui.random"))
+                            .persistentData(new NamespacedKey(plugin, "map"), PersistentDataType.STRING, "@random")
+                            .build()
+            );
+        }
 
         if (page < getTotalPageCount()) {
             ItemStack next = ItemStackBuilder.of(Material.ARROW)
@@ -135,7 +145,11 @@ public class MapSelector extends AbstractGui {
                     new NamespacedKey(plugin, "map"), PersistentDataType.STRING
             );
 
-            map = mapm.getMap(mid);
+            if (onClose != null) Bukkit.getScheduler().runTask(plugin, () ->
+                    onClose.accept(
+                            mid.equals("@random") ? null : mapm.getMap(mid)
+                    )
+            );
             player.closeInventory();
         }
         else if (item.getItemMeta().getPersistentDataContainer().has(
@@ -154,11 +168,7 @@ public class MapSelector extends AbstractGui {
     public void onClose(InventoryCloseEvent e) {
         if (e.getInventory().getHolder() != this) return;
 
-        if (!continu) {
-            unregisterAllGuiListeners(player);
-
-            if (onClose != null) Bukkit.getScheduler().runTask(plugin, () -> onClose.accept(map));
-        }
+        if (!continu) unregisterAllGuiListeners(player);
         else continu = false;
     }
 
