@@ -118,6 +118,7 @@ public class ANNIArena extends BukkitRunnable {
             player.sendMessage(mm.buildBigChar(CmnUtil.numberToChar(state.getId()), Character.toString(at.getCCChar()),
                     (Object[]) mm.buildArray("notify.big.mid_join", at.getTeamName())
             ));
+            player.getInventory().setContents(ANNIKit.teamColor(getKit(player), at));
         }
     }
 
@@ -374,6 +375,7 @@ public class ANNIArena extends BukkitRunnable {
 
             if (copyrm != null && origrm != null) {
                 // 保護領域のコピー
+
                 origrm.getRegions().forEach((s, pr) -> {
                     if (pr.getType() == RegionType.GLOBAL) {
                         copyrm.getRegions().values().forEach(pr1 -> {
@@ -478,11 +480,9 @@ public class ANNIArena extends BukkitRunnable {
                                         BukkitAdapter.adapt(copy)
                         );
                 try {
-                    rm.getRegions().values().forEach((pr) -> {
-                        if (pr.getType() != RegionType.GLOBAL)
-                            rm.removeRegion(pr.getId());
-                        else pr.setFlags(new HashMap<>());
-                    });
+                    rm.getRegions().values().forEach((pr) ->
+                        rm.removeRegion(pr.getId())
+                    );
                 }
                 catch (NullPointerException e) { e.printStackTrace(); }
                 FileUtil.deleteWorld(copy);
