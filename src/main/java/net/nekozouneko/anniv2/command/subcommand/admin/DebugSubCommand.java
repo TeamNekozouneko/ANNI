@@ -45,6 +45,7 @@ public class DebugSubCommand extends ASubCommand {
             case "get-stung":
                 ((Player) sender).getInventory().addItem(StunGrenade.get(16));
                 break;
+            default: return false;
         }
 
         return true;
