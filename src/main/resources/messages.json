@@ -120,6 +120,7 @@
   "command.err.invalid_vote": "&c「{0}」は投票できません。",
   "command.err.game_start_failed": "&cゲームを開始できませんでした。",
   "command.err.player_not_found": "「{0}」というプレイヤーは見つかりませんでした。",
+  "command.err.disabled_team": "「{0}」というチームは無効化されています。",
 
   "command.usage": "&c使用方法: {0}",
 
@@ -145,6 +146,8 @@
   "command.arena.set_map": "&aマップを「{0}」に設定しました。",
   "command.arena.map_random": "&aマップを投票による選択に設定しました。",
   "command.arena.starting": "&aゲームを開始しています...",
+  "command.arena.move": "&a{0} を {1}&a に移動しました。",
+  "command.arena.move.leave": "&a{0} を退出させました。",
 
   "command.vote.voted": "&a「{0}」に投票しました。",
 
@@ -182,6 +185,8 @@
   "notify.draw": "&6生存チームが0以下のため引き分けとなります。",
   "notify.stun": "&cもちっと&fスタン&cしてしまった！",
   "notify.deposit_points": "&a+{0} {1}",
+  "notify.moved": "&6あなたは {0}&6 に移動されました。",
+  "notify.moved_leave": "&6あなたは退出させられました。",
 
   "phase.name.1": "フェーズ 1",
   "phase.name.2": "フェーズ 2",
@@ -250,8 +255,6 @@
   "notify.big.won.7": null,
   "notify.big.won.8": null,
   "notify.big.won.9": null,
-
-
 
   "big.no_char.0": "&7▒▒▒▒▒▒▒▒▒▒&r {0}",
   "big.no_char.1": "&7▒▒▒▒▒▒▒▒▒▒&r {1}",
