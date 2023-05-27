@@ -82,12 +82,17 @@ public class ArenaSubCommand extends ASubCommand {
                 }
                 break;
             }
-            case "move:": {
+            case "move": {
                 if (args.size() >= 2) {
                     ANNITeam at = Enums.getIfPresent(ANNITeam.class, args.get(1)).orNull();
 
-                    if (!args.get(1).equals("@leave") && at == null) {
+                    if (at == null && !args.get(1).equals("@leave")) {
                         sender.sendMessage(mm.build("command.err.team_not_found", args.get(1)));
+                        return true;
+                    }
+
+                    if (!current.isEnabledTeam(at)) {
+                        sender.sendMessage(mm.build("command.err.disabled_team"));
                         return true;
                     }
 
@@ -109,16 +114,25 @@ public class ArenaSubCommand extends ASubCommand {
                     }
 
                     current.setTeam(target, at);
+                    if (at != null)
+                        sender.sendMessage(mm.build("command.arena.move", target.getName(), at.getTeamName()));
+                    else sender.sendMessage(mm.build("command.arena.move.leave", target.getName()));
 
                     if (current.getState().getId() >= 0) {
                         target.getInventory().clear();
                         target.getEnderChest().clear();
                         target.setHealth(0);
+                        if (!target.equals(sender)) {
+                            if (at != null)
+                                target.sendMessage(mm.build("notify.moved", at.getTeamName()));
+                            else sender.sendMessage(mm.build("notify.moved_leave"));
+                        }
                     }
                 }
                 else return false;
                 break;
             }
+            default: return false;
         }
 
         return true;

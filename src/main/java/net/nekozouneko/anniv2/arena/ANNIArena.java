@@ -198,11 +198,13 @@ public class ANNIArena extends BukkitRunnable {
         return Collections.unmodifiableMap(enabledTeams);
     }
 
-    public boolean setTeam(Player player, ANNITeam team) {
-        if (team != null)
+    public void setTeam(Player player, ANNITeam team) {
+        if (player.getScoreboard() != plugin.getPluginBoard()) player.setScoreboard(plugin.getPluginBoard());
+
+        getTeams(false).inverse().keySet().forEach(team1 -> team1.removePlayer(player));
+        if (team != null) {
             getTeam(team).addPlayer(player);
-        else getTeams(false).inverse().forEach((team1, ant) -> team1.removePlayer(player));
-        return true;
+        }
     }
 
     public Team getTeam(ANNITeam team) {
