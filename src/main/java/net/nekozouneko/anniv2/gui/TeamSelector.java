@@ -90,7 +90,7 @@ public class TeamSelector extends AbstractGui {
         if (!disableRandom) {
             inventory.setItem(8,
                     ItemStackBuilder.of(Material.WHITE_WOOL)
-                            .name(mm.build("gui.team_selector.random"))
+                            .name(mm.build("gui.random"))
                             .persistentData(tea, PersistentDataType.STRING, "@random")
                             .build()
             );
