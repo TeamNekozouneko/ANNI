@@ -4,8 +4,10 @@ import net.nekozouneko.anniv2.ANNIPlugin;
 import org.bukkit.GameMode;
 import org.bukkit.NamespacedKey;
 import org.bukkit.Sound;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.CraftItemEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryType;
@@ -17,7 +19,7 @@ import org.bukkit.persistence.PersistentDataType;
 public class PlayerDenyActionListener implements Listener {
 
     private final ANNIPlugin plugin = ANNIPlugin.getInstance();
-    private final NamespacedKey anniKit = new NamespacedKey(plugin, "anni-kit");
+    private final NamespacedKey anniKit = new NamespacedKey(plugin, "kit-item");
 
     @EventHandler
     public void onDrop(PlayerDropItemEvent e) {
@@ -56,7 +58,12 @@ public class PlayerDenyActionListener implements Listener {
                     anniKit, PersistentDataType.INTEGER, 0
             ) == 1) {
                 if (e.getWhoClicked().getGameMode() != GameMode.CREATIVE && e.getInventory() != null) {
-                    if (
+                    if (e.getClick() == ClickType.DROP || e.getClick() == ClickType.CONTROL_DROP) {
+                        e.setCurrentItem(null);
+                        ((Player) e.getWhoClicked()).playSound(e.getWhoClicked().getLocation(), Sound.ENTITY_ITEM_BREAK, 1, 1);
+                        return;
+                    }
+                    else if (
                             !(e.getInventory().getType() == InventoryType.CRAFTING ||
                                     e.getInventory().getType() == InventoryType.PLAYER ||
                                     e.getInventory().getType() == InventoryType.CREATIVE
