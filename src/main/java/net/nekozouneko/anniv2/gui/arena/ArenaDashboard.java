@@ -19,7 +19,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 
-//TODO いい加減作れよ
 public class ArenaDashboard extends AbstractGui {
 
     private final MessageManager mm = plugin.getMessageManager();
