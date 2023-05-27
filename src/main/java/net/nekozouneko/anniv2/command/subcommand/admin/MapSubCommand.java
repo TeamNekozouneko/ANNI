@@ -30,7 +30,7 @@ public class MapSubCommand extends ASubCommand {
     public boolean execute(CommandSender sender, List<String> args) {
         if (args.size() == 0) {
             if (sender instanceof Player) {
-                new MapSelector(ANNIPlugin.getInstance(), (Player) sender, 1, (map) -> {
+                new MapSelector(ANNIPlugin.getInstance(), (Player) sender, 1, false, (map) -> {
                     if (map != null)
                         new MapEditor(plugin, (Player) sender, map).open();
                 }).open();
