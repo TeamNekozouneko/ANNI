@@ -44,6 +44,7 @@ public class StunGrenade implements Listener {
     public void onLaunch(ProjectileLaunchEvent e) {
         if (e.getEntity().getShooter() != null && e.getEntity().getShooter() instanceof Player) {
             Player s = ((Player) e.getEntity().getShooter());
+            if (s.getInventory().getItemInMainHand() == null || s.getInventory().getItemInMainHand().getType().isAir()) return;
             PersistentDataContainer pdc = s.getInventory().getItemInMainHand()
                     .getItemMeta().getPersistentDataContainer();
             NamespacedKey siKey = new NamespacedKey(ANNIPlugin.getInstance(), "special-item");
