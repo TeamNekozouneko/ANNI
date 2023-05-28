@@ -34,7 +34,7 @@ public class PlayerRespawnListener implements Listener {
                 }
                 else e.setRespawnLocation(current.getMap().getSpawnOrDefault(at).toLocation(current.getCopyWorld()));
             }
-            else e.setRespawnLocation(current.getMap().getDefaultSpawn().toLocation(current.getCopyWorld()));
+            else {if (plugin.getLobby() != null) e.setRespawnLocation(plugin.getLobby());}
 
             // リスキル対策で 耐性4 (80%カット) と スピード 1 をリスポーン時付与
             e.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 200, 4, false, false, true));

@@ -6,6 +6,7 @@ import net.nekozouneko.anniv2.board.BoardManager;
 import net.nekozouneko.anniv2.command.*;
 import net.nekozouneko.anniv2.kit.items.StunGrenade;
 import net.nekozouneko.anniv2.listener.*;
+import net.nekozouneko.anniv2.listener.votifier.VotifierListener;
 import net.nekozouneko.anniv2.map.MapManager;
 import net.nekozouneko.anniv2.message.MessageManager;
 import net.nekozouneko.anniv2.util.FileUtil;
@@ -115,6 +116,15 @@ public final class ANNIPlugin extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new PlayerJoinListener(), this);
         getServer().getPluginManager().registerEvents(new PlayerQuitListener(), this);
         getServer().getPluginManager().registerEvents(new PlayerRespawnListener(), this);
+
+        if (ANNIConfig.isVotifierVoteEnabled()) {
+            try {
+                Class.forName("com.vexsoftware.votifier.model.VotifierEvent");
+                getServer().getPluginManager().registerEvents(new VotifierListener(), this);
+            } catch (ClassNotFoundException e) {
+                getLogger().info("Votifier event class is not defined.");
+            }
+        }
 
         getServer().getPluginManager().registerEvents(new StunGrenade(), this);
 

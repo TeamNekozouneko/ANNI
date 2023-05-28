@@ -47,4 +47,12 @@ public class ANNIConfig {
         return conf.getInt("default-arena.default-health");
     }
 
+    public static boolean isVotifierVoteEnabled() {
+        return conf.getBoolean("on-votifier.enabled");
+    }
+
+    public static double getVotePoints() {
+        return conf.getDouble("on-votifier.points");
+    }
+
 }

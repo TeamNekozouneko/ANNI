@@ -14,6 +14,7 @@ public class AsyncPlayerChatListener implements Listener {
 
     @EventHandler
     public void onChat(AsyncPlayerChatEvent e) {
+
         if (BlockBreakListener.getQueuedOnDamageMap().containsKey(e.getPlayer().getUniqueId())) {
             if (e.getMessage().equalsIgnoreCase("cancel")) {
                 BlockBreakListener.getQueuedOnDamageMap().remove(e.getPlayer().getUniqueId());

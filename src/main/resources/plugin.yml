@@ -8,6 +8,7 @@ authors: [Taitaitatata]
 description: '${project.description}'
 website: '${project.url}'
 
+softdepend: [Votifier]
 depend: [Vault, WorldEdit, WorldGuard]
 
 commands:

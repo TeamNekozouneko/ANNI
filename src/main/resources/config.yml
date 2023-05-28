@@ -8,3 +8,8 @@ default-arena:
   team-min-players: 2
   team-max-players: 30
   default-health: 100
+
+on-votifier:
+  enabled: true
+
+  points: 1000
