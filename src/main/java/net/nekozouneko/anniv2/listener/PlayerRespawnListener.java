@@ -31,13 +31,18 @@ public class PlayerRespawnListener implements Listener {
 
                     if (plugin.getLobby() != null)
                         e.setRespawnLocation(plugin.getLobby());
+
+                    return;
                 }
                 else e.setRespawnLocation(current.getMap().getSpawnOrDefault(at).toLocation(current.getCopyWorld()));
             }
-            else {if (plugin.getLobby() != null) e.setRespawnLocation(plugin.getLobby());}
+            else {
+                if (plugin.getLobby() != null) e.setRespawnLocation(plugin.getLobby());
+                return;
+            }
 
-            // リスキル対策で 耐性4 (80%カット) と スピード 1 をリスポーン時付与
-            e.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 200, 4, false, false, true));
+            // リスキル対策で 耐性255 と スピード 1 をリスポーン時付与
+            e.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 200, 255, false, false, true));
             e.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 200, 1, false, false, true));
 
             e.getPlayer().setGameMode(GameMode.SURVIVAL);
