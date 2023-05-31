@@ -42,6 +42,7 @@ import org.bukkit.scoreboard.Team;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 public class ANNIArena extends BukkitRunnable {
@@ -113,12 +114,14 @@ public class ANNIArena extends BukkitRunnable {
 
         if (getState().getId() > 0) {
             assignAtEquality(player);
-            player.teleport(map.getSpawnOrDefault(getTeamByPlayer(player)).toLocation(copy));
-            ANNITeam at = getTeamByPlayer(player);
-            player.sendMessage(mm.buildBigChar(CmnUtil.numberToChar(state.getId()), Character.toString(at.getCCChar()),
-                    (Object[]) mm.buildArray("notify.big.mid_join", at.getTeamName())
-            ));
-            player.getInventory().setContents(ANNIKit.teamColor(getKit(player), at));
+            if (getTeamByPlayer(player) != null && !isNexusLost(getTeamByPlayer(player))) {
+                player.teleport(map.getSpawnOrDefault(getTeamByPlayer(player)).toLocation(copy));
+                ANNITeam at = getTeamByPlayer(player);
+                player.sendMessage(mm.buildBigChar(CmnUtil.numberToChar(state.getId()), Character.toString(at.getCCChar()),
+                        (Object[]) mm.buildArray("notify.big.mid_join", at.getTeamName())
+                ));
+                player.getInventory().setContents(ANNIKit.teamColor(getKit(player), at));
+            }
         }
     }
 
@@ -357,6 +360,9 @@ public class ANNIArena extends BukkitRunnable {
         if (plugin.getLobby() == null) return false;
         if (plugin.getMapManager().getMaps().isEmpty()) return false;
 
+        Logger log = plugin.getLogger();
+
+        log.info("Starting game... (ID: " + id + ")");
         try {
             if (map == null) {
                 if (VoteManager.isNowVoting(id) && !VoteManager.getResult(id).isEmpty()) {
@@ -365,9 +371,15 @@ public class ANNIArena extends BukkitRunnable {
                 else map = plugin.getMapManager().getMaps()
                         .get(rand.nextInt(plugin.getMapManager().getMaps().size()));
             }
+            log.info("Map: " + map.getId());
 
+            log.info("Copying map...");
             copy = Worlds.copyWorld(map.getBukkitWorld(), id + "-anni");
-            if (copy == null) return false;
+            if (copy == null) {
+                log.warning("Copy map failed.");
+                return false;
+            }
+            log.info("Copy complete.");
 
             RegionContainer rc = WorldGuard.getInstance().getPlatform().getRegionContainer();
             RegionManager copyrm = rc.get(BukkitAdapter.adapt(copy));
@@ -375,49 +387,57 @@ public class ANNIArena extends BukkitRunnable {
 
             if (copyrm != null && origrm != null) {
                 // 保護領域のコピー
-
+                origrm.getRegions().clear();
                 origrm.getRegions().forEach((s, pr) -> {
+                    log.info("Copying region: " + s + " / " + pr.getId());
+                    ProtectedRegion newpr;
                     if (pr.getType() == RegionType.GLOBAL) {
-                        copyrm.getRegions().values().forEach(pr1 -> {
-                            if (pr.getId().equals(s) && pr1.getType() == RegionType.GLOBAL) {
-                                pr1.setFlags(new HashMap<>(pr.getFlags()));
-                            }
-                        });
+                        log.info(s + " is global region");
+                        newpr = new GlobalProtectedRegion(s);
+                    }
+                    else if (pr.getType() == RegionType.POLYGON) {
+                        log.info(s + " is polygon region.");
+                        newpr = new ProtectedPolygonalRegion(s,
+                                pr.getPoints(),
+                                pr.getMinimumPoint().getY(),
+                                pr.getMaximumPoint().getY()
+                        );
                     }
                     else {
-                        ProtectedRegion newpr;
-                        if (pr.getType() == RegionType.POLYGON) {
-                            newpr = new ProtectedPolygonalRegion(s,
-                                    pr.getPoints(),
-                                    pr.getMinimumPoint().getY(),
-                                    pr.getMaximumPoint().getY()
-                            );
-                        }
-                        else {
-                            newpr = new ProtectedCuboidRegion(s, pr.getMinimumPoint(), pr.getMaximumPoint());
-                        }
-
-                        newpr.setFlags(pr.getFlags());
-
-                        if (s.startsWith("anni-wood")) {
-                            newpr.setFlag(Flags.BLOCK_BREAK, StateFlag.State.ALLOW);
-                            newpr.setFlag(Flags.BLOCK_PLACE, StateFlag.State.DENY);
-                        }
-                        copyrm.addRegion(newpr);
+                        log.info(s + " is cuboid region.");
+                        newpr = new ProtectedCuboidRegion(s, pr.getMinimumPoint(), pr.getMaximumPoint());
                     }
+
+                    log.info("Setting flag: " + pr.getFlags());
+                    newpr.setFlags(pr.getFlags());
+
+                    if (s.startsWith("anni-wood")) {
+                        log.info(s + " is wood region.");
+                        newpr.setFlag(Flags.BLOCK_BREAK, StateFlag.State.ALLOW);
+                        newpr.setFlag(Flags.BLOCK_PLACE, StateFlag.State.DENY);
+                    }
+                    copyrm.addRegion(newpr);
+                    log.info("Copy region of '" + s+ "' is complete.");
                 });
                 // コピー終了後親保護領域などの設定
                 origrm.getRegions().forEach((idd, prr) -> {
                     if (copyrm.hasRegion(idd)) {
+                        log.info("Checking region's parent: " + idd);
                         if (prr.getParent() != null) {
+                            log.info("Region has parent.");
                             try {
                                 copyrm.getRegion(idd).setParent(prr.getParent());
-                            } catch (ProtectedRegion.CircularInheritanceException ignored) {}
+                            } catch (ProtectedRegion.CircularInheritanceException e) {
+                                e.printStackTrace();
+                            }
                         }
                     }
                 });
+
+                log.info("Setting nexus protection.");
                 // ネクサスの保護領域の設定
                 map.getNexuses().forEach((at, nexus) -> {
+                    log.info(at.name());
                     ProtectedRegion reg = new ProtectedCuboidRegion(
                             id+"-"+at.name().toLowerCase()+"-nexus",
                             nexus.getLocation(),
@@ -425,6 +445,7 @@ public class ANNIArena extends BukkitRunnable {
                     );
                     reg.setPriority(91217);
                     copyrm.addRegion(reg);
+                    log.info("complete");
                 });
             }
 
@@ -436,6 +457,7 @@ public class ANNIArena extends BukkitRunnable {
                         else bl.setType(Material.END_STONE);
                     });
 
+            log.info("Assigning players...");
             players.forEach(this::assignAtEquality);
             nexus.clear();
             getTeams().forEach((at, team) -> {
@@ -456,6 +478,7 @@ public class ANNIArena extends BukkitRunnable {
 
             setState(ArenaState.PHASE_ONE);
             setTimer(ArenaState.PHASE_ONE.nextPhaseIn());
+            log.info("Started game.");
         }
         catch (Exception e) {
             e.printStackTrace();
@@ -466,39 +489,60 @@ public class ANNIArena extends BukkitRunnable {
     }
 
     public void cleanUp() {
+        Logger log = plugin.getLogger();
+        log.info("Starting clean up.");
         try {
+            log.info("Initializing players...");
             players.forEach(player -> {
                 initPlayer(player);
                 player.teleport(plugin.getLobby());
             });
+            log.info("Removing player from team...");
             teams.values().forEach(team -> team.getPlayers().forEach(team::removePlayer));
+            log.info("Initializing nexus...");
             nexus.clear();
+            log.info("Initializing map...");
             map = null;
             if (copy != null) {
+                log.info("Copy map is now available. clean up now.");
                 RegionManager rm = WorldGuard.getInstance().getPlatform()
                                 .getRegionContainer().get(
                                         BukkitAdapter.adapt(copy)
                         );
                 try {
-                    rm.getRegions().values().forEach((pr) ->
-                        rm.removeRegion(pr.getId())
-                    );
+                    log.info("Removing worldguard regions...");
+                    rm.getRegions().values().forEach((pr) -> {
+                        log.info("Preparing remove region of '" + pr.getId() + "'...");
+                        if (pr.getType() != RegionType.GLOBAL) {
+                            rm.removeRegion(pr.getId());
+                            log.info("Removed region:" + pr.getId());
+                        }
+                        else {
+                            pr.setFlags(new HashMap<>());
+                            log.info("Reset global region: " + pr.getId());
+                        }
+                    });
                 }
                 catch (NullPointerException e) { e.printStackTrace(); }
+                log.info("Deleting map...");
                 FileUtil.deleteWorld(copy);
                 copy = null;
             }
             if (VoteManager.isNowVoting(id)) VoteManager.endVote(id);
         }
         catch (IOException e) { e.printStackTrace(); }
+
+        log.info("Clean up complete.");
     }
 
     public void broadcast(String message) {
         players.forEach(p -> p.sendMessage(message));
+        plugin.getLogger().info(message);
     }
 
     public void broadcast(String message, ANNITeam team) {
         getTeamPlayers(team).forEach(p -> p.sendMessage(message));
+        plugin.getLogger().info(message);
     }
 
     public void setKit(Player player, ANNIKit ki) {
@@ -708,7 +752,8 @@ public class ANNIArena extends BukkitRunnable {
 
     private String sbNexusHealth(ANNITeam team) {
         Integer nh = getNexusHealth(team);
-        return nh != null ? // ネクサスの体力が0なら
+        if (nh == null) nh = 0;
+        return isEnabledTeam(team) ? // teamが無効化されていないなら
                 String.format(mm.build("nexus.health.format"), nh) // フォーマット適応済みの体力
                 : mm.build("nexus.health.none"); // 体力なしのメッセージ
     }
