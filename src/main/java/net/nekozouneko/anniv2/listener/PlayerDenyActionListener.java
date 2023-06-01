@@ -1,17 +1,21 @@
 package net.nekozouneko.anniv2.listener;
 
 import net.nekozouneko.anniv2.ANNIPlugin;
+import net.nekozouneko.anniv2.arena.spectator.SpectatorManager;
 import org.bukkit.GameMode;
 import org.bukkit.NamespacedKey;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityPickupItemEvent;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.CraftItemEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.player.PlayerDropItemEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
@@ -23,6 +27,11 @@ public class PlayerDenyActionListener implements Listener {
 
     @EventHandler
     public void onDrop(PlayerDropItemEvent e) {
+        if (SpectatorManager.isSpectating(e.getPlayer()) && e.getPlayer().getGameMode() != GameMode.CREATIVE) {
+            e.setCancelled(true);
+            return;
+        }
+
         if (plugin.getCurrentGame().getState().getId() >= 0) {
             PersistentDataContainer pdc = e.getItemDrop().getItemStack()
                     .getItemMeta().getPersistentDataContainer();
@@ -37,6 +46,11 @@ public class PlayerDenyActionListener implements Listener {
 
     @EventHandler
     public void onCraft(CraftItemEvent e) {
+        if (SpectatorManager.isSpectating(((Player) e.getWhoClicked())) && e.getWhoClicked().getGameMode() != GameMode.CREATIVE) {
+            e.setCancelled(true);
+            return;
+        }
+
         if (plugin.getCurrentGame().getState().getId() >= 0) {
             for (ItemStack is : e.getInventory().getMatrix()) {
                 if (is == null || is.getType().isAir()) continue;
@@ -51,6 +65,13 @@ public class PlayerDenyActionListener implements Listener {
 
     @EventHandler
     public void onClick(InventoryClickEvent e) {
+        if (SpectatorManager.isSpectating((Player) e.getWhoClicked()) && e.getWhoClicked().getGameMode() != GameMode.CREATIVE) {
+            if (e.getInventory().getType() != InventoryType.PLAYER) {
+                e.setCancelled(true);
+                return;
+            }
+        }
+
         if (plugin.getCurrentGame().getState().getId() >= 0) {
             if (e.getCurrentItem() == null || e.getCurrentItem().getType().isAir()) return;
 
@@ -72,6 +93,35 @@ public class PlayerDenyActionListener implements Listener {
                         e.setCancelled(true);
                     }
                 }
+            }
+        }
+    }
+
+    @EventHandler
+    public void onInteract(PlayerInteractEvent e) {
+        if (SpectatorManager.isSpectating(e.getPlayer()) && e.getPlayer().getGameMode() != GameMode.CREATIVE) {
+            if (e.getClickedBlock() != null) e.setCancelled(true);
+        }
+    }
+
+    @EventHandler
+    public void onPickUp(EntityPickupItemEvent e) {
+        if (e.getEntity() instanceof Player) {
+            Player p = ((Player) e.getEntity());
+
+            if (SpectatorManager.isSpectating(p) && p.getGameMode() != GameMode.CREATIVE) {
+                e.setCancelled(true);
+            }
+        }
+    }
+
+    @EventHandler
+    public void onDamageByPlayer(EntityDamageByEntityEvent e) {
+        if (e.getDamager() instanceof Player) {
+            Player p = ((Player) e.getDamager());
+
+            if (SpectatorManager.isSpectating(p) && p.getGameMode() != GameMode.CREATIVE) {
+                e.setCancelled(true);
             }
         }
     }

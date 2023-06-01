@@ -16,6 +16,7 @@ import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.nekozouneko.anniv2.ANNIConfig;
 import net.nekozouneko.anniv2.ANNIPlugin;
+import net.nekozouneko.anniv2.arena.spectator.SpectatorManager;
 import net.nekozouneko.anniv2.arena.team.ANNITeam;
 import net.nekozouneko.anniv2.board.BoardManager;
 import net.nekozouneko.anniv2.kit.ANNIKit;
@@ -114,13 +115,17 @@ public class ANNIArena extends BukkitRunnable {
 
         if (getState().getId() > 0) {
             assignAtEquality(player);
-            if (getTeamByPlayer(player) != null && !isNexusLost(getTeamByPlayer(player))) {
+            if (!isNexusLost(getTeamByPlayer(player))) {
                 player.teleport(map.getSpawnOrDefault(getTeamByPlayer(player)).toLocation(copy));
                 ANNITeam at = getTeamByPlayer(player);
                 player.sendMessage(mm.buildBigChar(CmnUtil.numberToChar(state.getId()), Character.toString(at.getCCChar()),
                         (Object[]) mm.buildArray("notify.big.mid_join", at.getTeamName())
                 ));
                 player.getInventory().setContents(ANNIKit.teamColor(getKit(player), at));
+            }
+            else {
+                player.teleport(map.getSpawnOrDefault(getTeamByPlayer(player)).toLocation(copy));
+                SpectatorManager.add(player);
             }
         }
     }
@@ -387,7 +392,6 @@ public class ANNIArena extends BukkitRunnable {
 
             if (copyrm != null && origrm != null) {
                 // 保護領域のコピー
-                origrm.getRegions().clear();
                 origrm.getRegions().forEach((s, pr) -> {
                     log.info("Copying region: " + s + " / " + pr.getId());
                     ProtectedRegion newpr;
@@ -499,6 +503,8 @@ public class ANNIArena extends BukkitRunnable {
             });
             log.info("Removing player from team...");
             teams.values().forEach(team -> team.getPlayers().forEach(team::removePlayer));
+            log.info("Showing spectators...");
+
             log.info("Initializing nexus...");
             nexus.clear();
             log.info("Initializing map...");

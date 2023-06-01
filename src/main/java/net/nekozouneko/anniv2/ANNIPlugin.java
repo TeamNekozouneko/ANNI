@@ -2,6 +2,7 @@ package net.nekozouneko.anniv2;
 
 import com.google.gson.Gson;
 import net.nekozouneko.anniv2.arena.ANNIArena;
+import net.nekozouneko.anniv2.arena.spectator.SpectatorTask;
 import net.nekozouneko.anniv2.board.BoardManager;
 import net.nekozouneko.anniv2.command.*;
 import net.nekozouneko.anniv2.kit.items.StunGrenade;
@@ -45,6 +46,7 @@ public final class ANNIPlugin extends JavaPlugin {
     private File defaultMapsDir;
     private Location lobby;
     private Scoreboard pluginBoard;
+    private SpectatorTask spectatorTask;
 
     public MessageManager getMessageManager() {
         return messageManager;
@@ -129,7 +131,9 @@ public final class ANNIPlugin extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new StunGrenade(), this);
 
         currentGame = new ANNIArena(this, "current");
+        spectatorTask = new SpectatorTask();
         currentGame.runTaskTimer(this, 0, 20);
+        spectatorTask.runTaskTimer(this, 0, 1);
 
         getCommand("anni-admin").setExecutor(new ANNIAdminCommand());
         getCommand("anni").setExecutor(new ANNICommand());

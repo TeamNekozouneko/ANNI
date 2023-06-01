@@ -3,6 +3,7 @@ package net.nekozouneko.anniv2.command.subcommand.admin;
 import net.nekozouneko.anniv2.ANNIPlugin;
 import net.nekozouneko.anniv2.arena.ANNIArena;
 import net.nekozouneko.anniv2.arena.ArenaState;
+import net.nekozouneko.anniv2.arena.spectator.SpectatorManager;
 import net.nekozouneko.anniv2.command.ASubCommand;
 import net.nekozouneko.anniv2.kit.ANNIKit;
 import net.nekozouneko.anniv2.kit.items.StunGrenade;
@@ -45,6 +46,20 @@ public class DebugSubCommand extends ASubCommand {
             case "get-stung":
                 ((Player) sender).getInventory().addItem(StunGrenade.get(16));
                 break;
+            case "toggle-spec": {
+                Player p;
+
+                if (args.size() >= 2) {
+                    p = Bukkit.getPlayer(args.get(1));
+                }
+                else p = (Player) sender;
+
+                if (SpectatorManager.isSpectating(p)) {
+                    SpectatorManager.remove(p);
+                }
+                else SpectatorManager.add(p);
+                break;
+            }
             default: return false;
         }
 

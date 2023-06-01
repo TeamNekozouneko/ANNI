@@ -2,6 +2,7 @@ package net.nekozouneko.anniv2.listener;
 
 import net.nekozouneko.anniv2.ANNIPlugin;
 import net.nekozouneko.anniv2.arena.ANNIArena;
+import net.nekozouneko.anniv2.arena.spectator.SpectatorManager;
 import net.nekozouneko.anniv2.arena.team.ANNITeam;
 import net.nekozouneko.anniv2.kit.ANNIKit;
 import org.bukkit.GameMode;
@@ -18,23 +19,17 @@ public class PlayerRespawnListener implements Listener {
     @EventHandler
     public void onRespawn(PlayerRespawnEvent e) {
         ANNIArena current = plugin.getCurrentGame();
-        
+
         if (current.getState().getId() > 0 && current.isJoined(e.getPlayer())) {
             ANNITeam at = current.getTeamByPlayer(e.getPlayer());
 
             if (at != null) {
+                e.setRespawnLocation(current.getMap().getSpawnOrDefault(at).toLocation(current.getCopyWorld()));
+
                 if (current.isNexusLost(at)) {
-                    e.getPlayer().getInventory().clear();
-                    e.getPlayer().getEnderChest().clear();
-                    e.getPlayer().setLevel(0);
-                    e.getPlayer().setExp(0);
-
-                    if (plugin.getLobby() != null)
-                        e.setRespawnLocation(plugin.getLobby());
-
+                    SpectatorManager.add(e.getPlayer());
                     return;
                 }
-                else e.setRespawnLocation(current.getMap().getSpawnOrDefault(at).toLocation(current.getCopyWorld()));
             }
             else {
                 if (plugin.getLobby() != null) e.setRespawnLocation(plugin.getLobby());

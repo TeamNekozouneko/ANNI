@@ -1,6 +1,7 @@
 package net.nekozouneko.anniv2.listener;
 
 import net.nekozouneko.anniv2.ANNIPlugin;
+import net.nekozouneko.anniv2.arena.spectator.SpectatorManager;
 import net.nekozouneko.anniv2.gui.AbstractGui;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -12,6 +13,7 @@ public class PlayerQuitListener implements Listener {
     public void onQuit(PlayerQuitEvent e) {
         ANNIPlugin.getInstance().getCurrentGame().leave(e.getPlayer());
         AbstractGui.unregisterAllGuiListeners(e.getPlayer());
+        SpectatorManager.remove(e.getPlayer());
     }
 
 }
