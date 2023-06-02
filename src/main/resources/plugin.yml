@@ -39,3 +39,8 @@ commands:
     description: "Kit command"
     permission: anniv2.command.kit
     usage: "/<command>"
+  suicide:
+    aliases: [redeploy, kill]
+    description: "Suicide command"
+    permission: anniv2.command.suicide
+    usage: "/<command>"

@@ -139,6 +139,7 @@ public final class ANNIPlugin extends JavaPlugin {
         getCommand("anni").setExecutor(new ANNICommand());
         getCommand("combat-shop").setExecutor(new CombatShopCommand());
         getCommand("potion-shop").setExecutor(new PotionShopCommand());
+        getCommand("suicide").setExecutor(new SuicideCommand());
         getCommand("vote").setExecutor(new VoteCommand());
         getCommand("kit").setExecutor(new KitCommand());
 
@@ -192,7 +193,7 @@ public final class ANNIPlugin extends JavaPlugin {
 
     private void registerRecipe() {
         NamespacedKey g2f = new NamespacedKey(this, "flint");
-        NamespacedKey ega = new NamespacedKey(this, "senchanted_golden_apple");
+        NamespacedKey ega = new NamespacedKey(this, "enchanted_golden_apple");
 
         if (getServer().getRecipe(g2f) == null) {
             getServer().addRecipe(
