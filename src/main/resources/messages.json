@@ -407,6 +407,7 @@
   "item.stun_grenade.lore.5": "&9* 敵の視界が一瞬真っ黒になります。",
 
   "actionbar.nexus_alert": "&c{0} によってネクサスが破壊されています！",
+  "actionbar.spectator_mode": "&7観戦モード",
 
   "chat.global": "&8(全体)&r {0}&a:&f {1}",
   "chat.global.format": "&8(全体)&7 {0}%s&a:&f %s",
