@@ -25,7 +25,7 @@ public final class SpectatorManager {
 
     public static void remove(Player player) {
         spectating.remove(player.getUniqueId());
-        if (player.getGameMode() == GameMode.ADVENTURE)
+        if (player.getGameMode() == GameMode.ADVENTURE || player.getGameMode() == GameMode.SURVIVAL)
             player.setAllowFlight(false);
     }
 
