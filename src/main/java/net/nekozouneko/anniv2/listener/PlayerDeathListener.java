@@ -73,6 +73,8 @@ public class PlayerDeathListener implements Listener {
                     ) == 1;
                 })
                 .forEach(e.getDrops()::remove); // ドロップするアイテムから削除
+
+        PlayerDamageListener.setNotFighting(e.getEntity());
     }
 
 }
