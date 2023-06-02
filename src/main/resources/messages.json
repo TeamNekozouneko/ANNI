@@ -128,6 +128,8 @@
   "command.err.game_start_failed": "&cゲームを開始できませんでした。",
   "command.err.player_not_found": "「{0}」というプレイヤーは見つかりませんでした。",
   "command.err.disabled_team": "「{0}」というチームは無効化されています。",
+  "command.err.now_fighting": "&c現在あなたは戦闘中です。",
+  "command.err.cooldown": "&cクールダウン中です。あと{0}秒待ってください。",
 
   "command.usage": "&c使用方法: {0}",
 
