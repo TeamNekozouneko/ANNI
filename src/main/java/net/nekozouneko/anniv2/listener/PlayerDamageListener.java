@@ -1,6 +1,7 @@
 package net.nekozouneko.anniv2.listener;
 
 import net.nekozouneko.anniv2.ANNIPlugin;
+import net.nekozouneko.anniv2.arena.spectator.SpectatorManager;
 import net.nekozouneko.anniv2.message.MessageManager;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
@@ -38,6 +39,11 @@ public class PlayerDamageListener implements Listener {
     public void onDamage(EntityDamageEvent e) {
         if (e.getEntity() instanceof Player) {
             Player p = ((Player) e.getEntity());
+
+            if (SpectatorManager.isSpectating(p)) {
+                e.setCancelled(true);
+                return;
+            }
 
             if (p.hasPotionEffect(PotionEffectType.INVISIBILITY)) {
                 p.removePotionEffect(PotionEffectType.INVISIBILITY);

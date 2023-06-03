@@ -31,7 +31,7 @@ public class SuicideCommand implements CommandExecutor, TabCompleter {
                 return true;
             }
 
-            p.damage(p.getHealth() * 2);
+            p.setHealth(0);
             cooldown.put(p.getUniqueId(), System.currentTimeMillis() + 10000);
         }
         else sender.sendMessage(mm.build(
