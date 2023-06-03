@@ -130,6 +130,7 @@
   "command.err.disabled_team": "「{0}」というチームは無効化されています。",
   "command.err.now_fighting": "&c現在あなたは戦闘中です。",
   "command.err.cooldown": "&cクールダウン中です。あと{0}秒待ってください。",
+  "command.err.non_equal_team": "&cチームが同じではありません。",
 
   "command.usage": "&c使用方法: {0}",
 
@@ -414,5 +415,7 @@
   "chat.global": "&8(全体)&r {0}&a:&f {1}",
   "chat.global.format": "&8(全体)&7 {0}%s&a:&f %s",
   "chat.team": "&8(チーム)&r {0}&a:&f {1}",
-  "chat.team.format": "&8(チーム)&r {0}%s&a:&f %s"
+  "chat.team.format": "&8(チーム)&r {0}%s&a:&f %s",
+  "chat.tell.receive": "&f[&7{1} &f<- &7{0}&f]&a:&f {2}",
+  "chat.tell.send": "&f[&7{0} &f-> &7{1}&f]&a:&f {2}"
 }
