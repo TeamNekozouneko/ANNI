@@ -504,7 +504,7 @@ public class ANNIArena extends BukkitRunnable {
             log.info("Removing player from team...");
             teams.values().forEach(team -> team.getPlayers().forEach(team::removePlayer));
             log.info("Showing spectators...");
-
+            SpectatorManager.clear();
             log.info("Initializing nexus...");
             nexus.clear();
             log.info("Initializing map...");
