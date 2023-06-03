@@ -33,7 +33,7 @@ public final class FileUtil {
     }
 
     public static Gson createGson() {
-        GsonBuilder gb = new GsonBuilder()
+        return new GsonBuilder()
                 .registerTypeAdapter(
                         EnumMap.class,
                         new EnumMapInstanceCreator<ANNITeam, SpawnLocation>(ANNITeam.class)
@@ -50,9 +50,9 @@ public final class FileUtil {
                         Location.class,
                         new LocationInstanceCreator()
                 )
-                .serializeNulls();
-
-        return gb.create();
+                .serializeNulls()
+                .disableHtmlEscaping()
+                .create();
     }
 
     public static <T> boolean writeGson(File to, T obj, Class<T> cls) {
