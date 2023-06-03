@@ -1,4 +1,5 @@
 # ANNI v2
+![Thumbnail](./thumbnail.png)
 ANNIプラグインを1から作り直したものです。
 
 ## 使用ライブラリ
