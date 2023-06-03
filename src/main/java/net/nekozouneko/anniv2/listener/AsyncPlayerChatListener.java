@@ -3,10 +3,15 @@ package net.nekozouneko.anniv2.listener;
 import com.google.common.base.Strings;
 import net.nekozouneko.anniv2.ANNIPlugin;
 import net.nekozouneko.anniv2.arena.team.ANNITeam;
+import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.scoreboard.Team;
+
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class AsyncPlayerChatListener implements Listener {
 
@@ -27,6 +32,46 @@ public class AsyncPlayerChatListener implements Listener {
         if (at != null && !e.getMessage().startsWith("!")) {
             Team t = plugin.getCurrentGame().getTeam(at);
 
+            if (e.getMessage().startsWith("@")) {
+                Matcher matcher = Pattern.compile("^@(A-Za-z0-9_) (.+)$").matcher(e.getMessage());
+                if (matcher.find()) {
+                    Player receiver = Bukkit.getPlayer(matcher.group(1));
+
+                    if (receiver != null) {
+                        if (plugin.getCurrentGame().getTeamPlayers(
+                                plugin.getCurrentGame().getTeamByPlayer(e.getPlayer())
+                        ).contains(receiver)) {
+                            e.setCancelled(true);
+
+                            String senderMessage = plugin.getMessageManager().build("chat.tell.send",
+                                    e.getPlayer().getName(),
+                                    receiver.getName(),
+                                    matcher.group(2)
+                            );
+                            e.getPlayer().sendMessage(senderMessage);
+                            plugin.getLogger().info(senderMessage);
+                            receiver.sendMessage(
+                                    plugin.getMessageManager().build("chat.tell.receive",
+                                            e.getPlayer().getName(),
+                                            receiver.getName(),
+                                            matcher.group(2)
+                                    )
+                            );
+
+                            return;
+                        }
+                        else e.getPlayer().sendMessage(
+                                plugin.getMessageManager().build("command.err.non_equal_team")
+                        );
+                    }
+                    else e.getPlayer().sendMessage(
+                            plugin.getMessageManager().build("command.err.player_not_found", matcher.group(1))
+                    );
+
+                    return;
+                }
+            }
+
             try {
                 e.getRecipients().clear();
                 e.getRecipients().addAll(plugin.getCurrentGame().getTeamPlayers(at));
@@ -44,7 +89,6 @@ public class AsyncPlayerChatListener implements Listener {
                         e.getMessage()
                 );
                 plugin.getCurrentGame().broadcast(mes, at);
-                plugin.getLogger().info(mes);
             }
         }
         else {
@@ -76,7 +120,6 @@ public class AsyncPlayerChatListener implements Listener {
                         e.getMessage()
                 );
                 plugin.getCurrentGame().broadcast(mes);
-                plugin.getLogger().info(mes);
             }
         }
     }
