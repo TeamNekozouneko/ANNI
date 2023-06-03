@@ -40,7 +40,7 @@ public class StunGrenade implements Listener {
                 .build();
     }
 
-    @EventHandler
+    @EventHandler(ignoreCancelled = true)
     public void onLaunch(ProjectileLaunchEvent e) {
         if (e.getEntity().getShooter() != null && e.getEntity().getShooter() instanceof Player) {
             Player s = ((Player) e.getEntity().getShooter());
