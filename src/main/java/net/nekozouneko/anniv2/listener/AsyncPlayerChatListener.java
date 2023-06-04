@@ -33,16 +33,21 @@ public class AsyncPlayerChatListener implements Listener {
             Team t = plugin.getCurrentGame().getTeam(at);
 
             if (e.getMessage().startsWith("@")) {
-                Matcher matcher = Pattern.compile("^@(A-Za-z0-9_) (.+)$").matcher(e.getMessage());
+                Matcher matcher = Pattern.compile("^@(.{2,20}) (.+)$").matcher(e.getMessage());
                 if (matcher.find()) {
                     Player receiver = Bukkit.getPlayer(matcher.group(1));
 
                     if (receiver != null) {
+                        if (receiver.equals(e.getPlayer())) {
+                            e.getPlayer().sendMessage(plugin.getMessageManager().build(
+                                    "command.err.self_message"
+                            ));
+                            return;
+                        }
+
                         if (plugin.getCurrentGame().getTeamPlayers(
                                 plugin.getCurrentGame().getTeamByPlayer(e.getPlayer())
                         ).contains(receiver)) {
-                            e.setCancelled(true);
-
                             String senderMessage = plugin.getMessageManager().build("chat.tell.send",
                                     e.getPlayer().getName(),
                                     receiver.getName(),
@@ -68,6 +73,7 @@ public class AsyncPlayerChatListener implements Listener {
                             plugin.getMessageManager().build("command.err.player_not_found", matcher.group(1))
                     );
 
+                    e.setCancelled(true);
                     return;
                 }
             }
@@ -108,8 +114,6 @@ public class AsyncPlayerChatListener implements Listener {
 
 
             try {
-                e.getRecipients().clear();
-                e.getRecipients().addAll(plugin.getCurrentGame().getTeamPlayers(at));
                 String form = plugin.getMessageManager().build("chat.global.format", prefix);
                 e.setFormat(form);
             }
