@@ -448,13 +448,18 @@ public class ANNIArena extends BukkitRunnable {
                     }
 
                     log.info("Setting flag: " + pr.getFlags());
-                    newpr.setFlags(pr.getFlags());
+                    newpr.setFlags(new HashMap<>(pr.getFlags()));
 
+                    log.info("Original Priority: " + pr.getPriority());
                     if (s.startsWith("anni-wood")) {
                         log.info(s + " is wood region.");
                         newpr.setFlag(Flags.BLOCK_BREAK, StateFlag.State.ALLOW);
                         newpr.setFlag(Flags.BLOCK_PLACE, StateFlag.State.DENY);
+                        newpr.setPriority(10);
                     }
+                    else newpr.setPriority(pr.getPriority());
+                    log.info("Priority: " + pr.getPriority());
+
                     copyrm.addRegion(newpr);
                     log.info("Copy region of '" + s+ "' is complete.");
                 });
@@ -483,6 +488,7 @@ public class ANNIArena extends BukkitRunnable {
                             nexus.getLocation()
                     );
                     reg.setPriority(91217);
+                    reg.setFlag(Flags.BLOCK_BREAK, StateFlag.State.ALLOW);
                     copyrm.addRegion(reg);
                     log.info("complete");
                 });
@@ -887,14 +893,24 @@ public class ANNIArena extends BukkitRunnable {
         getTeams().entrySet().stream()
                 .filter(ent -> state.getId() < 0 || !isNexusLost(ent.getKey()))
                 .map(Map.Entry::getValue)
-                .forEach(t -> teamSize.put(t, t.getSize()));
+                .forEach(t ->
+                        teamSize.put(
+                                t,
+                                (int) t.getPlayers().stream()
+                                        .map(OfflinePlayer::isOnline)
+                                        .count()
+                        )
+                );
 
         if ( // 全部の値が一緒なら
                 Collections3.allValueEquals(
                         teamSize.values(),
                         teamSize.values().iterator().next() // チーム人数リストの最初の要素
                 )
-        ) teams.values().iterator().next().addPlayer(player); // 最初の要素 (チーム)に参加させる
+        ) {
+            List<Team> teams2 = new ArrayList<>(getTeams().values());
+            teams2.get(rand.nextInt(teams2.size())).addPlayer(player); // ランダムなチームに参加させる
+        }
         else { // 一緒じゃなければ均等に分散させる
             Map.Entry<Team, Integer> minTeam = null; // 人数が少ないチーム
 
