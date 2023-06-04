@@ -36,6 +36,7 @@ import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
 import org.bukkit.boss.KeyedBossBar;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.Team;
@@ -49,6 +50,24 @@ import java.util.stream.Collectors;
 public class ANNIArena extends BukkitRunnable {
 
     private static final Random rand = new Random();
+
+    private static class SaveData {
+        private final ANNITeam team;
+        private final ItemStack[] inventory;
+
+        public SaveData(ANNITeam team, ItemStack[] inventory) {
+            this.team = team;
+            this.inventory = inventory;
+        }
+
+        public ANNITeam getTeam() {
+            return team;
+        }
+
+        public ItemStack[] getInventory() {
+            return inventory;
+        }
+    }
 
     private final ANNIPlugin plugin;
     private final MessageManager mm;
@@ -69,6 +88,7 @@ public class ANNIArena extends BukkitRunnable {
 
     private final Map<ANNITeam, Integer> nexus = new EnumMap<>(ANNITeam.class);
     private final Map<UUID, String> kit = new HashMap<>();
+    private final Map<UUID, SaveData> savedData = new HashMap<>();
 
     private final KeyedBossBar bb;
 
@@ -113,15 +133,20 @@ public class ANNIArena extends BukkitRunnable {
         players.add(player);
         player.setScoreboard(plugin.getPluginBoard());
 
+        initPlayer(player);
+
         if (getState().getId() > 0) {
-            assignAtEquality(player);
+            SaveData sd = savedData.remove(player.getUniqueId());
+            if (sd != null) setTeam(player, sd.getTeam());
+            else assignAtEquality(player);
             if (!isNexusLost(getTeamByPlayer(player))) {
                 player.teleport(map.getSpawnOrDefault(getTeamByPlayer(player)).toLocation(copy));
                 ANNITeam at = getTeamByPlayer(player);
                 player.sendMessage(mm.buildBigChar(CmnUtil.numberToChar(state.getId()), Character.toString(at.getCCChar()),
                         (Object[]) mm.buildArray("notify.big.mid_join", at.getTeamName())
                 ));
-                player.getInventory().setContents(ANNIKit.teamColor(getKit(player), at));
+                if (sd != null) player.getInventory().setContents(sd.getInventory());
+                else player.getInventory().setContents(ANNIKit.teamColor(getKit(player), at));
             }
             else {
                 player.teleport(map.getSpawnOrDefault(getTeamByPlayer(player)).toLocation(copy));
@@ -135,6 +160,16 @@ public class ANNIArena extends BukkitRunnable {
 
         player.setScoreboard(plugin.getServer().getScoreboardManager().getMainScoreboard());
         bb.removePlayer(player);
+
+        if (state.getId() > 0) {
+            savedData.put(
+                    player.getUniqueId(),
+                    new SaveData(
+                            getTeamByPlayer(player),
+                            player.getInventory().getContents()
+                    )
+            );
+        }
     }
 
     public Set<Player> getPlayers() {
@@ -462,6 +497,7 @@ public class ANNIArena extends BukkitRunnable {
                     });
 
             log.info("Assigning players...");
+            savedData.clear();
             players.forEach(this::assignAtEquality);
             nexus.clear();
             getTeams().forEach((at, team) -> {
@@ -497,6 +533,7 @@ public class ANNIArena extends BukkitRunnable {
         log.info("Starting clean up.");
         try {
             log.info("Initializing players...");
+            savedData.clear();
             players.forEach(player -> {
                 initPlayer(player);
                 player.teleport(plugin.getLobby());
