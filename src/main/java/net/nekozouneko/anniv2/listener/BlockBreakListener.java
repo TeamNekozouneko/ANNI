@@ -18,7 +18,6 @@ import org.bukkit.block.Block;
 import org.bukkit.block.data.Ageable;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.inventory.ItemStack;
@@ -60,7 +59,7 @@ public class BlockBreakListener implements Listener {
         NO_BLOCK_COOLDOWN.put(Material.MELON, 100L);
     }
 
-    @EventHandler(priority = EventPriority.HIGH)
+    @EventHandler(ignoreCancelled = true)
     public void onBreak(BlockBreakEvent e) {
         Consumer<Block> cb = QUEUED_ON_DAMAGE.get(e.getPlayer().getUniqueId());
         if (cb != null) {
