@@ -23,14 +23,11 @@ public class SpectatorTask extends BukkitRunnable {
                         .build("actionbar.spectator_mode")
                 ));
 
-                SpectatorManager.getPlayers().stream()
-                        .filter(uuid -> Bukkit.getPlayer(uuid) != null)
-                        .map(Bukkit::getPlayer)
-                        .forEach(p2 -> {
-                            if (!p.equals(p2) && !SpectatorManager.isSpectating(p2)) {
-                                p2.hidePlayer(ANNIPlugin.getInstance(), p);
-                            }
-                        });
+                Bukkit.getOnlinePlayers().forEach(p2 -> {
+                    if (!p2.equals(p)) {
+                        p2.hidePlayer(ANNIPlugin.getInstance(), p);
+                    }
+                });
             }
             else {
                 Bukkit.getOnlinePlayers().forEach(p2 -> {
