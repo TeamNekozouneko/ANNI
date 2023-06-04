@@ -2,6 +2,7 @@ package net.nekozouneko.anniv2.command;
 
 import net.nekozouneko.anniv2.ANNIPlugin;
 import net.nekozouneko.anniv2.gui.KitSelector;
+import net.nekozouneko.anniv2.listener.PlayerDamageListener;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -18,7 +19,12 @@ public class KitCommand implements CommandExecutor, TabCompleter {
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command cmd, @NotNull String label, @NotNull String[] args) {
         if (sender instanceof Player) {
-            new KitSelector(ANNIPlugin.getInstance(), (Player) sender).open();
+            if (PlayerDamageListener.isFighting((Player) sender)) {
+                sender.sendMessage(ANNIPlugin.getInstance().getMessageManager()
+                        .build("command.err.now_fighting")
+                );
+            }
+            else new KitSelector(ANNIPlugin.getInstance(), (Player) sender).open();
         }
         else sender.sendMessage(ANNIPlugin.getInstance().getMessageManager().build("command.err.player_only"));
 
