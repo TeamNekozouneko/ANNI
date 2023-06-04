@@ -3,10 +3,12 @@ package net.nekozouneko.anniv2.listener;
 import net.nekozouneko.anniv2.ANNIPlugin;
 import net.nekozouneko.anniv2.arena.spectator.SpectatorManager;
 import org.bukkit.GameMode;
+import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityPickupItemEvent;
@@ -20,10 +22,17 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 
+import java.util.Arrays;
+import java.util.List;
+
 public class PlayerDenyActionListener implements Listener {
 
     private final ANNIPlugin plugin = ANNIPlugin.getInstance();
     private final NamespacedKey anniKit = new NamespacedKey(plugin, "kit-item");
+
+    private final List<Material> CRAFT_BLACKLIST = Arrays.asList(
+            Material.GOLDEN_PICKAXE, Material.FLINT_AND_STEEL
+    );
 
     @EventHandler
     public void onDrop(PlayerDropItemEvent e) {
@@ -59,6 +68,11 @@ public class PlayerDenyActionListener implements Listener {
                     e.setCancelled(true);
                     return;
                 }
+            }
+
+            if (CRAFT_BLACKLIST.contains(e.getRecipe().getResult().getType())) {
+                e.setCancelled(true);
+                return;
             }
         }
     }
@@ -97,10 +111,11 @@ public class PlayerDenyActionListener implements Listener {
         }
     }
 
-    @EventHandler
+    @EventHandler(ignoreCancelled = true, priority = EventPriority.LOWEST)
     public void onInteract(PlayerInteractEvent e) {
         if (SpectatorManager.isSpectating(e.getPlayer()) && e.getPlayer().getGameMode() != GameMode.CREATIVE) {
-            if (e.getClickedBlock() != null) e.setCancelled(true);
+            e.setCancelled(true);
+            return;
         }
     }
 
