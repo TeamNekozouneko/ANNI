@@ -60,6 +60,13 @@ public class DebugSubCommand extends ASubCommand {
                 else SpectatorManager.add(p);
                 break;
             }
+            case "watch-spec": {
+                if (SpectatorManager.isWatchable((Player) sender)) {
+                    SpectatorManager.removeWatchable((Player) sender);
+                }
+                else SpectatorManager.addWatchable((Player) sender);
+                break;
+            }
             default: return false;
         }
 
