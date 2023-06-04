@@ -4,7 +4,6 @@ import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.nekozouneko.anniv2.ANNIPlugin;
 import org.bukkit.Bukkit;
-import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -27,12 +26,14 @@ public class SpectatorTask extends BukkitRunnable {
                     if (!p2.equals(p)) {
                         p2.hidePlayer(ANNIPlugin.getInstance(), p);
                     }
+                    if (SpectatorManager.isWatchable(p2)) {
+                        p2.showPlayer(ANNIPlugin.getInstance(), p);
+                    }
                 });
             }
             else {
                 Bukkit.getOnlinePlayers().forEach(p2 -> {
                     p2.showPlayer(ANNIPlugin.getInstance(), p);
-                    if (p2.getGameMode() == GameMode.ADVENTURE) p2.setAllowFlight(false);
                 });
             }
         }

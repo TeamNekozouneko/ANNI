@@ -11,6 +11,7 @@ import java.util.UUID;
 public final class SpectatorManager {
 
     private static final List<UUID> spectating = new ArrayList<>();
+    private static final List<UUID> spectatorsWatchable = new ArrayList<>();
 
     private SpectatorManager() {
         throw new ExceptionInInitializerError();
@@ -23,6 +24,10 @@ public final class SpectatorManager {
         player.setAllowFlight(true);
     }
 
+    public static void addWatchable(Player player) {
+        spectatorsWatchable.add(player.getUniqueId());
+    }
+
     public static void remove(Player player) {
         spectating.remove(player.getUniqueId());
         if (player.getGameMode() == GameMode.ADVENTURE || player.getGameMode() == GameMode.SURVIVAL)
@@ -33,6 +38,14 @@ public final class SpectatorManager {
         spectating.remove(uniqueId);
     }
 
+    public static void removeWatchable(Player player) {
+        spectatorsWatchable.remove(player.getUniqueId());
+    }
+
+    public static void removeWatchable(UUID uniqueId) {
+        spectatorsWatchable.remove(uniqueId);
+    }
+
     public static boolean isSpectating(Player player) {
         return spectating.contains(player.getUniqueId());
     }
@@ -41,12 +54,28 @@ public final class SpectatorManager {
         return spectating.contains(uniqueId);
     }
 
+    public static boolean isWatchable(Player player) {
+        return spectatorsWatchable.contains(player.getUniqueId());
+    }
+
+    public static boolean isWatchable(UUID uniqueId) {
+        return spectatorsWatchable.contains(uniqueId);
+    }
+
     public static List<UUID> getPlayers() {
         return Collections.unmodifiableList(spectating);
     }
 
+    public static List<UUID> getWatchablePlayers() {
+        return Collections.unmodifiableList(spectatorsWatchable);
+    }
+
     public static void clear() {
         spectating.clear();
+    }
+
+    public static void clearWatchable() {
+        spectatorsWatchable.clear();
     }
 
 }
