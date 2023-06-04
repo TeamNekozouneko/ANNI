@@ -131,6 +131,7 @@
   "command.err.now_fighting": "&c現在あなたは戦闘中です。",
   "command.err.cooldown": "&cクールダウン中です。あと{0}秒待ってください。",
   "command.err.non_equal_team": "&cチームが同じではありません。",
+  "command.err.self_message": "&c自分自身にメッセージは送信できません。",
 
   "command.usage": "&c使用方法: {0}",
 
