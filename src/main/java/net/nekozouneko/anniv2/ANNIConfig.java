@@ -1,15 +1,37 @@
 package net.nekozouneko.anniv2;
 
+import com.google.common.base.Enums;
 import com.google.common.base.Preconditions;
 import net.nekozouneko.anniv2.arena.team.ANNITeam;
 import org.bukkit.configuration.file.FileConfiguration;
 
 public class ANNIConfig {
 
+    public enum DatabaseType {
+        SQLITE,
+        MYSQL,
+        MARIADB
+    }
+
     private static FileConfiguration conf;
 
     static void setConfig(FileConfiguration conf) {
         ANNIConfig.conf = conf;
+    }
+
+    public static DatabaseType getDatabaseType() {
+        return Enums.getIfPresent(
+                DatabaseType.class,
+                conf.getString("database.type", "sqlite").toUpperCase()
+        ).or(DatabaseType.SQLITE);
+    }
+
+    public static String getDBTablePrefix() {
+        return conf.getString("database.prefix", "anniv2_");
+    }
+
+    public static String getLocalDBPath() {
+        return ANNIPlugin.getInstance().getDataFolder() + "/" + conf.getString("database.local.path", "anni.db");
     }
 
     public static boolean isTeamEnabled(ANNITeam at) {
