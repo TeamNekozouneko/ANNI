@@ -401,6 +401,7 @@
   "kit.default.name": "標準キット",
   "kit.defense.name": "防衛キット",
   "kit.mochimochi.name": "もちもちキット",
+  "kit.miner.name": "採掘師",
 
   "item.stun_grenade.name": "&cもちっと&bスタングレネード",
   "item.stun_grenade.lore.0": "&7ある高齢の職人が作ったもちっとスタンさせるグレネード。",
