@@ -528,6 +528,7 @@ public class ANNIArena extends BukkitRunnable {
         }
         catch (Exception e) {
             e.printStackTrace();
+            cleanUp();
             return false;
         }
 
