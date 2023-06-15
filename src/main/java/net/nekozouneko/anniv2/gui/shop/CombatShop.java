@@ -173,7 +173,7 @@ public class CombatShop extends AbstractGui {
         );
         inventory.setItem(43,
                 ItemStackBuilder.of(Material.ENDER_PEARL)
-                        .amount(4)
+                        .amount(2)
                         .persistentData(price, PersistentDataType.DOUBLE, 1500.)
                         .lore(Collections.singletonList(
                                 mm.build("gui.shop.price", "1500", mm.build("gui.shop.ext"))
