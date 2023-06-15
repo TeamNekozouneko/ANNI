@@ -121,7 +121,7 @@ public class StunGrenade implements Listener {
                         }
                     }
 
-                    hit.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 200, 1));
+                    hit.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 200, 2));
                     hit.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 20, 1));
                 }
             }
