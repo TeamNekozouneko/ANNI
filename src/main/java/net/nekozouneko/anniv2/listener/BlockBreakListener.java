@@ -1,5 +1,6 @@
 package net.nekozouneko.anniv2.listener;
 
+import com.google.common.base.Enums;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
@@ -30,7 +31,7 @@ public class BlockBreakListener implements Listener {
     private static final Map<UUID, Consumer<Block>> QUEUED_ON_DAMAGE = new HashMap<>();
     private static final Map<Material, Long> COOLDOWN = new EnumMap<>(Material.class);
     private static final Map<Material, Long> NO_BLOCK_COOLDOWN = new EnumMap<>(Material.class);
-    private static final List<Material> WOODS = Arrays.asList(
+    private static final List<Material> WOODS = new ArrayList<>(Arrays.asList(
             Material.ACACIA_LOG, Material.BIRCH_LOG, Material.DARK_OAK_LOG,
             Material.JUNGLE_LOG, Material.OAK_LOG, Material.SPRUCE_LOG,
             Material.CRIMSON_STEM, Material.WARPED_STEM,
@@ -38,7 +39,7 @@ public class BlockBreakListener implements Listener {
             Material.STRIPPED_DARK_OAK_LOG, Material.STRIPPED_JUNGLE_LOG,
             Material.STRIPPED_OAK_LOG, Material.STRIPPED_SPRUCE_LOG,
             Material.STRIPPED_CRIMSON_STEM, Material.STRIPPED_WARPED_STEM
-    );
+    ));
 
     public static Map<UUID, Consumer<Block>> getQueuedOnDamageMap() {
         return QUEUED_ON_DAMAGE;
@@ -55,6 +56,30 @@ public class BlockBreakListener implements Listener {
         COOLDOWN.put(Material.NETHER_GOLD_ORE, 400L);
         COOLDOWN.put(Material.NETHER_QUARTZ_ORE, 200L);
         COOLDOWN.put(Material.REDSTONE_ORE, 200L);
+        COOLDOWN.put(Material.GILDED_BLACKSTONE, 400L);
+
+        // 1.17
+        if (Enums.getIfPresent(Material.class, "DEEPSLATE").isPresent()) {
+            COOLDOWN.put(Material.DEEPSLATE_COAL_ORE, 100L);
+            COOLDOWN.put(Material.DEEPSLATE_DIAMOND_ORE, 600L);
+            COOLDOWN.put(Material.DEEPSLATE_EMERALD_ORE, 600L);
+            COOLDOWN.put(Material.DEEPSLATE_GOLD_ORE, 400L);
+            COOLDOWN.put(Material.DEEPSLATE_IRON_ORE, 200L);
+            COOLDOWN.put(Material.DEEPSLATE_LAPIS_ORE, 200L);
+            COOLDOWN.put(Material.DEEPSLATE_REDSTONE_ORE, 200L);
+            COOLDOWN.put(Material.COPPER_ORE, 100L);
+            COOLDOWN.put(Material.DEEPSLATE_COPPER_ORE, 100L);
+        }
+        // 1.19
+        if (Enums.getIfPresent(Material.class, "MANGROVE_LOG").isPresent()) {
+            WOODS.add(Material.MANGROVE_LOG);
+            WOODS.add(Material.STRIPPED_MANGROVE_LOG);
+        }
+        // 1.20
+        if (Enums.getIfPresent(Material.class, "CHERRY_LOG").isPresent()) {
+            WOODS.add(Material.CHERRY_LOG);
+            WOODS.add(Material.STRIPPED_CHERRY_LOG);
+        }
 
         NO_BLOCK_COOLDOWN.put(Material.MELON, 100L);
     }
