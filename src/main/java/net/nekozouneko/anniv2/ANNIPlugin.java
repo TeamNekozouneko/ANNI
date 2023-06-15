@@ -83,6 +83,7 @@ public final class ANNIPlugin extends JavaPlugin {
 
     @Override
     public void onLoad() {
+        plugin = this;
         if (!getDataFolder().exists()) {
             getDataFolder().mkdir();
         }
@@ -93,8 +94,6 @@ public final class ANNIPlugin extends JavaPlugin {
 
     @Override
     public void onEnable() {
-        plugin = this;
-
         saveDefaultConfig();
         ANNIConfig.setConfig(getConfig());
 
