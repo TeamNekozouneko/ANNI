@@ -1,3 +1,11 @@
+database:
+  type: sqlite
+
+  prefix: anniv2_
+
+  local:
+    path: anni.db
+
 default-arena:
   enabled-teams:
     red: true
