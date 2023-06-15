@@ -16,25 +16,29 @@ public interface ANNIDatabase {
 
     HikariDataSource getSource();
 
-    int getLevel();
+    void initPlayer(UUID player);
 
-    void setLevel(int level);
+    void initPlayerIfNotInitialized(UUID player);
 
-    void addLevel(int add);
+    int getLevel(UUID player);
 
-    void subtractLevel(int subtract);
+    void setLevel(UUID player, int level);
 
-    int getExp();
+    void addLevel(UUID player, int add);
 
-    void setExp(int exp);
+    void subtractLevel(UUID player, int subtract);
 
-    void addExp(int add);
+    int getExp(UUID player);
 
-    void subtractExp(int subtract);
+    void setExp(UUID player, int exp);
 
-    ANNIKit getKit();
+    void addExp(UUID player, int add);
 
-    void setKit(ANNIKit kit);
+    void subtractExp(UUID player, int subtract);
+
+    ANNIKit getKit(UUID player);
+
+    void setKit(UUID player, ANNIKit kit);
 
     List<String> getAvailableKits(UUID player);
 
@@ -71,5 +75,21 @@ public interface ANNIDatabase {
     long addCountDestroyedNexus(UUID player, long add);
 
     long subtractCountDestroyedNexus(UUID player, long subtract);
+
+    long getWinCount(UUID player);
+
+    long setWinCount(UUID player, long wins);
+
+    long addWinCount(UUID player, long add);
+
+    long subtractWinCount(UUID player, long subtract);
+
+    long getLoseCount(UUID player);
+
+    long setLoseCount(UUID player, long loses);
+
+    long addLoseCount(UUID player, long add);
+
+    long subtractLoseCount(UUID player, long subtract);
 
 }

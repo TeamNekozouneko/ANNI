@@ -1,4 +1,4 @@
-package net.nekozouneko.anniv2.database.abs;
+package net.nekozouneko.anniv2.database.impl;
 
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
@@ -8,6 +8,7 @@ import net.nekozouneko.anniv2.kit.ANNIKit;
 
 import java.io.File;
 import java.sql.CallableStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -24,6 +25,7 @@ public class SQLiteDatabase implements ANNIDatabase {
         createTable("level", "player TEXT NOT NULL, level integer, exp integer");
         createTable("selected_kit", "player TEXT NOT NULL, kit TEXT");
         createTable("available_kits", "player TEXT NOT NULL, kits TEXT NOT NULL DEFAULT '[]'");
+        createTable("statistic", "player TEXT NOT NULL, kills integer, deaths integer, nexus integer, wins integer, loses integer");
     }
 
     private void connect() {
@@ -61,6 +63,61 @@ public class SQLiteDatabase implements ANNIDatabase {
         }
 
         return columns;
+    }
+
+    private void appendColumnIfNotContains(String table, String name, String modifiers) {
+        if (!getColumns(table).contains(name)) {
+            try (CallableStatement cs = source.getConnection().prepareCall(
+                    "ALTER TABLE "+ table +" ADD COULMN " + name + " " + modifiers
+            )) {
+                cs.execute();
+            }
+            catch (SQLException sqlex) {
+                throw new RuntimeException(sqlex);
+            }
+        }
+    }
+
+    @Override
+    public void initPlayer(UUID player) {
+        try {
+            // clean up
+            try (CallableStatement cs = source.getConnection().prepareCall(
+                    "DELETE FROM level WHERE player = ?"
+            )) {
+                cs.setString(1, player.toString());
+                cs.execute();
+            }
+
+            try (CallableStatement cs = source.getConnection().prepareCall(
+                    "DELETE FROM selected_kit WHERE player = ?"
+            )) {
+                cs.setString(1, player.toString());
+                cs.execute();
+            }
+
+            try (CallableStatement cs = source.getConnection().prepareCall(
+                    "DELETE FROM available_kits WHERE player = ?"
+            )) {
+                cs.setString(1, player.toString());
+                cs.execute();
+            }
+
+            try (CallableStatement cs = source.getConnection().prepareCall(
+                    "DELETE FROM statistic WHERE player = ?"
+            )) {
+                cs.setString(1, player.toString());
+                cs.execute();
+            }
+        }
+        catch (SQLException sqlex) {
+            throw new RuntimeException(sqlex);
+        }
+    }
+
+    @Override
+    public void initPlayerIfNotInitialized(UUID player) {
+
     }
 
     @Override
@@ -101,52 +158,64 @@ public class SQLiteDatabase implements ANNIDatabase {
     }
 
     @Override
-    public int getLevel() {
+    public int getLevel(UUID player) {
+        try (CallableStatement cs = source.getConnection().prepareCall(
+                "SELECT level FROM " + ANNIConfig.getDBTablePrefix() + "level WHERE player = ? LIMIT 1"
+        )){
+            cs.setString(1, player.toString());
+            ResultSet rs = cs.executeQuery();
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+        }
+        catch (SQLException sqlex) {
+            throw new RuntimeException(sqlex);
+        }
+        return 1;
+    }
+
+    @Override
+    public void setLevel(UUID player, int level) {
+
+    }
+
+    @Override
+    public void addLevel(UUID player, int add) {
+
+    }
+
+    @Override
+    public void subtractLevel(UUID player, int subtract) {
+
+    }
+
+    @Override
+    public int getExp(UUID player) {
         return 0;
     }
 
     @Override
-    public void setLevel(int level) {
+    public void setExp(UUID player, int exp) {
 
     }
 
     @Override
-    public void addLevel(int add) {
+    public void addExp(UUID player, int add) {
 
     }
 
     @Override
-    public void subtractLevel(int subtract) {
+    public void subtractExp(UUID player, int subtract) {
 
     }
 
     @Override
-    public int getExp() {
-        return 0;
-    }
-
-    @Override
-    public void setExp(int exp) {
-
-    }
-
-    @Override
-    public void addExp(int add) {
-
-    }
-
-    @Override
-    public void subtractExp(int subtract) {
-
-    }
-
-    @Override
-    public ANNIKit getKit() {
+    public ANNIKit getKit(UUID player) {
         return null;
     }
 
     @Override
-    public void setKit(ANNIKit kit) {
+    public void setKit(UUID player, ANNIKit kit) {
 
     }
 
@@ -227,6 +296,46 @@ public class SQLiteDatabase implements ANNIDatabase {
 
     @Override
     public long subtractCountDestroyedNexus(UUID player, long subtract) {
+        return 0;
+    }
+
+    @Override
+    public long getWinCount(UUID player) {
+        return 0;
+    }
+
+    @Override
+    public long setWinCount(UUID player, long wins) {
+        return 0;
+    }
+
+    @Override
+    public long addWinCount(UUID player, long add) {
+        return 0;
+    }
+
+    @Override
+    public long subtractWinCount(UUID player, long subtract) {
+        return 0;
+    }
+
+    @Override
+    public long getLoseCount(UUID player) {
+        return 0;
+    }
+
+    @Override
+    public long setLoseCount(UUID player, long loses) {
+        return 0;
+    }
+
+    @Override
+    public long addLoseCount(UUID player, long add) {
+        return 0;
+    }
+
+    @Override
+    public long subtractLoseCount(UUID player, long subtract) {
         return 0;
     }
 }
