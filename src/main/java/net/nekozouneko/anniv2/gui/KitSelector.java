@@ -66,6 +66,13 @@ public class KitSelector extends AbstractGui {
                         .owningPlayer(Bukkit.getOfflinePlayer("kinakomoti019"))
                         .build()
         );
+
+        inventory.setItem(5,
+                ItemStackBuilder.of(Material.IRON_ORE)
+                        .name("§r" + ANNIKit.MINER.getKit().getName())
+                        .persistentData(kin, PersistentDataType.STRING, ANNIKit.MINER.name())
+                        .build()
+        );
     }
 
     @EventHandler
@@ -96,6 +103,9 @@ public class KitSelector extends AbstractGui {
                     break;
                 case "MOCHI_MOCHI":
                     k = ANNIKit.MOCHI_MOCHI;
+                    break;
+                case "MINER":
+                    k = ANNIKit.MINER;
                     break;
                 default: {
                     k = ANNIKit.DEFAULT;

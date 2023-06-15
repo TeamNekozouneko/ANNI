@@ -20,7 +20,8 @@ public enum ANNIKit {
     BOW(new BowKit()),
     DEFAULT(new DefaultKit()),
     DEFENSE(new DefenseKit()),
-    MOCHI_MOCHI(new MochiMochiKit());
+    MOCHI_MOCHI(new MochiMochiKit()),
+    MINER(new MinerKit());
 
     private static final Map<String, ANNIKit> ID_MAP = new HashMap<>();
 
@@ -30,6 +31,7 @@ public enum ANNIKit {
         ID_MAP.put(DEFAULT.getKit().getId(), DEFAULT);
         ID_MAP.put(DEFENSE.getKit().getId(), DEFENSE);
         ID_MAP.put(MOCHI_MOCHI.getKit().getId(), MOCHI_MOCHI);
+        ID_MAP.put(MINER.getKit().getId(), MINER);
     }
 
     private final AbsANNIKit kit;
