@@ -197,5 +197,20 @@
             </exclusions>
         </dependency>
 
+        <!-- SQL -->
+
+        <dependency>
+            <groupId>com.zaxxer</groupId>
+            <artifactId>HikariCP</artifactId>
+            <version>4.0.3</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.xerial</groupId>
+            <artifactId>sqlite-jdbc</artifactId>
+            <version>3.42.0.0</version>
+            <scope>runtime</scope>
+        </dependency>
     </dependencies>
 </project>
