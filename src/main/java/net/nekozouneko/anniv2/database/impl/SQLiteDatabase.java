@@ -10,7 +10,6 @@ import java.io.File;
 import java.sql.CallableStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -49,7 +48,8 @@ public class SQLiteDatabase implements ANNIDatabase {
         }
     }
 
-    private List<String> getColumns(String table) {
+    // 現状データベースは更新しないためコメントアウト
+    /*private List<String> getColumns(String table) {
         List<String> columns = new ArrayList<>();
         try (CallableStatement cs = source.getConnection().prepareCall(
                 "SELECT * FROM " + table + " LIMIT 0"
@@ -76,10 +76,9 @@ public class SQLiteDatabase implements ANNIDatabase {
                 throw new RuntimeException(sqlex);
             }
         }
-    }
+    }*/
 
-    @Override
-    public void initPlayer(UUID player) {
+    private void reset(UUID player) {
         try {
             // clean up
             try (CallableStatement cs = source.getConnection().prepareCall(
@@ -108,6 +107,21 @@ public class SQLiteDatabase implements ANNIDatabase {
             )) {
                 cs.setString(1, player.toString());
                 cs.execute();
+            }
+        }
+        catch (SQLException sqlex) {
+            throw new RuntimeException(sqlex);
+        }
+    }
+
+    @Override
+    public void initPlayer(UUID player) {
+        reset(player);
+        try {
+            try (CallableStatement cs = source.getConnection().prepareCall(
+                    "INSERT INTO level"
+            )) {
+
             }
         }
         catch (SQLException sqlex) {
