@@ -7,12 +7,14 @@ import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.Collections;
-import java.util.List;
 
 public class MochiMochiKit extends AbsANNIKit{
 
     MochiMochiKit() {
-        super("mochimochi", "MOC", "kit.mochimochi.name");
+        super(
+                "mochimochi", "MOC", "kit.mochimochi.name",
+                Material.HONEY_BLOCK.name(), Collections.emptyList()
+        );
     }
 
     @Override
@@ -31,10 +33,5 @@ public class MochiMochiKit extends AbsANNIKit{
         inv[36] = LeatherArmorBuilder.of(Material.LEATHER_BOOTS).build();
 
         return inv;
-    }
-
-    @Override
-    public List<String> getBlackList() {
-        return Collections.emptyList();
     }
 }

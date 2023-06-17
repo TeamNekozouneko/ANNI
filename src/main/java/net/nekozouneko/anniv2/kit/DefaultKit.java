@@ -5,12 +5,15 @@ import net.nekozouneko.commons.spigot.inventory.special.LeatherArmorBuilder;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.List;
+import java.util.Collections;
 
 public class DefaultKit extends AbsANNIKit{
 
     DefaultKit() {
-        super("default", "DFT", "kit.default.name");
+        super(
+                "default", "DFT", "kit.default.name",
+                Material.DIRT.name(), Collections.emptyList()
+        );
     }
 
     @Override
@@ -28,10 +31,5 @@ public class DefaultKit extends AbsANNIKit{
         inv[36] = LeatherArmorBuilder.of(Material.LEATHER_BOOTS).build();
 
         return inv;
-    }
-
-    @Override
-    public List<String> getBlackList() {
-        return null;
     }
 }

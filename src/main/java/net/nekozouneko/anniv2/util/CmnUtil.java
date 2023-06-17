@@ -4,7 +4,6 @@ import com.google.common.base.Preconditions;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scoreboard.Team;
-import org.jetbrains.annotations.Range;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -60,7 +59,7 @@ public final class CmnUtil {
         );
     }
 
-    public static char numberToChar(@Range(from = 0, to = 9) int i) {
+    public static char numberToChar( int i) {
         return (char) (i + 0x30);
     }
 

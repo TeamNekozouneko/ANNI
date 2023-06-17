@@ -21,3 +21,7 @@ on-votifier:
   enabled: true
 
   points: 1000
+
+kits:
+  enable-custom-kit: true
+  custom-kit-only: false

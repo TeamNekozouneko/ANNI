@@ -45,7 +45,7 @@ public class MapManager {
     }
 
     public void unload(ANNIMap map) {
-        maps.keySet().forEach((s) -> {
+        new HashSet<>(maps.keySet()).forEach((s) -> {
             if (maps.get(s).equals(map)) maps.remove(s);
         });
     }

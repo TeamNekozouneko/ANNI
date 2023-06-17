@@ -77,4 +77,12 @@ public class ANNIConfig {
         return conf.getDouble("on-votifier.points");
     }
 
+    public static boolean isEnabledCustomKits() {
+        return conf.getBoolean("kits.enable-custom-kit");
+    }
+
+    public static boolean isCustomKitOnly() {
+        return conf.getBoolean("kits.custom-kit-only");
+    }
+
 }

@@ -48,6 +48,16 @@ public enum ANNIKit {
         return ID_MAP.getOrDefault(id, DEFAULT);
     }
 
+    public static AbsANNIKit getAbsKitOrCustomById(String id) {
+        return ANNIPlugin.getInstance().getCustomKitManager().getKit(id) != null ? ANNIPlugin.getInstance().getCustomKitManager().getKit(id) : getKitById(id).getKit();
+    }
+
+    public static boolean isDefaultKit(AbsANNIKit kit) {
+        return Arrays.stream(values())
+                .map(ANNIKit::getKit)
+                .anyMatch(kit::equals);
+    }
+
     public static ANNIKit get(AbsANNIKit kit) {
         for (ANNIKit k : values()) {
             if (k.getKit().equals(kit)) return k;

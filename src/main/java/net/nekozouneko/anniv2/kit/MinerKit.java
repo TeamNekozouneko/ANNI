@@ -6,12 +6,15 @@ import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.List;
+import java.util.Collections;
 
 public class MinerKit extends AbsANNIKit {
 
     public MinerKit() {
-        super("miner", "MNR", "kit.miner.name");
+        super(
+                "miner", "MNR", "kit.miner.name",
+                Material.IRON_PICKAXE.name(), Collections.emptyList()
+        );
     }
 
     @Override
@@ -32,10 +35,5 @@ public class MinerKit extends AbsANNIKit {
         inv[36] = LeatherArmorBuilder.of(Material.LEATHER_BOOTS).build();
 
         return inv;
-    }
-
-    @Override
-    public List<String> getBlackList() {
-        return null;
     }
 }

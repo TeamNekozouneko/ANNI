@@ -9,12 +9,15 @@ import org.bukkit.potion.PotionData;
 import org.bukkit.potion.PotionType;
 
 import java.util.Collections;
-import java.util.List;
 
 public final class AssaultKit extends AbsANNIKit {
 
     AssaultKit() {
-        super("assault", "AST", "kit.assault.name");
+        super(
+                "assault", "AST", "kit.assault.name",
+                Material.IRON_SWORD.name(),
+                Collections.emptyList()
+        );
     }
 
     @Override
@@ -41,10 +44,5 @@ public final class AssaultKit extends AbsANNIKit {
         inv[36] = LeatherArmorBuilder.of(Material.LEATHER_BOOTS).build();
 
         return inv;
-    }
-
-    @Override
-    public List<String> getBlackList() {
-        return Collections.emptyList();
     }
 }
