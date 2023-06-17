@@ -7,12 +7,14 @@ import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.Collections;
-import java.util.List;
 
 public class BowKit extends AbsANNIKit{
 
     BowKit() {
-        super("bow", "BOW", "kit.bow.name");
+        super(
+                "bow", "BOW", "kit.bow.name",
+                Material.BOW.name(), Collections.emptyList()
+        );
     }
 
     @Override
@@ -36,10 +38,5 @@ public class BowKit extends AbsANNIKit{
         inv[36] = LeatherArmorBuilder.of(Material.LEATHER_BOOTS).build();
 
         return inv;
-    }
-
-    @Override
-    public List<String> getBlackList() {
-        return Collections.emptyList();
     }
 }

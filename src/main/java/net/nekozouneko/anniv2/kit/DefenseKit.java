@@ -6,12 +6,14 @@ import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.Collections;
-import java.util.List;
 
 public class DefenseKit extends AbsANNIKit{
 
     DefenseKit() {
-        super("defense", "DEF", "kit.defense.name");
+        super(
+                "defense", "DEF", "kit.defense.name",
+                Material.SHIELD.name(), Collections.emptyList()
+        );
     }
 
     @Override
@@ -31,10 +33,5 @@ public class DefenseKit extends AbsANNIKit{
         inv[40] = ItemStackBuilder.of(Material.SHIELD).build();
 
         return inv;
-    }
-
-    @Override
-    public List<String> getBlackList() {
-        return Collections.emptyList();
     }
 }
