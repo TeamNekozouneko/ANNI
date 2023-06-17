@@ -1,5 +1,5 @@
 {
-  "version": "-1",
+  "version": "0",
   "example": "{0} {1|aa|bb}",
 
   "scoreboard.title": "&c&lANNI&9&lHI&a&lLA&e&lTION",
@@ -100,7 +100,7 @@
   "gui.team_selector.title": "チームを選択...",
   "gui.team_selector.random": "&fランダム",
 
-  "gui.kit_selector.title": "キットを選択...",
+  "gui.kit_selector.title": "キットを選択... ({0} / {1})",
   "gui.kit_selector.using": "&a「&7{0}&a」を選択しました。",
 
   "gui.combat_shop.title": "戦闘ショップ",
@@ -110,6 +110,8 @@
   "gui.shop.more_points": "&c{0} {1}&c不足しています。",
   "gui.shop.purchased": "&a購入しました！（-{0} {1}）",
   "gui.shop.price": "&7価格： &f{0}&f {1}",
+
+  "gui.customkit_editor.title": "カスタムキットエディター ({0})",
 
   "gui.next_page": "&a次のページ",
   "gui.prev_page": "&a前のページ",
@@ -132,6 +134,10 @@
   "command.err.cooldown": "&cクールダウン中です。あと{0}秒待ってください。",
   "command.err.non_equal_team": "&cチームが同じではありません。",
   "command.err.self_message": "&c自分自身にメッセージは送信できません。",
+  "command.err.kit_exists": "&cそのIDですでにカスタムキットが存在しています。",
+  "command.err.unknown": "なんらかの理由で不具合が発生しました。",
+  "command.err.kit_not_found": "&c「{0}」というキットは見つかりませんでした。",
+  "command.err.material_not_defined": "&c「{0}」というマテリアルは存在しません。",
 
   "command.usage": "&c使用方法: {0}",
 
@@ -175,6 +181,15 @@
   "command.rule.7": "&7・&fフェーズ5になると1秒ごとにネクサスのダメージが1になるまで減り続ける。",
   "command.rule.8": "&7・&f/kitを打つとキットが選択できる。好きなキットを使って戦ってみよう。",
   "command.rule.9": "&7・&f/vote <map>でゲーム開始前にマップが投票できる。気になるマップなどに投票してみよう。",
+
+  "command.createkit.success": "カスタムキット「{0}({1})」を作成しました。",
+
+  "command.kit.current_name": "現在のキットの名前は「{0}」です。",
+  "command.kit.current_shortname": "現在のキットのショートネームは「{0}」です。",
+  "command.kit.current_icon": "現在のキットのアイコンは「{0}」です。",
+  "command.kit.set_name": "キットの名前を「{0}」に設定しました。",
+  "command.kit.set_shortname": "キットのショートネームを「{0}」に設定しました。",
+  "command.kit.set_icon": "キットのアイコンを「{0}」に設定しました。",
 
   "xyz": "{0} / {1} / {2}",
   "xyz.format": "%.1f",
@@ -415,7 +430,7 @@
   "actionbar.spectator_mode": "&7観戦モード",
 
   "chat.global": "&8(全体)&r {0}&a:&f {1}",
-  "chat.global.format": "&8(全体)&7 {0}%s&a:&f %s",
+  "chat.global.format": "&8(全体)&r {0}%s&a:&f %s",
   "chat.team": "&8(チーム)&r {0}&a:&f {1}",
   "chat.team.format": "&8(チーム)&r {0}%s&a:&f %s",
   "chat.tell.receive": "&f[&7{1} &f<- &7{0}&f]&a:&f {2}",
