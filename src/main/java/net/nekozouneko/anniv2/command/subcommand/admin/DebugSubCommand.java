@@ -6,16 +6,16 @@ import net.nekozouneko.anniv2.arena.ArenaState;
 import net.nekozouneko.anniv2.arena.spectator.SpectatorManager;
 import net.nekozouneko.anniv2.command.ASubCommand;
 import net.nekozouneko.anniv2.kit.ANNIKit;
+import net.nekozouneko.anniv2.kit.custom.CustomKit;
 import net.nekozouneko.anniv2.kit.items.StunGrenade;
 import net.nekozouneko.anniv2.listener.BlockBreakListener;
 import net.nekozouneko.anniv2.util.CmdUtil;
+import net.nekozouneko.commons.spigot.command.TabCompletes;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class DebugSubCommand extends ASubCommand {
@@ -41,7 +41,7 @@ public class DebugSubCommand extends ASubCommand {
                 ANNIPlugin.getInstance().getMapManager().reload();
                 break;
             case "set-kit":
-                ANNIPlugin.getInstance().getCurrentGame().setKit(Bukkit.getPlayer(args.get(1)), ANNIKit.getKitById(args.get(2)));
+                ANNIPlugin.getInstance().getCurrentGame().setKit(Bukkit.getPlayer(args.get(1)), ANNIKit.getAbsKitOrCustomById(args.get(2)));
                 break;
             case "get-stung":
                 ((Player) sender).getInventory().addItem(StunGrenade.get(16));
@@ -79,19 +79,30 @@ public class DebugSubCommand extends ASubCommand {
             return CmdUtil.simpleTabComplete(args.get(0), "clear-queued", "get-stung", "reload-map", "set-kit", "set-state", "set-timer");
         }
         else {
-            switch (args.get(0)) {
-                case "set-state": {
-                    return CmdUtil.simpleTabComplete(
-                            args.get(1),
-                            Arrays.stream(ArenaState.values())
-                                    .map(ArenaState::name)
-                                    .collect(Collectors.toList())
-                    );
+            if (args.size() == 2) {
+                switch (args.get(0)) {
+                    case "set-state": {
+                        return CmdUtil.simpleTabComplete(
+                                args.get(1),
+                                Arrays.stream(ArenaState.values())
+                                        .map(ArenaState::name)
+                                        .collect(Collectors.toList())
+                        );
+                    }
+                    case "set-kit": {
+                        Set<String> ids = new HashSet<>();
+                        ids.addAll(Arrays.stream(ANNIKit.values())
+                                .map((ak) -> ak.getKit().getId()).collect(Collectors.toList()));
+                        ids.addAll(ANNIPlugin.getInstance().getCustomKitManager().getKits().stream()
+                                .map(CustomKit::getId).collect(Collectors.toList()));
+
+                        return TabCompletes.sorted(args.get(1), ids);
+                    }
                 }
-                default:
-                    return Collections.emptyList();
             }
         }
+
+        return Collections.emptyList();
     }
 
     @Override
