@@ -408,8 +408,12 @@ public class ANNIArena extends BukkitRunnable {
                 if (VoteManager.isNowVoting(id) && !VoteManager.getResult(id).isEmpty()) {
                     map = getMapRanking(VoteManager.endVote(id)).get(0).getKey();
                 }
-                else map = plugin.getMapManager().getMaps()
-                        .get(rand.nextInt(plugin.getMapManager().getMaps().size()));
+                else {
+                    List<ANNIMap> filtered = plugin.getMapManager().getMaps().stream()
+                            .filter(ANNIMap::canUseOnArena)
+                            .collect(Collectors.toList());
+                    map = filtered.get(rand.nextInt(filtered.size()));
+                }
             }
             log.info("Map: " + map.getId());
 
@@ -595,13 +599,13 @@ public class ANNIArena extends BukkitRunnable {
         plugin.getLogger().info(message);
     }
 
-    public void setKit(Player player, ANNIKit ki) {
-        kit.put(player.getUniqueId(), ki.getKit().getId());
+    public void setKit(Player player, AbsANNIKit ki) {
+        kit.put(player.getUniqueId(), ki.getId());
     }
 
     public AbsANNIKit getKit(Player player) {
         String id = kit.get(player.getUniqueId());
-        return ANNIKit.getKitById(id).getKit();
+        return ANNIKit.getAbsKitOrCustomById(id);
     }
 
     @Override
