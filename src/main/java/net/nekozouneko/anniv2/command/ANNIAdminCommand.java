@@ -19,6 +19,8 @@ public class ANNIAdminCommand implements CommandExecutor, TabCompleter {
     private final ASubCommand createMapSubCommand = new CreateMapSubCommand();
     private final ASubCommand setLobbySubCommand = new SetLobbySubCommand();
     private final ASubCommand arenaSubCommand = new ArenaSubCommand();
+    private final ASubCommand createKitSubCommand = new CreateKitSubCommand();
+    private final ASubCommand kitSubCommand = new KitSubCommand();
 
     private final Map<String, ASubCommand> subcommands = new HashMap<String, ASubCommand>() {
         {
@@ -27,6 +29,8 @@ public class ANNIAdminCommand implements CommandExecutor, TabCompleter {
             put("create-map", createMapSubCommand);
             put("set-lobby", setLobbySubCommand);
             put("arena", arenaSubCommand);
+            put("createkit", createKitSubCommand);
+            put("kit", kitSubCommand);
         }
     };
 
