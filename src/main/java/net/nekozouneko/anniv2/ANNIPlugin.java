@@ -5,6 +5,7 @@ import net.nekozouneko.anniv2.arena.ANNIArena;
 import net.nekozouneko.anniv2.arena.spectator.SpectatorTask;
 import net.nekozouneko.anniv2.board.BoardManager;
 import net.nekozouneko.anniv2.command.*;
+import net.nekozouneko.anniv2.kit.custom.CustomKitManager;
 import net.nekozouneko.anniv2.kit.items.StunGrenade;
 import net.nekozouneko.anniv2.listener.*;
 import net.nekozouneko.anniv2.listener.votifier.VotifierListener;
@@ -44,9 +45,11 @@ public final class ANNIPlugin extends JavaPlugin {
 
     private ANNIArena currentGame;
     private File defaultMapsDir;
+    private File defaultKitsDir;
     private Location lobby;
     private Scoreboard pluginBoard;
     private SpectatorTask spectatorTask;
+    private CustomKitManager customKitManager;
 
     public MessageManager getMessageManager() {
         return messageManager;
@@ -66,6 +69,14 @@ public final class ANNIPlugin extends JavaPlugin {
 
     public File getMapsDir() {
         return defaultMapsDir;
+    }
+
+    public File getKitsDir() {
+        return defaultKitsDir;
+    }
+
+    public CustomKitManager getCustomKitManager() {
+        return customKitManager;
     }
 
     public void setLobby(Location location) {
@@ -89,6 +100,9 @@ public final class ANNIPlugin extends JavaPlugin {
 
         defaultMapsDir = new File(getDataFolder(), "maps");
         defaultMapsDir.mkdir();
+
+        defaultKitsDir = new File(getDataFolder(), "kits");
+        defaultKitsDir.mkdir();
     }
 
     @Override
@@ -102,6 +116,7 @@ public final class ANNIPlugin extends JavaPlugin {
 
         boardManager = new BoardManager(this);
         mapManager = new MapManager(this);
+        customKitManager = new CustomKitManager(this);
 
         mapManager.load(defaultMapsDir);
 
