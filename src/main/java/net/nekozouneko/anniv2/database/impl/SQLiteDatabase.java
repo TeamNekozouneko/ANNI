@@ -1,24 +1,24 @@
 package net.nekozouneko.anniv2.database.impl;
 
-import com.zaxxer.hikari.HikariConfig;
-import com.zaxxer.hikari.HikariDataSource;
 import net.nekozouneko.anniv2.ANNIConfig;
 import net.nekozouneko.anniv2.database.ANNIDatabase;
 import net.nekozouneko.anniv2.kit.ANNIKit;
+import net.nekozouneko.anniv2.kit.AbsANNIKit;
+import net.nekozouneko.anniv2.util.CmnUtil;
+import net.nekozouneko.anniv2.util.FileUtil;
 
 import java.io.File;
-import java.sql.CallableStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
 public class SQLiteDatabase implements ANNIDatabase {
 
-    private HikariDataSource source;
+    private Connection source;
 
     public SQLiteDatabase() {
-        new File(ANNIConfig.getLocalDBPath()).mkdirs();
+        new File(ANNIConfig.getLocalDBPath()).getParentFile().mkdirs();
 
         connect();
         createTable("level", "player TEXT NOT NULL, level integer, exp integer");
@@ -28,20 +28,20 @@ public class SQLiteDatabase implements ANNIDatabase {
     }
 
     private void connect() {
-        HikariConfig conf = new HikariConfig();
-
-        conf.setDriverClassName("org.sqlite.JDBC");
-        conf.setJdbcUrl("jdbc:sqlite:"+ANNIConfig.getLocalDBPath());
-        conf.setAutoCommit(true);
-
-        source = new HikariDataSource(conf);
+        try {
+            source = DriverManager.getConnection("jdbc:sqlite:" + ANNIConfig.getLocalDBPath());
+            source.setAutoCommit(true);
+        }
+        catch (SQLException sqle) {
+            sqle.printStackTrace();
+        }
     }
 
     private void createTable(String tableName, String args) {
-        try (CallableStatement cs = source.getConnection().prepareCall(
+        try (PreparedStatement ps = source.prepareStatement(
                 "CREATE TABLE IF NOT EXISTS " + ANNIConfig.getDBTablePrefix() + tableName +"("+args+")"
         )) {
-            cs.execute();
+            ps.execute();
         }
         catch (SQLException sqlex) {
             throw new RuntimeException(sqlex);
@@ -51,7 +51,7 @@ public class SQLiteDatabase implements ANNIDatabase {
     // 現状データベースは更新しないためコメントアウト
     /*private List<String> getColumns(String table) {
         List<String> columns = new ArrayList<>();
-        try (CallableStatement cs = source.getConnection().prepareCall(
+        try (PreparedStatement ps = source.prepareStatement(
                 "SELECT * FROM " + table + " LIMIT 0"
         )) {
             for (int i = 0; i < cs.getMetaData().getColumnCount(); i++) {
@@ -67,10 +67,10 @@ public class SQLiteDatabase implements ANNIDatabase {
 
     private void appendColumnIfNotContains(String table, String name, String modifiers) {
         if (!getColumns(table).contains(name)) {
-            try (CallableStatement cs = source.getConnection().prepareCall(
+            try (PreparedStatement ps = source.prepareStatement(
                     "ALTER TABLE "+ table +" ADD COULMN " + name + " " + modifiers
             )) {
-                cs.execute();
+                ps.execute();
             }
             catch (SQLException sqlex) {
                 throw new RuntimeException(sqlex);
@@ -81,32 +81,32 @@ public class SQLiteDatabase implements ANNIDatabase {
     private void reset(UUID player) {
         try {
             // clean up
-            try (CallableStatement cs = source.getConnection().prepareCall(
+            try (PreparedStatement ps = source.prepareStatement(
                     "DELETE FROM level WHERE player = ?"
             )) {
-                cs.setString(1, player.toString());
-                cs.execute();
+                ps.setString(1, player.toString());
+                ps.execute();
             }
 
-            try (CallableStatement cs = source.getConnection().prepareCall(
+            try (PreparedStatement ps = source.prepareStatement(
                     "DELETE FROM selected_kit WHERE player = ?"
             )) {
-                cs.setString(1, player.toString());
-                cs.execute();
+                ps.setString(1, player.toString());
+                ps.execute();
             }
 
-            try (CallableStatement cs = source.getConnection().prepareCall(
+            try (PreparedStatement ps = source.prepareStatement(
                     "DELETE FROM available_kits WHERE player = ?"
             )) {
-                cs.setString(1, player.toString());
-                cs.execute();
+                ps.setString(1, player.toString());
+                ps.execute();
             }
 
-            try (CallableStatement cs = source.getConnection().prepareCall(
+            try (PreparedStatement ps = source.prepareStatement(
                     "DELETE FROM statistic WHERE player = ?"
             )) {
-                cs.setString(1, player.toString());
-                cs.execute();
+                ps.setString(1, player.toString());
+                ps.execute();
             }
         }
         catch (SQLException sqlex) {
@@ -118,10 +118,41 @@ public class SQLiteDatabase implements ANNIDatabase {
     public void initPlayer(UUID player) {
         reset(player);
         try {
-            try (CallableStatement cs = source.getConnection().prepareCall(
-                    "INSERT INTO level"
-            )) {
+            try (PreparedStatement ps = source.prepareStatement(
+                    "INSERT INTO "+ANNIConfig.getDBTablePrefix()+"level VALUES (?, ?, ?)"
+            )) { // レベル
+                ps.setString(1, player.toString());
+                ps.setInt(2, 1);
+                ps.setInt(3, CmnUtil.calcExp(2));
+                ps.execute();
+            }
 
+            try (PreparedStatement ps = source.prepareStatement(
+                    "INSERT INTO "+ANNIConfig.getDBTablePrefix()+"selected_kit VALUES (?, ?)"
+            )) { // 選択中のキット
+                ps.setString(1, player.toString());
+                ps.setString(2, "default");
+                ps.execute();
+            }
+
+            try (PreparedStatement ps = source.prepareStatement(
+                    "INSERT INTO "+ANNIConfig.getDBTablePrefix()+"available_kits VALUES (?, ?)"
+            )) { // 利用可能なキット
+                ps.setString(1, player.toString());
+                ps.setString(2, FileUtil.createGson().toJson(Collections.singletonList("default"), List.class));
+                ps.execute();
+            }
+
+            try (PreparedStatement ps = source.prepareStatement(
+                    "INSERT INTO "+ANNIConfig.getDBTablePrefix()+"statistic VALUES (?, ?, ?, ?, ?, ?)"
+            )) { // 統計
+                ps.setString(1, player.toString());
+                ps.setLong(2, 0);
+                ps.setLong(3, 0);
+                ps.setLong(4, 0);
+                ps.setLong(5, 0);
+                ps.setLong(6, 0);
+                ps.execute();
             }
         }
         catch (SQLException sqlex) {
@@ -131,7 +162,95 @@ public class SQLiteDatabase implements ANNIDatabase {
 
     @Override
     public void initPlayerIfNotInitialized(UUID player) {
+        try {
+            // init level
+            boolean isInitializedLevel;
+            try (PreparedStatement ps = source.prepareStatement(
+                    "SELECT * FROM " + ANNIConfig.getDBTablePrefix() + "level WHERE player = ? LIMIT 1"
+            )) {
+                ps.setString(1, player.toString());
+                ResultSet rs = ps.executeQuery();
+                isInitializedLevel = rs.next();
+            }
 
+            if (!isInitializedLevel) {
+                try (PreparedStatement ps = source.prepareStatement(
+                        "INSERT INTO "+ANNIConfig.getDBTablePrefix()+"level VALUES (?, ?, ?)"
+                )) {
+                    ps.setString(1, player.toString());
+                    ps.setInt(2, 1);
+                    ps.setInt(3, CmnUtil.calcExp(2));
+                    ps.execute();
+                }
+            }
+
+            // init selected kit
+            boolean isInitializedSelectedKit;
+            try (PreparedStatement ps = source.prepareStatement(
+                    "SELECT * FROM " + ANNIConfig.getDBTablePrefix() + "selected_kit WHERE player = ? LIMIT 1"
+            )) {
+                ps.setString(1, player.toString());
+                ResultSet rs = ps.executeQuery();
+                isInitializedSelectedKit = rs.next();
+            }
+
+            if (!isInitializedSelectedKit) {
+                try (PreparedStatement ps = source.prepareStatement(
+                        "INSERT INTO "+ANNIConfig.getDBTablePrefix()+"selected_kit VALUES (?, ?)"
+                )) {
+                    ps.setString(1, player.toString());
+                    ps.setString(2, "default");
+                    ps.execute();
+                }
+            }
+
+            // init available kits
+            boolean isInitializedAvailableKits;
+            try (PreparedStatement ps = source.prepareStatement(
+                    "SELECT * FROM " + ANNIConfig.getDBTablePrefix() + "available_kits WHERE player = ? LIMIT 1"
+            )) {
+                ps.setString(1, player.toString());
+                ResultSet rs = ps.executeQuery();
+                isInitializedAvailableKits = rs.next();
+            }
+
+            if (!isInitializedAvailableKits) {
+                try (PreparedStatement ps = source.prepareStatement(
+                        "INSERT INTO "+ANNIConfig.getDBTablePrefix()+"available_kits VALUES (?, ?)"
+                )) {
+                    ps.setString(1, player.toString());
+                    ps.setString(2, FileUtil.createGson().toJson(Collections.singletonList("default"), List.class));
+                    ps.execute();
+                }
+            }
+
+            // init statistic
+            boolean isInitializedStatistic;
+            try (PreparedStatement ps = source.prepareStatement(
+                    "SELECT * FROM " + ANNIConfig.getDBTablePrefix() + "statistic WHERE player = ? LIMIT 1"
+            )) {
+                ps.setString(1, player.toString());
+                ResultSet rs = ps.executeQuery();
+                isInitializedStatistic = rs.next();
+            }
+
+            if (!isInitializedStatistic) {
+                try (PreparedStatement ps = source.prepareStatement(
+                        "INSERT INTO "+ANNIConfig.getDBTablePrefix()+"statistic VALUES (?, ?, ?, ?, ?, ?)"
+                )) {
+                    ps.setString(1, player.toString());
+                    ps.setLong(2, 0);
+                    ps.setLong(3, 0);
+                    ps.setLong(4, 0);
+                    ps.setLong(5, 0);
+                    ps.setLong(6, 0);
+                    ps.execute();
+                }
+            }
+        }
+        catch (SQLException sqlex) {
+            throw new RuntimeException(sqlex);
+        }
     }
 
     @Override
@@ -150,36 +269,45 @@ public class SQLiteDatabase implements ANNIDatabase {
 
     @Override
     public boolean restoreConnectionIfClosed() {
-        if (source == null || source.isClosed())
-            return restoreConnection();
+        try {
+            if (source == null || source.isClosed())
+                return restoreConnection();
+        }
+        catch (SQLException sqlex) {
+            throw new RuntimeException(sqlex);
+        }
 
         return false;
     }
 
     @Override
     public boolean closeConnection() {
-        if (source.isClosed()) return false;
+        try {
+            if (source == null) return false;
+            if (source.isClosed()) {
+                source = null;
+                return false;
+            }
 
-        source.close();
-        source = null;
+            source.close();
+            source = null;
+        }
+        catch (SQLException sqlex) {
+            throw new RuntimeException(sqlex);
+        }
 
         return true;
     }
 
     @Override
-    public HikariDataSource getSource() {
-        return source;
-    }
-
-    @Override
     public int getLevel(UUID player) {
-        try (CallableStatement cs = source.getConnection().prepareCall(
+        try (PreparedStatement ps = source.prepareStatement(
                 "SELECT level FROM " + ANNIConfig.getDBTablePrefix() + "level WHERE player = ? LIMIT 1"
         )){
-            cs.setString(1, player.toString());
-            ResultSet rs = cs.executeQuery();
+            ps.setString(1, player.toString());
+            ResultSet rs = ps.executeQuery();
             if (rs.next()) {
-                return rs.getInt(1);
+                return rs.getInt("level");
             }
         }
         catch (SQLException sqlex) {
@@ -190,47 +318,135 @@ public class SQLiteDatabase implements ANNIDatabase {
 
     @Override
     public void setLevel(UUID player, int level) {
-
+        try (PreparedStatement ps = source.prepareStatement(
+                "UPDATE "+ANNIConfig.getDBTablePrefix()+"level SET level = ? WHERE player = ?"
+        )) {
+            ps.setInt(1, level);
+            ps.setString(2, player.toString());
+            ps.execute();
+        }
+        catch (SQLException sqlex) {
+            throw new RuntimeException(sqlex);
+        }
     }
 
     @Override
     public void addLevel(UUID player, int add) {
-
+        try (PreparedStatement ps = source.prepareStatement(
+                "UPDATE "+ANNIConfig.getDBTablePrefix()+"level SET level + ? WHERE player = ?"
+        )) {
+            ps.setInt(1, add);
+            ps.setString(2, player.toString());
+            ps.execute();
+        }
+        catch (SQLException sqlex) {
+            throw new RuntimeException(sqlex);
+        }
     }
 
     @Override
     public void subtractLevel(UUID player, int subtract) {
-
+        try (PreparedStatement ps = source.prepareStatement(
+                "UPDATE "+ANNIConfig.getDBTablePrefix()+"level SET level - ? WHERE player = ?"
+        )) {
+            ps.setInt(1, subtract);
+            ps.setString(2, player.toString());
+            ps.execute();
+        }
+        catch (SQLException sqlex) {
+            throw new RuntimeException(sqlex);
+        }
     }
 
     @Override
     public int getExp(UUID player) {
+        try (PreparedStatement ps = source.prepareStatement(
+                "SELECT level FROM " + ANNIConfig.getDBTablePrefix() + "level WHERE player = ? LIMIT 1"
+        )){
+            ps.setString(1, player.toString());
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                return rs.getInt("exp");
+            }
+        }
+        catch (SQLException sqlex) {
+            throw new RuntimeException(sqlex);
+        }
         return 0;
     }
 
     @Override
     public void setExp(UUID player, int exp) {
-
+        try (PreparedStatement ps = source.prepareStatement(
+                "UPDATE "+ANNIConfig.getDBTablePrefix()+"level SET exp = ? WHERE player = ?"
+        )) {
+            ps.setInt(1, exp);
+            ps.setString(2, player.toString());
+            ps.execute();
+        }
+        catch (SQLException sqlex) {
+            throw new RuntimeException(sqlex);
+        }
     }
 
     @Override
     public void addExp(UUID player, int add) {
-
+        try (PreparedStatement ps = source.prepareStatement(
+                "UPDATE "+ANNIConfig.getDBTablePrefix()+"level SET exp + ? WHERE player = ?"
+        )) {
+            ps.setInt(1, add);
+            ps.setString(2, player.toString());
+            ps.execute();
+        }
+        catch (SQLException sqlex) {
+            throw new RuntimeException(sqlex);
+        }
     }
 
     @Override
     public void subtractExp(UUID player, int subtract) {
-
+        try (PreparedStatement ps = source.prepareStatement(
+                "UPDATE "+ANNIConfig.getDBTablePrefix()+"level SET exp - ? WHERE player = ?"
+        )) {
+            ps.setInt(1, subtract);
+            ps.setString(2, player.toString());
+            ps.execute();
+        }
+        catch (SQLException sqlex) {
+            throw new RuntimeException(sqlex);
+        }
     }
 
     @Override
-    public ANNIKit getKit(UUID player) {
-        return null;
+    public AbsANNIKit getKit(UUID player) {
+        try (PreparedStatement ps = source.prepareStatement(
+                "SELECT kit FROM "+ANNIConfig.getDBTablePrefix()+"selected_kit WHERE player = ?"
+        )) {
+            ps.setString(1, player.toString());
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                return ANNIKit.getAbsKitOrCustomById(rs.getString("kit"));
+            }
+        }
+        catch (SQLException sqlex) {
+            throw new RuntimeException(sqlex);
+        }
+
+        return ANNIKit.DEFAULT.getKit();
     }
 
     @Override
-    public void setKit(UUID player, ANNIKit kit) {
-
+    public void setKit(UUID player, AbsANNIKit kit) {
+        try (PreparedStatement ps = source.prepareStatement(
+                "UPDATE " + ANNIConfig.getDBTablePrefix()+"selected_kit SET kit = ? WHERE player = ?"
+        )) {
+            ps.setString(1, kit.getId());
+            ps.setString(2, player.toString());
+            ps.execute();
+        }
+        catch (SQLException sqlex) {
+            throw new RuntimeException(sqlex);
+        }
     }
 
     @Override
