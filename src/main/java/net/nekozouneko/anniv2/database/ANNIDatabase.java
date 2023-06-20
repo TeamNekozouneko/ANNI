@@ -1,7 +1,7 @@
 package net.nekozouneko.anniv2.database;
 
-import com.zaxxer.hikari.HikariDataSource;
 import net.nekozouneko.anniv2.kit.ANNIKit;
+import net.nekozouneko.anniv2.kit.AbsANNIKit;
 
 import java.util.List;
 import java.util.UUID;
@@ -13,8 +13,6 @@ public interface ANNIDatabase {
     boolean restoreConnectionIfClosed();
 
     boolean closeConnection();
-
-    HikariDataSource getSource();
 
     void initPlayer(UUID player);
 
@@ -36,9 +34,9 @@ public interface ANNIDatabase {
 
     void subtractExp(UUID player, int subtract);
 
-    ANNIKit getKit(UUID player);
+    AbsANNIKit getKit(UUID player);
 
-    void setKit(UUID player, ANNIKit kit);
+    void setKit(UUID player, AbsANNIKit kit);
 
     List<String> getAvailableKits(UUID player);
 
