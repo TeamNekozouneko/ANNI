@@ -5,6 +5,8 @@ import net.nekozouneko.anniv2.arena.ANNIArena;
 import net.nekozouneko.anniv2.arena.spectator.SpectatorTask;
 import net.nekozouneko.anniv2.board.BoardManager;
 import net.nekozouneko.anniv2.command.*;
+import net.nekozouneko.anniv2.database.ANNIDatabase;
+import net.nekozouneko.anniv2.database.impl.SQLiteDatabase;
 import net.nekozouneko.anniv2.kit.custom.CustomKitManager;
 import net.nekozouneko.anniv2.kit.items.StunGrenade;
 import net.nekozouneko.anniv2.listener.*;
@@ -50,6 +52,7 @@ public final class ANNIPlugin extends JavaPlugin {
     private Scoreboard pluginBoard;
     private SpectatorTask spectatorTask;
     private CustomKitManager customKitManager;
+    private ANNIDatabase database = null;
 
     public MessageManager getMessageManager() {
         return messageManager;
@@ -92,6 +95,10 @@ public final class ANNIPlugin extends JavaPlugin {
         return pluginBoard;
     }
 
+    public ANNIDatabase getDatabase() {
+        return database;
+    }
+
     @Override
     public void onLoad() {
         plugin = this;
@@ -122,6 +129,14 @@ public final class ANNIPlugin extends JavaPlugin {
         lobby = FileUtil.readGson(new File(getDataFolder(), "lobby.json"), Location.class);
 
         pluginBoard = getServer().getScoreboardManager().getNewScoreboard();
+
+        if (database != null) database.closeConnection();
+        switch (ANNIConfig.getDatabaseType()) {
+            default: {
+                database = new SQLiteDatabase();
+                break;
+            }
+        }
 
         getServer().getPluginManager().registerEvents(new AsyncPlayerChatListener(), this);
         getServer().getPluginManager().registerEvents(new BlockBreakListener(), this);
@@ -164,6 +179,11 @@ public final class ANNIPlugin extends JavaPlugin {
     public void onDisable() {
         if (!currentGame.isCancelled()) currentGame.cancel();
         unregisterRecipe();
+
+        if (database != null) {
+            database.closeConnection();
+            database = null;
+        }
     }
 
     @SuppressWarnings("unchecked")
