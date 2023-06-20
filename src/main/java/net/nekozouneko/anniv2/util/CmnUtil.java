@@ -27,11 +27,6 @@ public final class CmnUtil {
         return l / 20D;
     }
 
-    /**
-     * MM...:SS
-     * @param second Total second
-     * @return Timer (MM...:SS)
-     */
     public static String secminTimer(long second) {
         long m = second / 60;
         long s = second - (m * 60);
@@ -81,6 +76,11 @@ public final class CmnUtil {
         }
 
         return true;
+    }
+
+    public static int calcExp(int level) {
+        double b = Math.sqrt(15) * 1000;
+        return (int) b * level;
     }
 
 }
