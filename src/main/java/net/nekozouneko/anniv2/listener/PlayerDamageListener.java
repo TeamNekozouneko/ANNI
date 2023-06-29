@@ -3,21 +3,27 @@ package net.nekozouneko.anniv2.listener;
 import net.nekozouneko.anniv2.ANNIPlugin;
 import net.nekozouneko.anniv2.arena.spectator.SpectatorManager;
 import net.nekozouneko.anniv2.message.MessageManager;
+import org.bukkit.Material;
 import org.bukkit.Sound;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
-import org.bukkit.event.*;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffectType;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 public class PlayerDamageListener implements Listener {
 
     private static final Map<UUID, Long> fighting = new HashMap<>();
+    private static final List<Material> AXES = Arrays.asList(
+            Material.STONE_AXE, Material.DIAMOND_AXE,
+            Material.WOODEN_AXE, Material.STONE_AXE,
+            Material.NETHERITE_AXE, Material.IRON_AXE
+    );
 
     public static boolean isFighting(Player player) {
         new HashSet<>(fighting.keySet()).forEach(key -> {
@@ -55,6 +61,17 @@ public class PlayerDamageListener implements Listener {
 
     @EventHandler
     public void onDamageByEntity(EntityDamageByEntityEvent e) {
+        if (e.getDamager() instanceof Player) {
+            Player damager = (Player) e.getDamager();
+            ItemStack main = damager.getInventory().getItemInMainHand();
+            // 斧で攻撃した場合
+            if (AXES.contains(main.getType())) {
+                main.getEnchantmentLevel(Enchantment.DAMAGE_ALL);
+                // 4ダメージより上なら4ダメージを減らしその上で0.25 * ダメージ増加 (ない場合0)のレベル減らす。
+                e.setDamage(e.getDamage() > 4 ? e.getDamage() - 4 - (0.4 * main.getEnchantmentLevel(Enchantment.DAMAGE_ALL)) : e.getDamage());
+            }
+        }
+
         if (e.getDamager() instanceof Player && e.getEntity() instanceof Player) {
             fighting.put(e.getEntity().getUniqueId(), System.currentTimeMillis() + 10000);
         }
