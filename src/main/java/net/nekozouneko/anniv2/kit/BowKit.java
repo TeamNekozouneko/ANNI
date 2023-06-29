@@ -28,6 +28,7 @@ public class BowKit extends AbsANNIKit{
         inv[4] = ItemStackBuilder.of(Material.BOW)
                 .enchant(Enchantment.DURABILITY, 3, false)
                 .build();
+        inv[8] = ItemStackBuilder.of(Material.BREAD).amount(16).build();
         inv[9] = ItemStackBuilder.of(Material.ARROW)
                 .amount(32)
                 .build();

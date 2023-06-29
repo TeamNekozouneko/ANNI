@@ -145,7 +145,7 @@ public class BlockBreakListener implements Listener {
                         return;
                     }
                     if (((e.getBlock().getType() == Material.DIAMOND_ORE || e.getBlock().getType() == Material.EMERALD_ORE)) && current.getState().getId() < 3) {
-                        e.getPlayer().sendMessage(ANNIPlugin.getInstance().getMessageManager().build("notify.cant_mine_now", e.getBlock().getTranslationKey()));
+                        e.getPlayer().sendMessage(ANNIPlugin.getInstance().getMessageManager().build("notify.cant_mine_now", new ItemStack(e.getBlock().getType()).getItemMeta().getLocalizedName()));
                         e.setCancelled(true);
                         return;
                     }

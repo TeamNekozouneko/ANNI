@@ -25,6 +25,8 @@ public class DefaultKit extends AbsANNIKit{
         inv[2] = ItemStackBuilder.of(Material.STONE_AXE).build();
         inv[3] = ItemStackBuilder.of(Material.STONE_SHOVEL).build();
 
+        inv[8] = ItemStackBuilder.of(Material.BREAD).amount(16).build();
+
         inv[39] = LeatherArmorBuilder.of(Material.LEATHER_HELMET).build();
         inv[38] = LeatherArmorBuilder.of(Material.LEATHER_CHESTPLATE).build();
         inv[37] = LeatherArmorBuilder.of(Material.LEATHER_LEGGINGS).build();
