@@ -437,16 +437,22 @@ public class ANNIArena extends BukkitRunnable {
         try {
             if (map == null) {
                 if (VoteManager.isNowVoting(id) && !VoteManager.getResult(id).isEmpty()) {
-                    map = getMapRanking(VoteManager.endVote(id)).get(0).getKey();
+                    map = getMapRanking(VoteManager.endVote(id)).stream()
+                            .filter(ent -> ent.getKey().canUseOnArena())
+                            .map(Map.Entry::getKey)
+                            .findFirst().orElse(null);
                 }
-                else {
+
+                if (map == null) {
                     List<ANNIMap> filtered = plugin.getMapManager().getMaps().stream()
                             .filter(ANNIMap::canUseOnArena)
                             .collect(Collectors.toList());
+                    if (filtered.size() == 0) return false;
                     map = filtered.get(rand.nextInt(filtered.size()));
                 }
             }
             log.info("Map: " + map.getId());
+            if (map == null) return false;
 
             log.info("Copying map...");
             copy = Worlds.copyWorld(map.getBukkitWorld(), id + "-anni");
