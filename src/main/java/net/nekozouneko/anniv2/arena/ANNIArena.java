@@ -21,6 +21,7 @@ import net.nekozouneko.anniv2.arena.team.ANNITeam;
 import net.nekozouneko.anniv2.board.BoardManager;
 import net.nekozouneko.anniv2.kit.ANNIKit;
 import net.nekozouneko.anniv2.kit.AbsANNIKit;
+import net.nekozouneko.anniv2.listener.PlayerDamageListener;
 import net.nekozouneko.anniv2.map.ANNIMap;
 import net.nekozouneko.anniv2.message.MessageManager;
 import net.nekozouneko.anniv2.util.CmnUtil;
@@ -28,6 +29,7 @@ import net.nekozouneko.anniv2.util.FileUtil;
 import net.nekozouneko.anniv2.util.VaultUtil;
 import net.nekozouneko.anniv2.vote.VoteManager;
 import net.nekozouneko.commons.lang.collect.Collections3;
+import net.nekozouneko.commons.spigot.entity.Players;
 import net.nekozouneko.commons.spigot.world.Worlds;
 import org.bukkit.*;
 import org.bukkit.attribute.Attribute;
@@ -54,10 +56,16 @@ public class ANNIArena extends BukkitRunnable {
     private static class SaveData {
         private final ANNITeam team;
         private final ItemStack[] inventory;
+        private final float exp;
+        private final int level;
+        private final double health;
 
-        public SaveData(ANNITeam team, ItemStack[] inventory) {
+        public SaveData(ANNITeam team, ItemStack[] inventory, float exp, int level, double health) {
             this.team = team;
             this.inventory = inventory;
+            this.exp = exp;
+            this.level = level;
+            this.health = health;
         }
 
         public ANNITeam getTeam() {
@@ -66,6 +74,18 @@ public class ANNIArena extends BukkitRunnable {
 
         public ItemStack[] getInventory() {
             return inventory;
+        }
+
+        public float getExp() {
+            return exp;
+        }
+
+        public int getLevel() {
+            return level;
+        }
+
+        public double getHealth() {
+            return health;
         }
     }
 
@@ -145,13 +165,21 @@ public class ANNIArena extends BukkitRunnable {
                 player.sendMessage(mm.buildBigChar(CmnUtil.numberToChar(state.getId()), Character.toString(at.getCCChar()),
                         (Object[]) mm.buildArray("notify.big.mid_join", at.getTeamName())
                 ));
-                if (sd != null) player.getInventory().setContents(sd.getInventory());
+                if (sd != null) {
+                    player.getInventory().setContents(sd.getInventory());
+                    player.setExp(sd.getExp());
+                    player.setLevel(sd.getLevel());
+                    player.setHealth(sd.getHealth());
+                }
                 else player.getInventory().setContents(ANNIKit.teamColor(getKit(player), at));
             }
             else {
                 player.teleport(map.getSpawnOrDefault(getTeamByPlayer(player)).toLocation(copy));
                 SpectatorManager.add(player);
             }
+        }
+        else {
+            if (plugin.getLobby() != null) player.teleport(plugin.getLobby());
         }
     }
 
@@ -161,12 +189,15 @@ public class ANNIArena extends BukkitRunnable {
         player.setScoreboard(plugin.getServer().getScoreboardManager().getMainScoreboard());
         bb.removePlayer(player);
 
-        if (state.getId() > 0) {
+        if (state.getId() > 0 && !PlayerDamageListener.isFighting(player)) {
             savedData.put(
                     player.getUniqueId(),
                     new SaveData(
                             getTeamByPlayer(player),
-                            player.getInventory().getContents()
+                            player.getInventory().getContents(),
+                            player.getExp(),
+                            player.getLevel(),
+                            player.getHealth()
                     )
             );
         }
@@ -611,6 +642,12 @@ public class ANNIArena extends BukkitRunnable {
     @Override
     public void run() {
         if (state == ArenaState.WAITING || state == ArenaState.STARTING) {
+            players.forEach(player -> {
+                Players.healExhaustion(player);
+                Players.healSaturation(player);
+                Players.healFoodLevel(player);
+            });
+
             if (map == null) {
                 if (state == ArenaState.STARTING && getTimer() <= 10) {
                     if (VoteManager.isNowVoting(id)) {
