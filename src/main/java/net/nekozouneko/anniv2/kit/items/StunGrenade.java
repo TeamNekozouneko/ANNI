@@ -8,6 +8,7 @@ import org.bukkit.*;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
@@ -24,7 +25,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 public class StunGrenade implements Listener {
 
-    public static ItemStack get(int amount) {
+    public static ItemStackBuilder builder() {
         MessageManager mm = ANNIPlugin.getInstance().getMessageManager();
 
         return ItemStackBuilder.of(Material.SNOWBALL)
@@ -35,12 +36,10 @@ public class StunGrenade implements Listener {
                         PersistentDataType.STRING, "stun-grenade"
                 )
                 .itemFlags(ItemFlag.HIDE_ENCHANTS)
-                .enchant(Enchantment.DURABILITY, 1, false)
-                .amount(Math.max(amount, 1))
-                .build();
+                .enchant(Enchantment.DURABILITY, 1, false);
     }
 
-    @EventHandler(ignoreCancelled = true)
+    @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
     public void onLaunch(ProjectileLaunchEvent e) {
         if (e.getEntity().getShooter() != null && e.getEntity().getShooter() instanceof Player) {
             Player s = ((Player) e.getEntity().getShooter());
