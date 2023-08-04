@@ -7,6 +7,7 @@ import net.nekozouneko.anniv2.arena.spectator.SpectatorManager;
 import net.nekozouneko.anniv2.command.ASubCommand;
 import net.nekozouneko.anniv2.kit.ANNIKit;
 import net.nekozouneko.anniv2.kit.custom.CustomKit;
+import net.nekozouneko.anniv2.kit.items.AirJump;
 import net.nekozouneko.anniv2.kit.items.StunGrenade;
 import net.nekozouneko.anniv2.listener.BlockBreakListener;
 import net.nekozouneko.anniv2.util.CmdUtil;
@@ -44,7 +45,7 @@ public class DebugSubCommand extends ASubCommand {
                 ANNIPlugin.getInstance().getCurrentGame().setKit(Bukkit.getPlayer(args.get(1)), ANNIKit.getAbsKitOrCustomById(args.get(2)));
                 break;
             case "get-stung":
-                ((Player) sender).getInventory().addItem(StunGrenade.get(16));
+                ((Player) sender).getInventory().addItem(StunGrenade.builder().amount(16).build());
                 break;
             case "toggle-spec": {
                 Player p;
@@ -65,6 +66,10 @@ public class DebugSubCommand extends ASubCommand {
                     SpectatorManager.removeWatchable((Player) sender);
                 }
                 else SpectatorManager.addWatchable((Player) sender);
+                break;
+            }
+            case "get-airjump": {
+                ((Player)sender).getInventory().addItem(AirJump.builder().build());
                 break;
             }
             default: return false;
