@@ -2,11 +2,8 @@ package net.nekozouneko.anniv2.kit;
 
 import net.nekozouneko.commons.spigot.inventory.ItemStackBuilder;
 import net.nekozouneko.commons.spigot.inventory.special.LeatherArmorBuilder;
-import net.nekozouneko.commons.spigot.inventory.special.PotionBuilder;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.potion.PotionData;
-import org.bukkit.potion.PotionType;
 
 import java.util.Collections;
 
@@ -29,7 +26,6 @@ public final class AssaultKit extends AbsANNIKit {
         inv[2] = ItemStackBuilder.of(Material.STONE_AXE).build();
         inv[3] = ItemStackBuilder.of(Material.STONE_SHOVEL).build();
         inv[5] = ItemStackBuilder.of(Material.BREAD).amount(16).build();
-        inv[8] = PotionBuilder.of(Material.POTION).basePotionData(new PotionData(PotionType.SPEED, false, false)).build();
 
         inv[39] = LeatherArmorBuilder.of(Material.LEATHER_HELMET).build();
         inv[38] = LeatherArmorBuilder.of(Material.LEATHER_CHESTPLATE).build();
