@@ -6,6 +6,7 @@ import net.nekozouneko.anniv2.arena.spectator.SpectatorTask;
 import net.nekozouneko.anniv2.board.BoardManager;
 import net.nekozouneko.anniv2.command.*;
 import net.nekozouneko.anniv2.kit.custom.CustomKitManager;
+import net.nekozouneko.anniv2.kit.items.AirJump;
 import net.nekozouneko.anniv2.kit.items.StunGrenade;
 import net.nekozouneko.anniv2.listener.*;
 import net.nekozouneko.anniv2.listener.votifier.VotifierListener;
@@ -144,6 +145,7 @@ public final class ANNIPlugin extends JavaPlugin {
         }
 
         getServer().getPluginManager().registerEvents(new StunGrenade(), this);
+        getServer().getPluginManager().registerEvents(new AirJump(), this);
 
         currentGame = new ANNIArena(this, "current");
         spectatorTask = new SpectatorTask();
