@@ -29,15 +29,7 @@ public final class AssaultKit extends AbsANNIKit {
         inv[2] = ItemStackBuilder.of(Material.STONE_AXE).build();
         inv[3] = ItemStackBuilder.of(Material.STONE_SHOVEL).build();
         inv[5] = ItemStackBuilder.of(Material.BREAD).amount(16).build();
-        inv[6] = PotionBuilder.of(Material.POTION)
-                .basePotionData(new PotionData(PotionType.STRENGTH))
-                .build();
-        inv[7] = PotionBuilder.of(Material.POTION)
-                .basePotionData(new PotionData(PotionType.REGEN, false, true))
-                .build();
-        inv[8] = PotionBuilder.of(Material.POTION)
-                .basePotionData(new PotionData(PotionType.REGEN, false, true))
-                .build();
+        inv[8] = PotionBuilder.of(Material.POTION).basePotionData(new PotionData(PotionType.SPEED, false, false)).build();
 
         inv[39] = LeatherArmorBuilder.of(Material.LEATHER_HELMET).build();
         inv[38] = LeatherArmorBuilder.of(Material.LEATHER_CHESTPLATE).build();
