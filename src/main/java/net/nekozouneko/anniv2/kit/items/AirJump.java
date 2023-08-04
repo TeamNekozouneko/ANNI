@@ -3,6 +3,7 @@ package net.nekozouneko.anniv2.kit.items;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.nekozouneko.anniv2.ANNIPlugin;
+import net.nekozouneko.anniv2.message.MessageManager;
 import net.nekozouneko.commons.spigot.inventory.ItemStackBuilder;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -40,7 +41,10 @@ public class AirJump implements Listener {
     }
 
     public static ItemStackBuilder builder() {
+        MessageManager mm = ANNIPlugin.getInstance().getMessageManager();
         return ItemStackBuilder.of(Material.FEATHER)
+                .name(mm.build("item.airjump.name"))
+                .lore(mm.buildList("item.airjump.lore"))
                 .persistentData(
                         new NamespacedKey(ANNIPlugin.getInstance(), "special-item"),
                         PersistentDataType.STRING, "air-jump"
@@ -57,7 +61,7 @@ public class AirJump implements Listener {
             ) {
                 e.setCancelled(true);
                 if (isCooldownEnd(e.getPlayer().getUniqueId())) {
-                    setCooldown(e.getPlayer().getUniqueId(), System.currentTimeMillis() + 20000);
+                    setCooldown(e.getPlayer().getUniqueId(), System.currentTimeMillis() + 10000);
                     e.getPlayer().getWorld().playSound(
                             e.getPlayer().getLocation(), Sound.ENTITY_WITHER_SHOOT, 1, 2
                     );
