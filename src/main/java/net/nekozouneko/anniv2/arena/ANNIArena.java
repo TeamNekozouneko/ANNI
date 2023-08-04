@@ -39,6 +39,8 @@ import org.bukkit.boss.BarStyle;
 import org.bukkit.boss.KeyedBossBar;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.Team;
@@ -684,52 +686,61 @@ public class ANNIArena extends BukkitRunnable {
         updateScoreboard();
         tickTimer();
 
-        if (state.getId() > 0) {
-            // プレイヤー数が0のチームを退場させる
-            getTeams().keySet().forEach(at -> {
-                if (!isNexusLost(at) && getTeamPlayers(at).isEmpty()) {
-                    nexus.put(at, null);
-                    broadcast(plugin.getMessageManager().build("notify.no_player_team", at.getTeamName()));
-                }
-            });
-
-            if (state == ArenaState.PHASE_FIVE) {
-                getTeams().keySet().forEach((at) -> {
-                    // (ネクサスを失ったもしくは、ネクサスの体力が1以下) ではないなら
-                    if (!(isNexusLost(at) || getNexusHealth(at) <= 1)) {
-                        damageNexusHealth(at, 1, null);
+        if (state.getId() >= 0) {
+            if (state.getId() > 0) {
+                // プレイヤー数が0のチームを退場させる
+                getTeams().keySet().forEach(at -> {
+                    if (!isNexusLost(at) && getTeamPlayers(at).isEmpty()) {
+                        nexus.put(at, null);
+                        broadcast(plugin.getMessageManager().build("notify.no_player_team", at.getTeamName()));
                     }
                 });
-            }
 
-            // ネクサスを失っていないチーム数を調べる
-            List<ANNITeam> living = getTeams().keySet().stream()
-                    .filter(team -> !isNexusLost(team))
-                    .collect(Collectors.toList());
-
-            // もし1以下なら
-            if (living.size() <= 1) {
-                // もし1なら
-                if (living.size() == 1) {
-                    ANNITeam won = living.get(0);
-
-                    for (String s : mm.buildBigChar(
-                            'e', Character.toString(won.getCCChar()),
-                            (Object[]) mm.buildArray("notify.big.won",
-                                    won.getColoredName()
-                            ))
-                    ) broadcast(s);
-                    VaultUtil.ifAvail((eco) -> getTeamPlayers(won).forEach(p -> {
-                            eco.depositPlayer(p, 3000);
-                            p.sendMessage(mm.build("notify.deposit_points", "3000", mm.build("gui.shop.full_ext")));
-                    }));
-                } else { // ではない (0 ~ (Integer.MIN_VALUE)) なら
-                    broadcast(mm.build("notify.draw"));
+                if (state == ArenaState.PHASE_FIVE) {
+                    getTeams().keySet().forEach((at) -> {
+                        // (ネクサスを失ったもしくは、ネクサスの体力が1以下) ではないなら
+                        if (!(isNexusLost(at) || getNexusHealth(at) <= 1)) {
+                            damageNexusHealth(at, 1, null);
+                        }
+                    });
                 }
 
-                setTimer(ArenaState.GAME_OVER.nextPhaseIn());
-                setState(ArenaState.GAME_OVER);
+                // ネクサスを失っていないチーム数を調べる
+                List<ANNITeam> living = getTeams().keySet().stream()
+                        .filter(team -> !isNexusLost(team))
+                        .collect(Collectors.toList());
+
+                // もし1以下なら
+                if (living.size() <= 1) {
+                    // もし1なら
+                    if (living.size() == 1) {
+                        ANNITeam won = living.get(0);
+
+                        for (String s : mm.buildBigChar(
+                                'e', Character.toString(won.getCCChar()),
+                                (Object[]) mm.buildArray("notify.big.won",
+                                        won.getColoredName()
+                                ))
+                        )
+                            broadcast(s);
+                        VaultUtil.ifAvail((eco) -> getTeamPlayers(won).forEach(p -> {
+                            eco.depositPlayer(p, 3000);
+                            p.sendMessage(mm.build("notify.deposit_points", "3000", mm.build("gui.shop.full_ext")));
+                        }));
+                    } else { // ではない (0 ~ (Integer.MIN_VALUE)) なら
+                        broadcast(mm.build("notify.draw"));
+                    }
+
+                    setTimer(ArenaState.GAME_OVER.nextPhaseIn());
+                    setState(ArenaState.GAME_OVER);
+                }
             }
+
+            players.forEach((p) -> {
+                if (getKit(p).equals(ANNIKit.ASSAULT.getKit())) {
+                    p.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 40, 0, false, false, true));
+                }
+            });
         }
     }
 
