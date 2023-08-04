@@ -46,7 +46,7 @@ public class PlayerDenyActionListener implements Listener {
             PersistentDataContainer pdc = e.getItemDrop().getItemStack()
                     .getItemMeta().getPersistentDataContainer();
 
-            if (pdc.getOrDefault(noRemove, PersistentDataType.INTEGER, 0) == 0 && pdc.getOrDefault(anniKit, PersistentDataType.INTEGER, 0) == 1) {
+            if (pdc.getOrDefault(noRemove, PersistentDataType.INTEGER, 0) == 1 || pdc.getOrDefault(anniKit, PersistentDataType.INTEGER, 0) == 1) {
                 e.getPlayer().playSound(e.getItemDrop().getLocation(), Sound.ENTITY_ITEM_BREAK, 1, 1);
                 e.getItemDrop().remove();
                 return;
