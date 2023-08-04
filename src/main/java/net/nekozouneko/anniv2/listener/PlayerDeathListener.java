@@ -1,6 +1,7 @@
 package net.nekozouneko.anniv2.listener;
 
 import net.nekozouneko.anniv2.ANNIPlugin;
+import net.nekozouneko.anniv2.kit.items.AirJump;
 import net.nekozouneko.anniv2.message.MessageManager;
 import net.nekozouneko.anniv2.util.CmnUtil;
 import net.nekozouneko.anniv2.util.VaultUtil;
@@ -74,6 +75,7 @@ public class PlayerDeathListener implements Listener {
                 })
                 .forEach(e.getDrops()::remove); // ドロップするアイテムから削除
 
+        AirJump.setCooldown(e.getEntity().getUniqueId(), null);
         PlayerDamageListener.setNotFighting(e.getEntity());
     }
 
