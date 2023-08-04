@@ -9,12 +9,10 @@ import net.nekozouneko.anniv2.ANNIPlugin;
 import net.nekozouneko.anniv2.arena.ANNIArena;
 import net.nekozouneko.anniv2.arena.team.ANNITeam;
 import net.nekozouneko.anniv2.map.Nexus;
+import net.nekozouneko.anniv2.message.MessageManager;
 import net.nekozouneko.anniv2.util.CmnUtil;
 import net.nekozouneko.commons.spigot.inventory.ItemStackBuilder;
-import org.bukkit.Bukkit;
-import org.bukkit.GameMode;
-import org.bukkit.Location;
-import org.bukkit.Material;
+import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.block.data.Ageable;
 import org.bukkit.block.data.BlockData;
@@ -22,6 +20,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.potion.PotionEffectType;
 
 import java.util.*;
 import java.util.function.Consumer;
@@ -138,6 +137,13 @@ public class BlockBreakListener implements Listener {
         if (current.getState().getId() >= 0) {
             if (e.getPlayer().getGameMode() != GameMode.CREATIVE) {
                 ItemStack mainHand = e.getPlayer().getInventory().getItemInMainHand();
+
+                if (e.getPlayer().hasPotionEffect(PotionEffectType.INVISIBILITY)) {
+                    MessageManager mm = ANNIPlugin.getInstance().getMessageManager();
+                    e.getPlayer().removePotionEffect(PotionEffectType.INVISIBILITY);
+                    e.getPlayer().playSound(e.getPlayer().getLocation(), Sound.ENTITY_GENERIC_EXTINGUISH_FIRE, 1, 2);
+                    e.getPlayer().sendMessage(mm.build("notify.removed_invisibility"));
+                }
 
                 if (COOLDOWN.containsKey(e.getBlock().getType())) {
                     if (e.getBlock().getDrops(mainHand).isEmpty()) {
