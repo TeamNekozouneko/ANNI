@@ -2,6 +2,7 @@ package net.nekozouneko.anniv2.listener;
 
 import net.nekozouneko.anniv2.ANNIPlugin;
 import net.nekozouneko.anniv2.arena.spectator.SpectatorManager;
+import net.nekozouneko.anniv2.kit.ANNIKit;
 import net.nekozouneko.anniv2.message.MessageManager;
 import org.bukkit.Material;
 import org.bukkit.Sound;
@@ -41,7 +42,7 @@ public class PlayerDamageListener implements Listener {
     private final ANNIPlugin plugin = ANNIPlugin.getInstance();
     private final MessageManager mm = plugin.getMessageManager();
 
-    @EventHandler
+    @EventHandler(ignoreCancelled = true)
     public void onDamage(EntityDamageEvent e) {
         if (e.getEntity() instanceof Player) {
             Player p = ((Player) e.getEntity());
@@ -51,15 +52,24 @@ public class PlayerDamageListener implements Listener {
                 return;
             }
 
-            if (p.hasPotionEffect(PotionEffectType.INVISIBILITY)) {
-                p.removePotionEffect(PotionEffectType.INVISIBILITY);
-                p.playSound(p.getLocation(), Sound.ENTITY_GENERIC_EXTINGUISH_FIRE, 1, 2);
-                p.sendMessage(mm.build("notify.removed_invisibility"));
+            if (ANNIPlugin.getInstance().getCurrentGame().getState().getId() >= 0) {
+                if (ANNIPlugin.getInstance().getCurrentGame().getKit(p).equals(ANNIKit.ACROBAT.getKit())) {
+                    if (e.getCause() == EntityDamageEvent.DamageCause.FALL) {
+                        e.setCancelled(true);
+                        return;
+                    }
+                }
+
+                if (p.hasPotionEffect(PotionEffectType.INVISIBILITY)) {
+                    p.removePotionEffect(PotionEffectType.INVISIBILITY);
+                    p.playSound(p.getLocation(), Sound.ENTITY_GENERIC_EXTINGUISH_FIRE, 1, 2);
+                    p.sendMessage(mm.build("notify.removed_invisibility"));
+                }
             }
         }
     }
 
-    @EventHandler
+    @EventHandler(ignoreCancelled = true)
     public void onDamageByEntity(EntityDamageByEntityEvent e) {
         if (e.getDamager() instanceof Player) {
             Player damager = (Player) e.getDamager();
