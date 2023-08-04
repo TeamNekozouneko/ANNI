@@ -29,6 +29,7 @@ public class PlayerDenyActionListener implements Listener {
 
     private final ANNIPlugin plugin = ANNIPlugin.getInstance();
     private final NamespacedKey anniKit = new NamespacedKey(plugin, "kit-item");
+    private final NamespacedKey noRemove = new NamespacedKey(plugin, "no-remove");
 
     private final List<Material> CRAFT_BLACKLIST = Arrays.asList(
             Material.GOLDEN_PICKAXE, Material.FLINT_AND_STEEL
@@ -45,7 +46,7 @@ public class PlayerDenyActionListener implements Listener {
             PersistentDataContainer pdc = e.getItemDrop().getItemStack()
                     .getItemMeta().getPersistentDataContainer();
 
-            if (pdc.getOrDefault(anniKit, PersistentDataType.INTEGER, 0) == 1) {
+            if (pdc.getOrDefault(noRemove, PersistentDataType.INTEGER, 0) == 0 && pdc.getOrDefault(anniKit, PersistentDataType.INTEGER, 0) == 1) {
                 e.getPlayer().playSound(e.getItemDrop().getLocation(), Sound.ENTITY_ITEM_BREAK, 1, 1);
                 e.getItemDrop().remove();
                 return;
@@ -64,7 +65,7 @@ public class PlayerDenyActionListener implements Listener {
             for (ItemStack is : e.getInventory().getMatrix()) {
                 if (is == null || is.getType().isAir()) continue;
                 PersistentDataContainer pdc = is.getItemMeta().getPersistentDataContainer();
-                if (pdc.getOrDefault(anniKit, PersistentDataType.INTEGER, 0) == 1) {
+                if (pdc.getOrDefault(noRemove, PersistentDataType.INTEGER, 0) == 1 || pdc.getOrDefault(anniKit, PersistentDataType.INTEGER, 0) == 1) {
                     e.setCancelled(true);
                     return;
                 }
@@ -89,9 +90,9 @@ public class PlayerDenyActionListener implements Listener {
         if (plugin.getCurrentGame().getState().getId() >= 0) {
             if (e.getCurrentItem() == null || e.getCurrentItem().getType().isAir()) return;
 
-            if (e.getCurrentItem().getItemMeta().getPersistentDataContainer().getOrDefault(
-                    anniKit, PersistentDataType.INTEGER, 0
-            ) == 1) {
+            PersistentDataContainer pdc = e.getCurrentItem().getItemMeta().getPersistentDataContainer();
+
+            if (pdc.getOrDefault(noRemove, PersistentDataType.INTEGER, 0) == 0 || pdc.getOrDefault(anniKit, PersistentDataType.INTEGER, 0) == 1) {
                 if (e.getWhoClicked().getGameMode() != GameMode.CREATIVE && e.getInventory() != null) {
                     if (e.getClick() == ClickType.DROP || e.getClick() == ClickType.CONTROL_DROP) {
                         e.setCurrentItem(null);
@@ -103,6 +104,7 @@ public class PlayerDenyActionListener implements Listener {
                                     e.getInventory().getType() == InventoryType.PLAYER ||
                                     e.getInventory().getType() == InventoryType.CREATIVE
                             )
+                            && pdc.getOrDefault(anniKit, PersistentDataType.INTEGER, 0) == 1
                     ) {
                         e.setCancelled(true);
                     }

@@ -1,10 +1,13 @@
 package net.nekozouneko.anniv2.kit;
 
+import net.nekozouneko.anniv2.ANNIPlugin;
 import net.nekozouneko.anniv2.kit.items.StunGrenade;
 import net.nekozouneko.commons.spigot.inventory.ItemStackBuilder;
 import net.nekozouneko.commons.spigot.inventory.special.LeatherArmorBuilder;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.persistence.PersistentDataType;
 
 import java.util.Collections;
 
@@ -26,7 +29,10 @@ public class MochiMochiKit extends AbsANNIKit{
         inv[2] = ItemStackBuilder.of(Material.STONE_AXE).build();
         inv[3] = ItemStackBuilder.of(Material.STONE_SHOVEL).build();
         inv[7] = ItemStackBuilder.of(Material.BREAD).amount(16).build();
-        inv[8] = StunGrenade.get(5);
+        inv[8] = StunGrenade.builder()
+                .amount(5)
+                .persistentData(new NamespacedKey(ANNIPlugin.getInstance(), "no-remove"), PersistentDataType.INTEGER, 1)
+                .build();
 
         inv[39] = LeatherArmorBuilder.of(Material.LEATHER_HELMET).build();
         inv[38] = LeatherArmorBuilder.of(Material.LEATHER_CHESTPLATE).build();
