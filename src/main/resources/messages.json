@@ -417,6 +417,7 @@
   "kit.defense.name": "防衛キット",
   "kit.mochimochi.name": "もちもちキット",
   "kit.miner.name": "採掘師",
+  "kit.acrobat.name": "アクロバットキット",
 
   "item.stun_grenade.name": "&cもちっと&bスタングレネード",
   "item.stun_grenade.lore.0": "&7ある高齢の職人が作ったもちっとスタンさせるグレネード。",
@@ -426,8 +427,14 @@
   "item.stun_grenade.lore.4": "&9* 敵が10秒間遅くなります",
   "item.stun_grenade.lore.5": "&9* 敵の視界が一瞬真っ黒になります。",
 
+  "item.airjump.name": "&b空中ジャンプ",
+  "item.airjump.lore.0": "&7右クリックすることで大きなジャンプができる",
+  "item.airjump.lore.1": "",
+  "item.airjump.lore.2": "&9クールダウン: 20秒",
+
   "actionbar.nexus_alert": "&c{0} によってネクサスが破壊されています！",
   "actionbar.spectator_mode": "&7観戦モード",
+  "actionbar.cooldown_stats": "&cあと{0}秒後使用できます。",
 
   "chat.global": "&8(全体)&r {0}&a:&f {1}",
   "chat.global.format": "&8(全体)&r {0}%s&a:&f %s",
