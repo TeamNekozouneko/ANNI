@@ -16,6 +16,7 @@ import java.util.Map;
 
 public enum ANNIKit {
 
+    ACROBAT(new AcrobatKit()),
     ASSAULT(new AssaultKit()),
     BOW(new BowKit()),
     DEFAULT(new DefaultKit()),
@@ -26,6 +27,7 @@ public enum ANNIKit {
     private static final Map<String, ANNIKit> ID_MAP = new HashMap<>();
 
     static {
+        ID_MAP.put(ACROBAT.getKit().getId(), ACROBAT);
         ID_MAP.put(ASSAULT.getKit().getId(), ASSAULT);
         ID_MAP.put(BOW.getKit().getId(), BOW);
         ID_MAP.put(DEFAULT.getKit().getId(), DEFAULT);
