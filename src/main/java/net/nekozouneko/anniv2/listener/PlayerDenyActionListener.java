@@ -92,7 +92,7 @@ public class PlayerDenyActionListener implements Listener {
 
             PersistentDataContainer pdc = e.getCurrentItem().getItemMeta().getPersistentDataContainer();
 
-            if (pdc.getOrDefault(noRemove, PersistentDataType.INTEGER, 0) == 0 || pdc.getOrDefault(anniKit, PersistentDataType.INTEGER, 0) == 1) {
+            if (pdc.getOrDefault(noRemove, PersistentDataType.INTEGER, 0) == 1 || pdc.getOrDefault(anniKit, PersistentDataType.INTEGER, 0) == 1) {
                 if (e.getWhoClicked().getGameMode() != GameMode.CREATIVE && e.getInventory() != null) {
                     if (e.getClick() == ClickType.DROP || e.getClick() == ClickType.CONTROL_DROP) {
                         e.setCurrentItem(null);
