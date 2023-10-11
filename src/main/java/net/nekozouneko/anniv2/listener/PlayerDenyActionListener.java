@@ -6,6 +6,7 @@ import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.Sound;
+import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -16,7 +17,9 @@ import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.CraftItemEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryType;
+import org.bukkit.event.player.PlayerArmorStandManipulateEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
+import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.persistence.PersistentDataContainer;
@@ -88,7 +91,13 @@ public class PlayerDenyActionListener implements Listener {
         }
 
         if (plugin.getCurrentGame().getState().getId() >= 0) {
-            if (e.getCurrentItem() == null || e.getCurrentItem().getType().isAir()) return;
+            if (e.getClick() == ClickType.NUMBER_KEY) {
+                e.getWhoClicked().sendMessage("Key " + e.getHotbarButton() + " is pushed");
+                e.getWhoClicked().sendMessage("CurrentItem: " + e.getCurrentItem());
+                e.getWhoClicked().sendMessage("Cursosr: " + e.getCursor());
+                return;
+            }
+            else if (e.getCurrentItem() == null || e.getCurrentItem().getType().isAir()) return;
 
             PersistentDataContainer pdc = e.getCurrentItem().getItemMeta().getPersistentDataContainer();
 
@@ -122,6 +131,20 @@ public class PlayerDenyActionListener implements Listener {
     }
 
     @EventHandler
+    public void onInteractAtEntity(PlayerInteractEntityEvent e) {
+        if (e.getRightClicked() instanceof ItemFrame) {
+            ItemFrame ife = ((ItemFrame) e.getRightClicked());
+            ItemStack item = e.getPlayer().getInventory().getItem(e.getHand());
+            if (ife.isEmpty() && item != null) {
+                PersistentDataContainer c = item.getItemMeta().getPersistentDataContainer();
+                if (c.getOrDefault(new NamespacedKey(plugin, "kit-item"), PersistentDataType.INTEGER, 0) == 1) {
+                    e.setCancelled(true);
+                }
+            }
+        }
+    }
+
+    @EventHandler
     public void onPickUp(EntityPickupItemEvent e) {
         if (e.getEntity() instanceof Player) {
             Player p = ((Player) e.getEntity());
@@ -139,6 +162,20 @@ public class PlayerDenyActionListener implements Listener {
 
             if (SpectatorManager.isSpectating(p) && p.getGameMode() != GameMode.CREATIVE) {
                 e.setCancelled(true);
+            }
+        }
+    }
+
+    @EventHandler
+    public void onManipulate(PlayerArmorStandManipulateEvent e) {
+        if (e.getPlayer().getGameMode() != GameMode.CREATIVE && ANNIPlugin.getInstance().getCurrentGame().getState().getId() >= 0) {
+            ItemStack pi = e.getPlayerItem();
+            if (/*pi != null && */!pi.getType().isAir()) {
+                PersistentDataContainer c = pi.getItemMeta().getPersistentDataContainer();
+
+                if (c.getOrDefault(noRemove, PersistentDataType.INTEGER, 0) == 1 || c.getOrDefault(anniKit, PersistentDataType.INTEGER, 0) == 1) {
+                    e.setCancelled(true);
+                }
             }
         }
     }
