@@ -7,7 +7,7 @@
 
     <groupId>net.nekozouneko</groupId>
     <artifactId>ANNIv2</artifactId>
-    <version>2.0.3</version>
+    <version>2.0.4</version>
     <packaging>jar</packaging>
 
     <name>ANNIv2</name>
