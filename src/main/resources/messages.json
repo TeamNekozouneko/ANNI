@@ -138,6 +138,7 @@
   "command.err.unknown": "なんらかの理由で不具合が発生しました。",
   "command.err.kit_not_found": "&c「{0}」というキットは見つかりませんでした。",
   "command.err.material_not_defined": "&c「{0}」というマテリアルは存在しません。",
+  "command.err.no_perm": "&c権限が不足しています。",
 
   "command.usage": "&c使用方法: {0}",
 
@@ -190,6 +191,9 @@
   "command.kit.set_name": "キットの名前を「{0}」に設定しました。",
   "command.kit.set_shortname": "キットのショートネームを「{0}」に設定しました。",
   "command.kit.set_icon": "キットのアイコンを「{0}」に設定しました。",
+
+  "command.point.self_point": "&a現在のあなたのポイントは{0}&a{1}&aです。",
+  "command.point.other_point": "&a現在の{0}&aのポイントは{1}&a{2}&aです。",
 
   "xyz": "{0} / {1} / {2}",
   "xyz.format": "%.1f",

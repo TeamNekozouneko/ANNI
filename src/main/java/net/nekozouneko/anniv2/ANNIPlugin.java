@@ -159,6 +159,7 @@ public final class ANNIPlugin extends JavaPlugin {
         getCommand("suicide").setExecutor(new SuicideCommand());
         getCommand("vote").setExecutor(new VoteCommand());
         getCommand("kit").setExecutor(new KitCommand());
+        getCommand("point").setExecutor(new PointCommand());
 
         registerRecipe();
     }
