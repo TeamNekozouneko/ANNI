@@ -83,4 +83,14 @@ public final class CmnUtil {
         return true;
     }
 
+    public static boolean classExists(String class1) {
+        try {
+            Class.forName(class1);
+        }
+        catch (Exception e) {
+            return false;
+        }
+        return true;
+    }
+
 }
