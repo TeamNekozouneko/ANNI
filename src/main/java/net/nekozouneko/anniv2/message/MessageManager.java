@@ -7,8 +7,6 @@ import net.nekozouneko.anniv2.util.CmnUtil;
 import org.bukkit.Location;
 
 import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class MessageManager {
 
@@ -29,7 +27,7 @@ public class MessageManager {
                 Object arg = args[i];
                 if (arg == null) arg = "";
 
-                if (arg instanceof Integer) {
+                /*if (arg instanceof Integer) {
                     int numb = (int) arg;
 
                     Pattern p = Pattern.compile("(\\{" + i + "\\|(.+)})");
@@ -43,7 +41,8 @@ public class MessageManager {
                         s = s.replace(format1, args2[numb]);
                     }
                 }
-                else s = s != null ? s.replace("{" + i + "}", Objects.toString(arg)) : "";
+                else 未使用のためコメントアウト*/
+                s = s != null ? s.replace("{" + i + "}", Objects.toString(arg)) : "";
             }
         }
 
