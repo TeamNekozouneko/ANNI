@@ -968,14 +968,16 @@ public class ANNIArena extends BukkitRunnable {
                 )
         ) {
             List<Team> teams2 = new ArrayList<>(getTeams().values());
-            teams2.get(rand.nextInt(teams2.size())).addPlayer(player); // ランダムなチームに参加させる
+            Team sel = teams2.get(rand.nextInt(teams2.size()));
+            /*teams2.get(rand.nextInt(teams2.size()))*/ sel.addPlayer(player); // ランダムなチームに参加させる
         }
         else { // 一緒じゃなければ均等に分散させる
             Map.Entry<Team, Integer> minTeam = null; // 人数が少ないチーム
 
             for (Map.Entry<Team, Integer> entry : teamSize.entrySet()) {
-                if (minTeam == null || minTeam.getValue() > entry.getValue())
+                if (minTeam == null || minTeam.getValue() > entry.getValue()) {
                     minTeam = entry; // minTeamがnullもしくはminTeamの人数より少なければentryに置き換える
+                }
             }
 
             minTeam.getKey().addPlayer(player);
