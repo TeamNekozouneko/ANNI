@@ -61,11 +61,11 @@ public class AirJump implements Listener {
             ) {
                 e.setCancelled(true);
                 if (isCooldownEnd(e.getPlayer().getUniqueId())) {
-                    setCooldown(e.getPlayer().getUniqueId(), System.currentTimeMillis() + 10000);
+                    setCooldown(e.getPlayer().getUniqueId(), System.currentTimeMillis() + 15000);
                     e.getPlayer().getWorld().playSound(
                             e.getPlayer().getLocation(), Sound.ENTITY_WITHER_SHOOT, 1, 2
                     );
-                    e.getPlayer().setVelocity(e.getPlayer().getLocation().getDirection().setY(1));
+                    e.getPlayer().setVelocity(e.getPlayer().getLocation().getDirection().setY(0.75));
                 }
                 else {
                     e.getPlayer().spigot().sendMessage(ChatMessageType.ACTION_BAR,
