@@ -1,6 +1,7 @@
 package net.nekozouneko.anniv2.command.subcommand.admin;
 
 import com.google.common.base.Enums;
+import net.nekozouneko.anniv2.ANNIConfig;
 import net.nekozouneko.anniv2.ANNIPlugin;
 import net.nekozouneko.anniv2.arena.ANNIArena;
 import net.nekozouneko.anniv2.arena.team.ANNITeam;
@@ -25,7 +26,7 @@ public class ArenaSubCommand extends ASubCommand {
 
     @Override
     public boolean execute(CommandSender sender, List<String> args) {
-        if (args.size() == 0) {
+        if (args.isEmpty()) {
             if (sender instanceof Player) {
                 new ArenaDashboard(plugin, (Player) sender).open();
                 return true;
@@ -137,6 +138,26 @@ public class ArenaSubCommand extends ASubCommand {
                 else return false;
                 break;
             }
+            case "sethealth": {
+                if (args.size() >= 3) {
+                    ANNITeam at = Enums.getIfPresent(ANNITeam.class, args.get(1).toUpperCase()).orNull();
+                    if (at == null) return false;
+                    int to = Integer.parseInt(args.get(2));
+
+                    current.setNexusHealth(at, to);
+                }
+                else return false;
+                break;
+            }
+            case "restore": {
+                if (args.size() >= 2) {
+                    ANNITeam at = Enums.getIfPresent(ANNITeam.class, args.get(1).toUpperCase()).orNull();
+                    if (at == null) return false;
+
+                    current.restoreNexus(at, ANNIConfig.getDefaultHealth());
+                }
+                else return false;
+            }
             default: return false;
         }
 
@@ -146,13 +167,14 @@ public class ArenaSubCommand extends ASubCommand {
     @Override
     public List<String> tabComplete(CommandSender sender, List<String> args) {
         if (args.size() == 1) {
-            return CmdUtil.simpleTabComplete(args.get(0), "disable-team", "enable-team", "move", "set-map", "start");
+            return CmdUtil.simpleTabComplete(args.get(0), "disable-team", "enable-team", "move", "sethealth", "set-map", "start");
         }
         if (args.size() == 2) {
             switch (args.get(0)) {
                 case "disable-team":
                 case "enable-team":
                 case "move":
+                case "sethealth":
                     return CmdUtil.simpleTabComplete(
                             args.get(1),
                             Arrays.stream(ANNITeam.values())
