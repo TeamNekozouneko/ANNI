@@ -6,11 +6,11 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>net.nekozouneko</groupId>
-    <artifactId>ANNIv2</artifactId>
+    <artifactId>ANNI</artifactId>
     <version>2.0.4</version>
     <packaging>jar</packaging>
 
-    <name>ANNIv2</name>
+    <name>ANNI</name>
     <description></description>
 
     <properties>
@@ -18,7 +18,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
-    <url>https://github.com/TeamNekozouneko/ANNIv2</url>
+    <url>https://github.com/TeamNekozouneko/ANNI</url>
 
     <organization>
         <name>Team Nekozouneko</name>
@@ -27,13 +27,13 @@
 
     <issueManagement>
         <system>GitHub</system>
-        <url>https://github.com/TeamNekozouneko/ANNIv2/issues</url>
+        <url>https://github.com/TeamNekozouneko/ANNI/issues</url>
     </issueManagement>
 
     <scm>
-        <connection>scm:git:https://github.com/TeamNekozouneko/ANNIv2.git</connection>
-        <developerConnection>scm:git:git@github.com:TeamNekozouneko/ANNIv2.git</developerConnection>
-        <url>https://github.com/TeamNekozouneko/ANNIv2</url>
+        <connection>scm:git:https://github.com/TeamNekozouneko/ANNI.git</connection>
+        <developerConnection>scm:git:git@github.com:TeamNekozouneko/ANNI.git</developerConnection>
+        <url>https://github.com/TeamNekozouneko/ANNI</url>
     </scm>
 
     <build>
@@ -41,6 +41,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.11.0</version>
                 <configuration>
                     <source>${java.version}</source>
                     <target>${java.version}</target>
@@ -49,6 +50,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-shade-plugin</artifactId>
+                <version>3.5.1</version>
                 <executions>
                     <execution>
                         <phase>package</phase>
