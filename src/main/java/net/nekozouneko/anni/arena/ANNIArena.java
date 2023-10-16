@@ -21,7 +21,6 @@ import net.nekozouneko.anni.arena.team.ANNITeam;
 import net.nekozouneko.anni.board.BoardManager;
 import net.nekozouneko.anni.kit.ANNIKit;
 import net.nekozouneko.anni.kit.AbsANNIKit;
-import net.nekozouneko.anni.listener.PlayerDamageListener;
 import net.nekozouneko.anni.map.ANNIMap;
 import net.nekozouneko.anni.message.MessageManager;
 import net.nekozouneko.anni.util.CmnUtil;
@@ -160,7 +159,7 @@ public class ANNIArena extends BukkitRunnable {
         if (getState().getId() > 0) {
             SaveData sd = savedData.remove(player.getUniqueId());
             if (sd != null) setTeam(player, sd.getTeam());
-            else assignAtEquality(player);
+            else assignPlayer(player);
             if (!isNexusLost(getTeamByPlayer(player))) {
                 player.teleport(map.getSpawnOrDefault(getTeamByPlayer(player)).toLocation(copy));
                 ANNITeam at = getTeamByPlayer(player);
@@ -188,10 +187,7 @@ public class ANNIArena extends BukkitRunnable {
     public void leave(Player player) {
         players.remove(player);
 
-        player.setScoreboard(plugin.getServer().getScoreboardManager().getMainScoreboard());
-        bb.removePlayer(player);
-
-        if (state.getId() > 0 && !PlayerDamageListener.isFighting(player)) {
+        if (state.getId() > 0 && getTeamByPlayer(player) != null/*&& !PlayerDamageListener.isFighting(player)*/) {
             savedData.put(
                     player.getUniqueId(),
                     new SaveData(
@@ -202,7 +198,13 @@ public class ANNIArena extends BukkitRunnable {
                             player.getHealth()
                     )
             );
+            player.getInventory().clear();
         }
+
+        if (getTeamByPlayer(player) != null) getTeam(getTeamByPlayer(player)).removePlayer(player);
+
+        player.setScoreboard(plugin.getServer().getScoreboardManager().getMainScoreboard());
+        bb.removePlayer(player);
     }
 
     public Set<Player> getPlayers() {
@@ -547,7 +549,7 @@ public class ANNIArena extends BukkitRunnable {
 
             log.info("Assigning players...");
             savedData.clear();
-            players.forEach(this::assignAtEquality);
+            players.forEach(this::assignPlayer);
             nexus.clear();
             getTeams().forEach((at, team) -> {
                 setNexusHealth(at, ANNIConfig.getDefaultHealth());
@@ -585,11 +587,16 @@ public class ANNIArena extends BukkitRunnable {
             log.info("Initializing players...");
             savedData.clear();
             players.forEach(player -> {
+                player.spigot().respawn();
                 initPlayer(player);
                 player.teleport(plugin.getLobby());
             });
             log.info("Removing player from team...");
-            teams.values().forEach(team -> team.getPlayers().forEach(team::removePlayer));
+            teams.values().forEach(team -> {
+                    team.getEntries().forEach(team::removeEntry);
+                    log.info(team.getEntries().toString());
+            });
+
             log.info("Showing spectators...");
             SpectatorManager.clear();
             log.info("Initializing nexus...");
@@ -943,7 +950,7 @@ public class ANNIArena extends BukkitRunnable {
         }
     }
 
-    private void assignAtEquality(Player player) {
+    private void assignPlayer(Player player) {
         if (player.getScoreboard() != plugin.getPluginBoard())
             player.setScoreboard(plugin.getPluginBoard());
         if (CmnUtil.getJoinedTeam(player) != null) return;
@@ -969,7 +976,7 @@ public class ANNIArena extends BukkitRunnable {
         ) {
             List<Team> teams2 = new ArrayList<>(getTeams().values());
             Team sel = teams2.get(rand.nextInt(teams2.size()));
-            /*teams2.get(rand.nextInt(teams2.size()))*/ sel.addPlayer(player); // ランダムなチームに参加させる
+            sel.addPlayer(player); // ランダムなチームに参加させる
         }
         else { // 一緒じゃなければ均等に分散させる
             Map.Entry<Team, Integer> minTeam = null; // 人数が少ないチーム
