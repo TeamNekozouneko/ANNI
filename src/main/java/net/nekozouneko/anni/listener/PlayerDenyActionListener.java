@@ -93,8 +93,18 @@ public class PlayerDenyActionListener implements Listener {
         if (plugin.getCurrentGame().getState().getId() >= 0) {
             if (e.getClick() == ClickType.NUMBER_KEY) {
                 e.getWhoClicked().sendMessage("Key " + e.getHotbarButton() + " is pushed");
-                e.getWhoClicked().sendMessage("CurrentItem: " + e.getCurrentItem());
-                e.getWhoClicked().sendMessage("Cursosr: " + e.getCursor());
+
+                ItemStack item = e.getWhoClicked().getInventory().getItem(e.getHotbarButton());
+
+                e.getWhoClicked().sendMessage("Item?: " + item);
+
+                if (item != null && !item.getType().isAir()) {
+                    PersistentDataContainer pdc = item.getItemMeta().getPersistentDataContainer();
+                    if (pdc.getOrDefault(noRemove, PersistentDataType.INTEGER, 0) == 1 || pdc.getOrDefault(anniKit, PersistentDataType.INTEGER, 0) == 1) {
+                        e.setCancelled(true);
+                    }
+                }
+
                 return;
             }
             else if (e.getCurrentItem() == null || e.getCurrentItem().getType().isAir()) return;
