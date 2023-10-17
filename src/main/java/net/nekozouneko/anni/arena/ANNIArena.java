@@ -11,7 +11,6 @@ import com.sk89q.worldguard.protection.flags.Flags;
 import com.sk89q.worldguard.protection.flags.StateFlag;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.*;
-import fr.mrmicky.fastboard.FastBoard;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.nekozouneko.anni.ANNIConfig;
@@ -798,69 +797,90 @@ public class ANNIArena extends BukkitRunnable {
         BoardManager bm = plugin.getBoardManager();
 
         for (Player pl : players) {
-            FastBoard fb = bm.get(pl);
-            SimpleDateFormat df = new SimpleDateFormat(mm.build("scoreboard.dateformat"));
-            fb.updateTitle(mm.build("scoreboard.title"));
+            try {
+                BoardManager.ANNIFastBoard fb = bm.get(pl);
+                SimpleDateFormat df = new SimpleDateFormat(mm.build("scoreboard.dateformat"));
 
-            switch (state) {
-                case WAITING:
-                case STARTING: {
-                    String news = state == ArenaState.STARTING ?
-                            mm.build("scoreboard.waiting.2.starting", CmnUtil.secminTimer(getTimer())) :
-                            mm.build("scoreboard.waiting.2.more_player", (
-                                    enabledTeams.entrySet().stream()
-                                            .filter(Map.Entry::getValue)
-                                            .count() * ANNIConfig.getTeamMinPlayers()
-                                            - players.size())
+                switch (state) {
+                    case WAITING:
+                    case STARTING: {
+                        fb.updateTitle(mm.build("scoreboard.title"));
+                        String news = state == ArenaState.STARTING ?
+                                mm.build("scoreboard.waiting.2.starting", CmnUtil.secminTimer(getTimer())) :
+                                mm.build("scoreboard.waiting.2.more_player", (
+                                        enabledTeams.entrySet().stream()
+                                                .filter(Map.Entry::getValue)
+                                                .count() * ANNIConfig.getTeamMinPlayers()
+                                                - players.size())
+                                );
+
+                        if (map != null) {
+                            fb.updateLines(mm.buildList("scoreboard.waiting",
+                                    df.format(Calendar.getInstance().getTime()),
+                                    news,
+                                    players.size() + " / 120",
+                                    map.getName()
+                            ));
+                        } else {
+                            List<Map.Entry<ANNIMap, Integer>> nowRes = getMapRanking(VoteManager.getResult(id));
+                            fb.updateLines(mm.buildList("scoreboard.waiting_voting",
+                                    df.format(Calendar.getInstance().getTime()),
+                                    news,
+                                    players.size() + " / " + (ANNIConfig.getTeamMaxPlayers() * getEnabledTeams().size()),
+                                    nowRes.size() > 0 ? nowRes.get(0).getKey().getName() + " - " + nowRes.get(0).getValue() : "",
+                                    nowRes.size() > 1 ? nowRes.get(1).getKey().getName() + " - " + nowRes.get(1).getValue() : "",
+                                    nowRes.size() > 2 ? nowRes.get(2).getKey().getName() + " - " + nowRes.get(2).getValue() : ""
+                            ));
+                        }
+                        break;
+                    }
+                    case PHASE_ONE:
+                    case PHASE_TWO:
+                    case PHASE_THREE:
+                    case PHASE_FOUR:
+                    case PHASE_FIVE:
+                    case GAME_OVER: {
+                        if (fb.hasLinesMaxLength()) {
+                            if (map.getName() != null)
+                                fb.updateTitle(mm.build("scoreboard.playing.short.title", map.getName()));
+                            else fb.updateTitle(mm.build("scoreboard.title"));
+                            fb.updateLines(
+                                    mm.buildList(
+                                            "scoreboard.playing.short",
+                                            shortNexusHealth(ANNITeam.RED),
+                                            shortNexusHealth(ANNITeam.BLUE),
+                                            shortNexusHealth(ANNITeam.GREEN),
+                                            shortNexusHealth(ANNITeam.YELLOW)
+                                    )
                             );
-
-                    if (map != null) {
-                        fb.updateLines(mm.buildList("scoreboard.waiting",
-                                df.format(Calendar.getInstance().getTime()),
-                                news,
-                                players.size() + " / 120",
-                                map.getName()
-                        ));
+                        }
+                        else {
+                            fb.updateTitle(mm.build("scoreboard.title"));
+                            fb.updateLines(mm.buildList("scoreboard.playing",
+                                    df.format(Calendar.getInstance().getTime()),
+                                    sbNexusState(ANNITeam.RED),
+                                    sbNexusState(ANNITeam.BLUE),
+                                    sbNexusState(ANNITeam.GREEN),
+                                    sbNexusState(ANNITeam.YELLOW),
+                                    sbNexusHealth(ANNITeam.RED),
+                                    sbNexusHealth(ANNITeam.BLUE),
+                                    sbNexusHealth(ANNITeam.GREEN),
+                                    sbNexusHealth(ANNITeam.YELLOW),
+                                    map != null ? map.getName() : "-----"
+                            ));
+                        }
+                        break;
                     }
-                    else {
-                        List<Map.Entry<ANNIMap, Integer>> nowRes = getMapRanking(VoteManager.getResult(id));
-                        fb.updateLines(mm.buildList("scoreboard.waiting_voting",
-                                df.format(Calendar.getInstance().getTime()),
-                                news,
-                                players.size() + " / " + (ANNIConfig.getTeamMaxPlayers() * getEnabledTeams().size()),
-                                nowRes.size() > 0 ? nowRes.get(0).getKey().getName() + " - " + nowRes.get(0).getValue(): "",
-                                nowRes.size() > 1 ? nowRes.get(1).getKey().getName() + " - " + nowRes.get(1).getValue(): "",
-                                nowRes.size() > 2 ? nowRes.get(2).getKey().getName() + " - " + nowRes.get(2).getValue(): ""
+                    default: {
+                        fb.updateLines(mm.buildList("scoreboard.stopping",
+                                df.format(Calendar.getInstance().getTime())
                         ));
+                        break;
                     }
-                    break;
                 }
-                case PHASE_ONE:
-                case PHASE_TWO:
-                case PHASE_THREE:
-                case PHASE_FOUR:
-                case PHASE_FIVE:
-                case GAME_OVER: {
-                    fb.updateLines(mm.buildList("scoreboard.playing",
-                            df.format(Calendar.getInstance().getTime()),
-                            sbNexusState(ANNITeam.RED),
-                            sbNexusState(ANNITeam.BLUE),
-                            sbNexusState(ANNITeam.GREEN),
-                            sbNexusState(ANNITeam.YELLOW),
-                            sbNexusHealth(ANNITeam.RED),
-                            sbNexusHealth(ANNITeam.BLUE),
-                            sbNexusHealth(ANNITeam.GREEN),
-                            sbNexusHealth(ANNITeam.YELLOW),
-                            map != null ? map.getName() : "-----"
-                    ));
-                    break;
-                }
-                default: {
-                    fb.updateLines(mm.buildList("scoreboard.stopping",
-                            df.format(Calendar.getInstance().getTime())
-                    ));
-                    break;
-                }
+            }
+            catch (Exception e) {
+                e.printStackTrace();
             }
         }
     }
@@ -875,6 +895,10 @@ public class ANNIArena extends BukkitRunnable {
 
     private String sbNexusState(ANNITeam team) {
         return isNexusLost(team) ? mm.build("nexus.status.lost") : mm.build("nexus.status.active");
+    }
+
+    private int shortNexusHealth(ANNITeam team) {
+        return getNexusHealth(team) != null ? getNexusHealth(team) : 0;
     }
 
     private void tickTimer() {

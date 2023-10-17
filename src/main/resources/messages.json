@@ -1,5 +1,5 @@
 {
-  "version": "0",
+  "version": "2",
   "example": "{0} {1|aa|bb}",
 
   "scoreboard.title": "&c&lANNI&9&lHI&a&lLA&e&lTION",
@@ -41,6 +41,13 @@
   "scoreboard.playing.7": "マップ: {9}",
   "scoreboard.playing.8": "",
   "scoreboard.playing.9": "&9www.nekozouneko.net",
+
+  "scoreboard.playing.short.0": "§c赤チーム§r: {0}",
+  "scoreboard.playing.short.1": "§9青チーム§r: {1}",
+  "scoreboard.playing.short.2": "§a緑チーム§r: {2}",
+  "scoreboard.playing.short.3": "§e黄チーム§r: {3}",
+  "scoreboard.playing.short.title": "マップ: {0}",
+
 
   "scoreboard.stopping.0": "&8{0}",
   "scoreboard.stopping.1": "",
