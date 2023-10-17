@@ -36,12 +36,14 @@ public class PlayerDeathListener implements Listener {
 
             e.setDeathMessage(mm.build("kill.default", deadName, killerName));
 
-            VaultUtil.ifAvail((eco) -> {
-                eco.depositPlayer(e.getEntity().getKiller(), 10);
-                e.getEntity().getKiller().sendMessage(
-                        mm.build("notify.deposit_points", "10", mm.build("gui.shop.full_ext"))
-                );
-            });
+            if (plugin.getCurrentGame().getState().getId() > 0) {
+                VaultUtil.ifAvail((eco) -> {
+                    eco.depositPlayer(e.getEntity().getKiller(), 10);
+                    e.getEntity().getKiller().sendMessage(
+                            mm.build("notify.deposit_points", "10", mm.build("gui.shop.full_ext"))
+                    );
+                });
+            }
         }
         else {
             EntityDamageEvent ede = e.getEntity().getLastDamageCause();
