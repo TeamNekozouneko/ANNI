@@ -35,7 +35,7 @@ public class PlayerDenyActionListener implements Listener {
     private final NamespacedKey noRemove = new NamespacedKey(plugin, "no-remove");
 
     private final List<Material> CRAFT_BLACKLIST = Arrays.asList(
-            Material.GOLDEN_PICKAXE, Material.FLINT_AND_STEEL
+            Material.FLINT_AND_STEEL
     );
 
     @EventHandler
@@ -92,11 +92,7 @@ public class PlayerDenyActionListener implements Listener {
 
         if (plugin.getCurrentGame().getState().getId() >= 0) {
             if (e.getClick() == ClickType.NUMBER_KEY) {
-                e.getWhoClicked().sendMessage("Key " + e.getHotbarButton() + " is pushed");
-
                 ItemStack item = e.getWhoClicked().getInventory().getItem(e.getHotbarButton());
-
-                e.getWhoClicked().sendMessage("Item?: " + item);
 
                 if (item != null && !item.getType().isAir()) {
                     PersistentDataContainer pdc = item.getItemMeta().getPersistentDataContainer();
