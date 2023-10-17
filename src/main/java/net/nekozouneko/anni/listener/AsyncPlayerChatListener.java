@@ -63,6 +63,7 @@ public class AsyncPlayerChatListener implements Listener {
                                     )
                             );
 
+                            e.setCancelled(true);
                             return;
                         }
                         else e.getPlayer().sendMessage(
