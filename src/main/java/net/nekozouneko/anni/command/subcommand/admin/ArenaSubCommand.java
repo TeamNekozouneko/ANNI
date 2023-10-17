@@ -157,6 +157,7 @@ public class ArenaSubCommand extends ASubCommand {
                     current.restoreNexus(at, ANNIConfig.getDefaultHealth());
                 }
                 else return false;
+                break;
             }
             default: return false;
         }
