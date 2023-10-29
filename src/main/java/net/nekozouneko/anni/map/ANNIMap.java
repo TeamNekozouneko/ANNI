@@ -2,6 +2,7 @@ package net.nekozouneko.anni.map;
 
 import com.google.common.base.Preconditions;
 import com.sk89q.worldedit.math.BlockVector3;
+import lombok.Getter;
 import net.nekozouneko.anni.arena.team.ANNITeam;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -13,14 +14,18 @@ import java.util.Map;
 
 public class ANNIMap {
 
+    @Getter
     private final String id;
+    @Getter
     private String name;
 
+    @Getter
     private final String world;
 
     private final EnumMap<ANNITeam, Nexus> nexus = new EnumMap<>(ANNITeam.class);
     private final EnumMap<ANNITeam, SpawnLocation> spawn = new EnumMap<>(ANNITeam.class);
 
+    @Getter
     private SpawnLocation defaultSpawn;
 
     public ANNIMap(String id, String world, String name) {
@@ -43,24 +48,8 @@ public class ANNIMap {
         );
     }
 
-    public String getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public String getWorld() {
-        return world;
-    }
-
     public World getBukkitWorld() {
         return Bukkit.getWorld(world);
-    }
-
-    public SpawnLocation getDefaultSpawn() {
-        return defaultSpawn;
     }
 
     public Nexus getNexus(ANNITeam team) {

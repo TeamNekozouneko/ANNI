@@ -1,6 +1,7 @@
 package net.nekozouneko.anni;
 
 import com.google.gson.Gson;
+import lombok.Getter;
 import net.nekozouneko.anni.arena.ANNIArena;
 import net.nekozouneko.anni.arena.spectator.SpectatorTask;
 import net.nekozouneko.anni.board.BoardManager;
@@ -40,33 +41,24 @@ public final class ANNIPlugin extends JavaPlugin {
         return plugin;
     }
 
+    @Getter
     private MessageManager messageManager;
+    @Getter
     private BoardManager boardManager;
+    @Getter
     private MapManager mapManager;
 
+    @Getter
     private ANNIArena currentGame;
     private File defaultMapsDir;
     private File defaultKitsDir;
+    @Getter
     private Location lobby;
+    @Getter
     private Scoreboard pluginBoard;
     private SpectatorTask spectatorTask;
+    @Getter
     private CustomKitManager customKitManager;
-
-    public MessageManager getMessageManager() {
-        return messageManager;
-    }
-
-    public BoardManager getBoardManager() {
-        return boardManager;
-    }
-
-    public MapManager getMapManager() {
-        return mapManager;
-    }
-
-    public ANNIArena getCurrentGame() {
-        return currentGame;
-    }
 
     public File getMapsDir() {
         return defaultMapsDir;
@@ -76,21 +68,9 @@ public final class ANNIPlugin extends JavaPlugin {
         return defaultKitsDir;
     }
 
-    public CustomKitManager getCustomKitManager() {
-        return customKitManager;
-    }
-
     public void setLobby(Location location) {
         lobby = location.clone();
         FileUtil.writeGson(new File(getDataFolder(), "lobby.json"), location, Location.class);
-    }
-
-    public Location getLobby() {
-        return lobby;
-    }
-
-    public Scoreboard getPluginBoard() {
-        return pluginBoard;
     }
 
     @Override

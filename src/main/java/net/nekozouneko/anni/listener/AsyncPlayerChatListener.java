@@ -37,6 +37,7 @@ public class AsyncPlayerChatListener implements Listener {
                 if (matcher.find()) {
                     Player receiver = Bukkit.getPlayer(matcher.group(1));
 
+                    e.setCancelled(true);
                     if (receiver != null) {
                         if (receiver.equals(e.getPlayer())) {
                             e.getPlayer().sendMessage(plugin.getMessageManager().build(
@@ -49,7 +50,6 @@ public class AsyncPlayerChatListener implements Listener {
                                 plugin.getCurrentGame().getTeamByPlayer(e.getPlayer())
                         ).contains(receiver)) {
                             String senderMessage = plugin.getMessageManager().build("chat.tell.send",
-                                    e.getPlayer().getName(),
                                     receiver.getName(),
                                     matcher.group(2)
                             );
@@ -58,12 +58,10 @@ public class AsyncPlayerChatListener implements Listener {
                             receiver.sendMessage(
                                     plugin.getMessageManager().build("chat.tell.receive",
                                             e.getPlayer().getName(),
-                                            receiver.getName(),
                                             matcher.group(2)
                                     )
                             );
 
-                            e.setCancelled(true);
                             return;
                         }
                         else e.getPlayer().sendMessage(
@@ -74,7 +72,6 @@ public class AsyncPlayerChatListener implements Listener {
                             plugin.getMessageManager().build("command.err.player_not_found", matcher.group(1))
                     );
 
-                    e.setCancelled(true);
                     return;
                 }
             }
@@ -83,16 +80,15 @@ public class AsyncPlayerChatListener implements Listener {
                 e.getRecipients().clear();
                 e.getRecipients().addAll(plugin.getCurrentGame().getTeamPlayers(at));
                 String form = plugin.getMessageManager().build("chat.team.format",
-                        t != null ? Strings.nullToEmpty(t.getPrefix()) + t.getColor() : ""
+                        t.getColor() + t.getDisplayName()
                 );
                 e.setFormat(form);
             }
-            catch (Exception e1) {
+            catch (UnsupportedOperationException e1) {
                 e.setCancelled(true);
                 String mes = plugin.getMessageManager().build("chat.team",
-                        t != null ?
-                                Strings.nullToEmpty(t.getPrefix()) + t.getColor() + e.getPlayer().getName()
-                                : e.getPlayer().getName(),
+                        t.getColor() + t.getDisplayName(),
+                        e.getPlayer().getName(),
                         e.getMessage()
                 );
                 plugin.getCurrentGame().broadcast(mes, at);
@@ -106,7 +102,7 @@ public class AsyncPlayerChatListener implements Listener {
                 Team t = plugin.getCurrentGame().getTeam(at);
 
                 prefix = Strings.nullToEmpty(t.getPrefix()) + t.getColor();
-                username = prefix + e.getPlayer().getName();
+                username = prefix + "§r " + e.getPlayer().getName();
             }
             else {
                 prefix = "";
@@ -115,10 +111,10 @@ public class AsyncPlayerChatListener implements Listener {
 
 
             try {
-                String form = plugin.getMessageManager().build("chat.global.format", prefix);
+                String form = plugin.getMessageManager().build("chat.global.format", prefix + "§r ");
                 e.setFormat(form);
             }
-            catch (Exception e1) {
+            catch (UnsupportedOperationException e1) {
                 e.setCancelled(true);
                 String mes = plugin.getMessageManager().build("chat.global",
                         username,

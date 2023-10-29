@@ -2,6 +2,8 @@ package net.nekozouneko.anni.kit;
 
 import com.google.common.base.Enums;
 import com.google.gson.annotations.SerializedName;
+import lombok.Getter;
+import lombok.Setter;
 import net.nekozouneko.anni.ANNIPlugin;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
@@ -12,8 +14,11 @@ import java.util.List;
 
 public abstract class AbsANNIKit {
 
+    @Getter
     protected final String id;
+    @Getter @Setter
     protected String shortName;
+    @Setter
     protected String name;
 
     protected String icon;
@@ -28,24 +33,8 @@ public abstract class AbsANNIKit {
         this.lore = lore != null ? new ArrayList<>(lore) : new ArrayList<>();
     }
 
-    public String getId() {
-        return id;
-    }
-
-    public String getShortName() {
-        return shortName;
-    }
-
-    public void setShortName(String shortName) {
-        this.shortName = shortName;
-    }
-
     public String getName() {
         return ANNIPlugin.getInstance().getMessageManager().build(name);
-    }
-
-    public void setName(String name) {
-        this.name = name;
     }
 
     public Material getIcon() {

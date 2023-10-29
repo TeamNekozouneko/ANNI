@@ -1,5 +1,7 @@
 package net.nekozouneko.anni.arena;
 
+import lombok.Getter;
+
 public enum ArenaState {
 
     WAITING(-2, null, null, null, 0, null),
@@ -15,8 +17,11 @@ public enum ArenaState {
 
     STOPPED(-3, null, null, null, 0, null);
 
+    @Getter
     private final int id;
+    @Getter
     private final String name;
+    @Getter
     private final String description;
 
     private final Integer nexusDamage;
@@ -30,18 +35,6 @@ public enum ArenaState {
         this.nextPhaseIn = nextPhaseIn;
         this.nextPhase = nextPhase;
         this.description = desc;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public String getDescription() {
-        return description;
     }
 
     public boolean canDestroyNexus() {

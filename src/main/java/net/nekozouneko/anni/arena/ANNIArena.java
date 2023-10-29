@@ -11,6 +11,9 @@ import com.sk89q.worldguard.protection.flags.Flags;
 import com.sk89q.worldguard.protection.flags.StateFlag;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.nekozouneko.anni.ANNIConfig;
@@ -53,44 +56,18 @@ public class ANNIArena extends BukkitRunnable {
 
     private static final Random rand = new Random();
 
+    @Getter @AllArgsConstructor
     private static class SaveData {
         private final ANNITeam team;
         private final ItemStack[] inventory;
         private final float exp;
         private final int level;
         private final double health;
-
-        public SaveData(ANNITeam team, ItemStack[] inventory, float exp, int level, double health) {
-            this.team = team;
-            this.inventory = inventory;
-            this.exp = exp;
-            this.level = level;
-            this.health = health;
-        }
-
-        public ANNITeam getTeam() {
-            return team;
-        }
-
-        public ItemStack[] getInventory() {
-            return inventory;
-        }
-
-        public float getExp() {
-            return exp;
-        }
-
-        public int getLevel() {
-            return level;
-        }
-
-        public double getHealth() {
-            return health;
-        }
     }
 
     private final ANNIPlugin plugin;
     private final MessageManager mm;
+    @Getter
     private final String id;
 
     private final Set<Player> players = new HashSet<>();
@@ -98,12 +75,15 @@ public class ANNIArena extends BukkitRunnable {
     private final BiMap<ANNITeam, Team> teams = HashBiMap.create(4);
     private final Map<ANNITeam, Boolean> enabledTeams = new EnumMap<>(ANNITeam.class);
 
+    @Getter @Setter
     private ArenaState state = ArenaState.WAITING;
 
     private ANNIMap map = null;
     private World copy = null;
 
-    private boolean enableTimer = false;
+    @Getter
+    private boolean enabledTimer = false;
+    @Getter @Setter
     private long timer = 0;
 
     private final Map<ANNITeam, Integer> nexus = new EnumMap<>(ANNITeam.class);
@@ -133,18 +113,6 @@ public class ANNIArena extends BukkitRunnable {
             if (!ANNIConfig.isTeamEnabled(at))
                 disableTeam(at);
         }
-    }
-
-    public String getId() {
-        return id;
-    }
-
-    public ArenaState getState() {
-        return state;
-    }
-
-    public void setState(ArenaState state) {
-        this.state = state;
     }
 
     public void join(Player player) {
@@ -327,24 +295,12 @@ public class ANNIArena extends BukkitRunnable {
 
     // Timer
 
-    public boolean isEnabledTimer() {
-        return enableTimer;
-    }
-
     public void enableTimer() {
-        enableTimer = true;
+        enabledTimer = true;
     }
 
     public void disableTimer() {
-        enableTimer = false;
-    }
-
-    public long getTimer() {
-        return timer;
-    }
-
-    public void setTimer(long l) {
-        timer = l;
+        enabledTimer = false;
     }
 
     // Nexus

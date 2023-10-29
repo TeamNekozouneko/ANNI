@@ -5,6 +5,7 @@ import net.nekozouneko.anni.arena.ANNIArena;
 import net.nekozouneko.anni.arena.spectator.SpectatorManager;
 import net.nekozouneko.anni.arena.team.ANNITeam;
 import net.nekozouneko.anni.kit.ANNIKit;
+import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -37,8 +38,11 @@ public class PlayerRespawnListener implements Listener {
             }
 
             // リスキル対策で 耐性255 と スピード 1 をリスポーン時付与
-            e.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 200, 255, false, false, true));
-            e.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 200, 1, false, false, true));
+            Bukkit.getScheduler().runTask(plugin, () -> {
+                        e.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 200, 255, false, false, true));
+                        e.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 200, 1, false, false, true));
+                    }
+            );
 
             e.getPlayer().setGameMode(GameMode.SURVIVAL);
             e.getPlayer().getInventory().setContents(
