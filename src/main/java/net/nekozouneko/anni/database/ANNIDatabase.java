@@ -1,7 +1,7 @@
-package net.nekozouneko.anniv2.database;
+package net.nekozouneko.anni.database;
 
-import net.nekozouneko.anniv2.kit.ANNIKit;
-import net.nekozouneko.anniv2.kit.AbsANNIKit;
+import net.nekozouneko.anni.kit.ANNIKit;
+import net.nekozouneko.anni.kit.AbsANNIKit;
 
 import java.util.List;
 import java.util.UUID;

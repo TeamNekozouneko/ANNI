@@ -1,11 +1,11 @@
-package net.nekozouneko.anniv2.database.impl;
+package net.nekozouneko.anni.database.impl;
 
-import net.nekozouneko.anniv2.ANNIConfig;
-import net.nekozouneko.anniv2.database.ANNIDatabase;
-import net.nekozouneko.anniv2.kit.ANNIKit;
-import net.nekozouneko.anniv2.kit.AbsANNIKit;
-import net.nekozouneko.anniv2.util.CmnUtil;
-import net.nekozouneko.anniv2.util.FileUtil;
+import net.nekozouneko.anni.ANNIConfig;
+import net.nekozouneko.anni.database.ANNIDatabase;
+import net.nekozouneko.anni.kit.ANNIKit;
+import net.nekozouneko.anni.kit.AbsANNIKit;
+import net.nekozouneko.anni.util.CmnUtil;
+import net.nekozouneko.anni.util.FileUtil;
 
 import java.io.File;
 import java.sql.*;
@@ -22,7 +22,7 @@ public class SQLiteDatabase implements ANNIDatabase {
 
         connect();
         createTable("level", "player TEXT NOT NULL, level integer, exp integer");
-        createTable("selected_kit", "player TEXT NOT NULL, kit TEXT");
+        createTable("settings", "player TEXT NOT NULL, kit TEXT");
         createTable("available_kits", "player TEXT NOT NULL, kits TEXT NOT NULL DEFAULT '[]'");
         createTable("statistic", "player TEXT NOT NULL, kills integer, deaths integer, nexus integer, wins integer, loses integer");
     }
@@ -68,7 +68,7 @@ public class SQLiteDatabase implements ANNIDatabase {
     private void appendColumnIfNotContains(String table, String name, String modifiers) {
         if (!getColumns(table).contains(name)) {
             try (PreparedStatement ps = source.prepareStatement(
-                    "ALTER TABLE "+ table +" ADD COULMN " + name + " " + modifiers
+                    "ALTER TABLE "+ table +" ADD COLUMN " + name + " " + modifiers
             )) {
                 ps.execute();
             }
@@ -89,7 +89,7 @@ public class SQLiteDatabase implements ANNIDatabase {
             }
 
             try (PreparedStatement ps = source.prepareStatement(
-                    "DELETE FROM selected_kit WHERE player = ?"
+                    "DELETE FROM settings WHERE player = ?"
             )) {
                 ps.setString(1, player.toString());
                 ps.execute();
@@ -128,7 +128,7 @@ public class SQLiteDatabase implements ANNIDatabase {
             }
 
             try (PreparedStatement ps = source.prepareStatement(
-                    "INSERT INTO "+ANNIConfig.getDBTablePrefix()+"selected_kit VALUES (?, ?)"
+                    "INSERT INTO "+ANNIConfig.getDBTablePrefix()+"settings VALUES (?, ?)"
             )) { // 選択中のキット
                 ps.setString(1, player.toString());
                 ps.setString(2, "default");
@@ -185,18 +185,18 @@ public class SQLiteDatabase implements ANNIDatabase {
             }
 
             // init selected kit
-            boolean isInitializedSelectedKit;
+            boolean isInitializedSettings;
             try (PreparedStatement ps = source.prepareStatement(
-                    "SELECT * FROM " + ANNIConfig.getDBTablePrefix() + "selected_kit WHERE player = ? LIMIT 1"
+                    "SELECT * FROM " + ANNIConfig.getDBTablePrefix() + "settings WHERE player = ? LIMIT 1"
             )) {
                 ps.setString(1, player.toString());
                 ResultSet rs = ps.executeQuery();
-                isInitializedSelectedKit = rs.next();
+                isInitializedSettings = rs.next();
             }
 
-            if (!isInitializedSelectedKit) {
+            if (!isInitializedSettings) {
                 try (PreparedStatement ps = source.prepareStatement(
-                        "INSERT INTO "+ANNIConfig.getDBTablePrefix()+"selected_kit VALUES (?, ?)"
+                        "INSERT INTO "+ANNIConfig.getDBTablePrefix()+"settings VALUES (?, ?)"
                 )) {
                     ps.setString(1, player.toString());
                     ps.setString(2, "default");
@@ -420,7 +420,7 @@ public class SQLiteDatabase implements ANNIDatabase {
     @Override
     public AbsANNIKit getKit(UUID player) {
         try (PreparedStatement ps = source.prepareStatement(
-                "SELECT kit FROM "+ANNIConfig.getDBTablePrefix()+"selected_kit WHERE player = ?"
+                "SELECT kit FROM "+ANNIConfig.getDBTablePrefix()+"settings WHERE player = ?"
         )) {
             ps.setString(1, player.toString());
             ResultSet rs = ps.executeQuery();
@@ -438,7 +438,7 @@ public class SQLiteDatabase implements ANNIDatabase {
     @Override
     public void setKit(UUID player, AbsANNIKit kit) {
         try (PreparedStatement ps = source.prepareStatement(
-                "UPDATE " + ANNIConfig.getDBTablePrefix()+"selected_kit SET kit = ? WHERE player = ?"
+                "UPDATE " + ANNIConfig.getDBTablePrefix()+"settings SET kit = ? WHERE player = ?"
         )) {
             ps.setString(1, kit.getId());
             ps.setString(2, player.toString());
