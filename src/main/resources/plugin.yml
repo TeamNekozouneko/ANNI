@@ -1,7 +1,7 @@
-name: ANNIv2
+name: ANNI
 version: '${project.version}'
 
-main: net.nekozouneko.anniv2.ANNIPlugin
+main: net.nekozouneko.anni.ANNIPlugin
 api-version: 1.16
 
 authors: [Taitaitatata]
@@ -47,4 +47,9 @@ commands:
     aliases: [redeploy, kill]
     description: "Suicide command"
     permission: anniv2.command.suicide
+
     usage: "/<command>"
+  point:
+    description: "Point command"
+    permission: anniv2.command.point
+    usage: "/<command> [target]"

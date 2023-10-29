@@ -1,6 +1,5 @@
 {
-  "version": "0",
-  "example": "{0} {1|aa|bb}",
+  "version": "3",
 
   "scoreboard.title": "&c&lANNI&9&lHI&a&lLA&e&lTION",
   "scoreboard.dateformat": "yyyy/MM/dd HH:mm",
@@ -41,6 +40,13 @@
   "scoreboard.playing.7": "マップ: {9}",
   "scoreboard.playing.8": "",
   "scoreboard.playing.9": "&9www.nekozouneko.net",
+
+  "scoreboard.playing.short.0": "§c赤チーム§r: {0}",
+  "scoreboard.playing.short.1": "§9青チーム§r: {1}",
+  "scoreboard.playing.short.2": "§a緑チーム§r: {2}",
+  "scoreboard.playing.short.3": "§e黄チーム§r: {3}",
+  "scoreboard.playing.short.title": "マップ: {0}",
+
 
   "scoreboard.stopping.0": "&8{0}",
   "scoreboard.stopping.1": "",
@@ -138,6 +144,7 @@
   "command.err.unknown": "なんらかの理由で不具合が発生しました。",
   "command.err.kit_not_found": "&c「{0}」というキットは見つかりませんでした。",
   "command.err.material_not_defined": "&c「{0}」というマテリアルは存在しません。",
+  "command.err.no_perm": "&c権限が不足しています。",
 
   "command.usage": "&c使用方法: {0}",
 
@@ -190,6 +197,9 @@
   "command.kit.set_name": "キットの名前を「{0}」に設定しました。",
   "command.kit.set_shortname": "キットのショートネームを「{0}」に設定しました。",
   "command.kit.set_icon": "キットのアイコンを「{0}」に設定しました。",
+
+  "command.point.self_point": "&a現在のあなたのポイントは{0}&a{1}&aです。",
+  "command.point.other_point": "&a現在の{0}&aのポイントは{1}&a{2}&aです。",
 
   "xyz": "{0} / {1} / {2}",
   "xyz.format": "%.1f",
@@ -417,6 +427,7 @@
   "kit.defense.name": "防衛キット",
   "kit.mochimochi.name": "もちもちキット",
   "kit.miner.name": "採掘師",
+  "kit.acrobat.name": "アクロバットキット",
 
   "item.stun_grenade.name": "&cもちっと&bスタングレネード",
   "item.stun_grenade.lore.0": "&7ある高齢の職人が作ったもちっとスタンさせるグレネード。",
@@ -426,13 +437,19 @@
   "item.stun_grenade.lore.4": "&9* 敵が10秒間遅くなります",
   "item.stun_grenade.lore.5": "&9* 敵の視界が一瞬真っ黒になります。",
 
+  "item.airjump.name": "&b空中ジャンプ",
+  "item.airjump.lore.0": "&7右クリックすることで大きなジャンプができる",
+  "item.airjump.lore.1": "",
+  "item.airjump.lore.2": "&9クールダウン: 20秒",
+
   "actionbar.nexus_alert": "&c{0} によってネクサスが破壊されています！",
   "actionbar.spectator_mode": "&7観戦モード",
+  "actionbar.cooldown_stats": "&cあと{0}秒後使用できます。",
 
-  "chat.global": "&8(全体)&r {0}&a:&f {1}",
-  "chat.global.format": "&8(全体)&r {0}%s&a:&f %s",
-  "chat.team": "&8(チーム)&r {0}&a:&f {1}",
-  "chat.team.format": "&8(チーム)&r {0}%s&a:&f %s",
-  "chat.tell.receive": "&f[&7{1} &f<- &7{0}&f]&a:&f {2}",
-  "chat.tell.send": "&f[&7{0} &f-> &7{1}&f]&a:&f {2}"
+  "chat.global": "{0}&a:&f {1}",
+  "chat.global.format": "{0}%s&a:&f %s",
+  "chat.team": "&8[{0}§8]&r {1}&a:&f {2}",
+  "chat.team.format": "&8[{0}§8]&r %s&a:&f %s",
+  "chat.tell.receive": "&f[&7{0} から]&a:&f {1}",
+  "chat.tell.send": "&f[&7{0} へ]&a:&f {1}"
 }
