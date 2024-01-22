@@ -1,6 +1,7 @@
 package net.nekozouneko.anni.listener;
 
 import com.google.common.base.Strings;
+import net.md_5.bungee.api.ChatColor;
 import net.nekozouneko.anni.ANNIPlugin;
 import net.nekozouneko.anni.arena.team.ANNITeam;
 import org.bukkit.Bukkit;
@@ -101,8 +102,10 @@ public class AsyncPlayerChatListener implements Listener {
                 e.setMessage(e.getMessage().substring(1));
                 Team t = plugin.getCurrentGame().getTeam(at);
 
-                prefix = Strings.nullToEmpty(t.getPrefix()) + t.getColor();
-                username = prefix + "§r " + e.getPlayer().getName();
+                prefix = t.getColor() + Strings.nullToEmpty(t.getPrefix());
+                username = prefix + ChatColor.RESET
+                        + (Strings.nullToEmpty(t.getPrefix()).isEmpty() ? "" : " ")
+                        + t.getColor() + e.getPlayer().getName();
             }
             else {
                 prefix = "";
