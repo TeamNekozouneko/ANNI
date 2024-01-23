@@ -77,7 +77,7 @@ public class PlayerDamageListener implements Listener {
             // 斧で攻撃した場合
             if (AXES.contains(main.getType())) {
                 // 4ダメージより上なら4ダメージを減らして0.4 * ダメージ増加 (ない場合0)のレベル減らしてそうではないならそのまま通す
-                e.setDamage(Math.max(e.getDamage() > 2 ? e.getDamage() - 4 - (0.5 * main.getEnchantmentLevel(Enchantment.DAMAGE_ALL)) : e.getDamage(), 0.5));
+                e.setDamage(Math.max(e.getDamage() > 2 ? e.getDamage() - 4 - (0.5 * main.getEnchantmentLevel(Enchantment.DAMAGE_ALL)) : e.getDamage(), 0));
             }
         }
 
