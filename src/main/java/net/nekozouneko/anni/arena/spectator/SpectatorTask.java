@@ -24,7 +24,7 @@ public class SpectatorTask extends BukkitRunnable {
                             .build("actionbar.spectator_mode")
                     ));
 
-                    if (SpectatorManager.isWatchable(player)) {
+                    if (SpectatorManager.isWatchable(watcher)) {
                         if (watcher.canSee(player)) return;
                         watcher.showPlayer(ANNIPlugin.getInstance(), player);
                     }
