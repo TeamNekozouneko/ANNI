@@ -180,6 +180,15 @@ public class CombatShop extends AbstractGui {
                         ))
                         .build()
         );
+        inventory.setItem(34,
+                ItemStackBuilder.of(Material.EXPERIENCE_BOTTLE)
+                        .amount(4)
+                        .persistentData(price, PersistentDataType.DOUBLE, 700.)
+                        .lore(Collections.singletonList(
+                                mm.build("gui.shop.price", "700", mm.build("gui.shop.ext"))
+                        ))
+                        .build()
+        );
     }
 
     @EventHandler
