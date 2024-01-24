@@ -327,7 +327,13 @@ public class ANNIArena extends BukkitRunnable {
             nexus.put(team, health <= 0 ? null : health);
 
             if (player != null) {
-                bb.setProgress(1);
+                double leftHealth = CmnUtil.bossBarProgress(ANNIConfig.getDefaultHealth(), health);
+                if (leftHealth <= 0.2) bb.setColor(BarColor.RED);
+                else if (leftHealth <= 0.5) bb.setColor(BarColor.YELLOW);
+                else bb.setColor(BarColor.GREEN);
+
+                bb.setProgress(leftHealth);
+
                 bb.setTitle(ANNIPlugin.getInstance().getMessageManager().build(
                         "bossbar.damaged_nexus",
                         player.getName(), team.getTeamName()
@@ -611,6 +617,10 @@ public class ANNIArena extends BukkitRunnable {
 
     @Override
     public void run() {
+        if (isEnabledTimer() && timer > 0) {
+            timer--;
+        }
+
         if (state == ArenaState.WAITING || state == ArenaState.STARTING) {
             players.forEach(player -> {
                 Players.healExhaustion(player);
@@ -646,7 +656,7 @@ public class ANNIArena extends BukkitRunnable {
 
         updateBossBar();
         updateScoreboard();
-        tickTimer();
+        updatePhase();
 
         if (state.getId() >= 0) {
             if (state.getId() > 0) {
@@ -720,6 +730,7 @@ public class ANNIArena extends BukkitRunnable {
     private void updateBossBar() {
         players.forEach(bb::addPlayer);
 
+        bb.setColor(BarColor.BLUE);
         switch (state) {
             case PHASE_ONE:
             case PHASE_TWO:
@@ -857,11 +868,7 @@ public class ANNIArena extends BukkitRunnable {
         return getNexusHealth(team) != null ? getNexusHealth(team) : 0;
     }
 
-    private void tickTimer() {
-        if (isEnabledTimer() && timer > 0) {
-            timer--;
-        }
-
+    private void updatePhase() {
         switch (state) {
             case WAITING: {
                 if (players.size() >= getTeams().size() * 2) {
