@@ -5,6 +5,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scoreboard.Team;
 
+import java.util.Collection;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -51,6 +52,17 @@ public final class CmnUtil {
         if (prg < 0) prg = 0;
 
         return prg;
+    }
+
+    public static void giveOrDrop(Player player, Collection<ItemStack> items) {
+        ItemStack[] array = new ItemStack[items.size()];
+        int i = 0;
+        for (ItemStack item : items) {
+            array[i] = item;
+            i++;
+        }
+
+        giveOrDrop(player, array);
     }
 
     public static void giveOrDrop(Player player, ItemStack... items) {
