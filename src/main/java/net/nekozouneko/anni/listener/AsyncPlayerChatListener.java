@@ -114,7 +114,7 @@ public class AsyncPlayerChatListener implements Listener {
 
 
             try {
-                String form = plugin.getMessageManager().build("chat.global.format", prefix.isEmpty() ? prefix + "§r " : "");
+                String form = plugin.getMessageManager().build("chat.global.format", prefix.isEmpty() ? "" : prefix + "§r ");
                 e.setFormat(form);
             }
             catch (UnsupportedOperationException e1) {
