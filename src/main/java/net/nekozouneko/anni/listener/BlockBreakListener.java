@@ -106,7 +106,7 @@ public class BlockBreakListener implements Listener {
 
     static {
         BLOCKS.put(Material.MELON, new ANNIBlockInfo(5, false, null, () -> 0));
-        BLOCKS.put(Material.GRAVEL, new ANNIBlockInfo(5, false, null, () -> 0));
+        BLOCKS.put(Material.GRAVEL, new ANNIBlockInfo(5, false, Material.COBBLESTONE, () -> 0));
 
         ANNIBlockInfo lowInfo = new ANNIBlockInfo(
                 5, false, Material.COBBLESTONE,
@@ -125,7 +125,7 @@ public class BlockBreakListener implements Listener {
         BLOCKS.put(Material.IRON_ORE, commonInfo);
         BLOCKS.put(Material.NETHER_QUARTZ_ORE, commonInfo);
         BLOCKS.put(Material.REDSTONE_ORE, commonInfo);
-        BLOCKS.put(Material.LAPIS_LAZULI, commonInfo);
+        BLOCKS.put(Material.LAPIS_ORE, commonInfo);
         BLOCKS.put(Material.GOLD_ORE, new ANNIBlockInfo(
                 20, false, Material.COBBLESTONE,
                 () -> new Random().nextInt(7) + 6
@@ -163,6 +163,8 @@ public class BlockBreakListener implements Listener {
 
     @EventHandler(ignoreCancelled = true)
     public void onBreak(BlockBreakEvent e) {
+        MessageManager mm = ANNIPlugin.getInstance().getMessageManager();
+
         Consumer<Block> cb = QUEUED_ON_DAMAGE.get(e.getPlayer().getUniqueId());
         if (cb != null) {
             cb.accept(e.getBlock());
@@ -217,17 +219,27 @@ public class BlockBreakListener implements Listener {
                 ItemStack mainHand = e.getPlayer().getInventory().getItemInMainHand();
 
                 if (e.getPlayer().hasPotionEffect(PotionEffectType.INVISIBILITY)) {
-                    MessageManager mm = ANNIPlugin.getInstance().getMessageManager();
                     e.getPlayer().removePotionEffect(PotionEffectType.INVISIBILITY);
                     e.getPlayer().playSound(e.getPlayer().getLocation(), Sound.ENTITY_GENERIC_EXTINGUISH_FIRE, 1, 2);
                     e.getPlayer().sendMessage(mm.build("notify.removed_invisibility"));
                 }
 
                 if (BLOCKS.containsKey(e.getBlock().getType())) {
+                    if (e.getBlock().getDrops(mainHand).isEmpty()) {
+                        e.setCancelled(true);
+                        return;
+                    }
+
                     ANNIBlockInfo info = BLOCKS.get(e.getBlock().getType());
                     if (info == null) return;
 
-                    CmnUtil.giveOrDrop(e.getPlayer(), e.getBlock().getDrops(e.getPlayer().getInventory().getItemInMainHand(), e.getPlayer()));
+                    if (info.isRare() && current.getState().getId() < 3) {
+                        e.getPlayer().sendMessage(mm.build("notify.cant_mine_now"));
+                        e.setCancelled(true);
+                        return;
+                    }
+
+                    CmnUtil.giveOrDrop(e.getPlayer(), e.getBlock().getDrops(mainHand, e.getPlayer()));
 
                     e.setExpToDrop(0);
                     e.setDropItems(false);
