@@ -127,7 +127,10 @@ public class ANNIArena extends BukkitRunnable {
         if (getState().getId() > 0) {
             SaveData sd = savedData.remove(player.getUniqueId());
             if (sd != null) setTeam(player, sd.getTeam());
-            else assignPlayer(player);
+            else {
+                Players.clearPotionEffects(player);
+                assignPlayer(player);
+            }
             if (!isNexusLost(getTeamByPlayer(player))) {
                 player.teleport(map.getSpawnOrDefault(getTeamByPlayer(player)).toLocation(copy));
                 ANNITeam at = getTeamByPlayer(player);
@@ -551,6 +554,7 @@ public class ANNIArena extends BukkitRunnable {
             players.forEach(player -> {
                 player.spigot().respawn();
                 initPlayer(player);
+                Players.clearPotionEffects(player);
                 player.teleport(plugin.getLobby());
             });
             log.info("Removing player from team...");
