@@ -1,5 +1,6 @@
 package net.nekozouneko.anni.listener;
 
+import com.google.common.base.Enums;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import net.nekozouneko.anni.ANNIPlugin;
 import net.nekozouneko.anni.arena.ANNIArena;
@@ -14,27 +15,45 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockPlaceEvent;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public final class BlockPlaceListener implements Listener {
 
-    public static final List<Material> BLACKLIST = Arrays.asList(
-            // 鉱石
-            Material.COAL_ORE,
-            Material.DIAMOND_ORE,
-            Material.EMERALD_ORE,
-            Material.GOLD_ORE,
-            Material.IRON_ORE,
-            Material.LAPIS_ORE,
-            Material.NETHER_GOLD_ORE,
-            Material.NETHER_QUARTZ_ORE,
-            Material.REDSTONE_ORE,
-            Material.GRAVEL,
-            Material.LAVA,
-            Material.LAVA_BUCKET
-    );
+    public static final List<Material> BLACKLIST;
+
+    static {
+        List<Material> black = new ArrayList<>(Arrays.asList(
+                // 鉱石
+                Material.COAL_ORE,
+                Material.DIAMOND_ORE,
+                Material.EMERALD_ORE,
+                Material.GOLD_ORE,
+                Material.IRON_ORE,
+                Material.LAPIS_ORE,
+                Material.NETHER_GOLD_ORE,
+                Material.NETHER_QUARTZ_ORE,
+                Material.REDSTONE_ORE,
+                Material.GRAVEL,
+                Material.LAVA,
+                Material.LAVA_BUCKET
+        ));
+
+        if (Enums.getIfPresent(Material.class, "DEEPSLATE").isPresent()) {
+            black.addAll(Arrays.asList(
+                    Material.DEEPSLATE_COAL_ORE,
+                    Material.DEEPSLATE_COPPER_ORE,
+                    Material.DEEPSLATE_DIAMOND_ORE,
+                    Material.DEEPSLATE_EMERALD_ORE,
+                    Material.DEEPSLATE_GOLD_ORE,
+                    Material.DEEPSLATE_IRON_ORE,
+                    Material.DEEPSLATE_LAPIS_ORE,
+                    Material.DEEPSLATE_REDSTONE_ORE,
+                    Material.COPPER_ORE
+            ));
+        }
+
+        BLACKLIST = Collections.unmodifiableList(black);
+    }
 
     private final ANNIPlugin plugin = ANNIPlugin.getInstance();
 
