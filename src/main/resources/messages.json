@@ -1,5 +1,5 @@
 {
-  "version": "4",
+  "version": "5",
 
   "scoreboard.title": "&c&lANNI&9&lHI&a&lLA&e&lTION",
   "scoreboard.dateformat": "yyyy/MM/dd HH:mm",
@@ -222,7 +222,7 @@
   "notify.no_player_team": "&c「&r{0}&c」にオンラインのプレイヤーがいないため自動的に敗退しました。",
   "notify.lost_nexus_by_player": "「{0}」のネクサスは、{1} により失われました！",
   "notify.lost_nexus": "「{0}」のネクサスは失われました！",
-  "notify.cant_mine_now": "&cこのフェーズでは、「{0}&c」を採掘することはできません。",
+  "notify.cant_mine_now": "&cこのフェーズでは採掘することはできません。",
   "notify.draw": "&6生存チームが0以下のため引き分けとなります。",
   "notify.stun": "&cもちっと&fスタン&cしてしまった！",
   "notify.deposit_points": "&a+{0} {1}",
