@@ -3,7 +3,10 @@ package net.nekozouneko.anni.arena.spectator;
 import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.UUID;
 
 public final class SpectatorManager {
 
