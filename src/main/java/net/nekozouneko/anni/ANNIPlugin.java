@@ -34,7 +34,7 @@ import java.util.Map;
 
 public final class ANNIPlugin extends JavaPlugin {
 
-    public static final String LATEST_MESSAGE_VERSION = "0";
+    public static final String LATEST_MESSAGE_VERSION = "5";
     private static ANNIPlugin plugin;
 
     public static ANNIPlugin getInstance() {
