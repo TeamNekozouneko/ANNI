@@ -125,6 +125,7 @@ public class BlockBreakListener implements Listener {
         BLOCKS.put(Material.IRON_ORE, commonInfo);
         BLOCKS.put(Material.NETHER_QUARTZ_ORE, commonInfo);
         BLOCKS.put(Material.REDSTONE_ORE, commonInfo);
+        BLOCKS.put(Material.LAPIS_LAZULI, commonInfo);
         BLOCKS.put(Material.GOLD_ORE, new ANNIBlockInfo(
                 20, false, Material.COBBLESTONE,
                 () -> new Random().nextInt(7) + 6
