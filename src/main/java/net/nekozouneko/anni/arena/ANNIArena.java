@@ -23,6 +23,7 @@ import net.nekozouneko.anni.arena.team.ANNITeam;
 import net.nekozouneko.anni.board.BoardManager;
 import net.nekozouneko.anni.kit.ANNIKit;
 import net.nekozouneko.anni.kit.AbsANNIKit;
+import net.nekozouneko.anni.listener.PlayerDamageListener;
 import net.nekozouneko.anni.map.ANNIMap;
 import net.nekozouneko.anni.message.MessageManager;
 import net.nekozouneko.anni.util.CmnUtil;
@@ -154,7 +155,7 @@ public class ANNIArena extends BukkitRunnable {
     public void leave(Player player) {
         players.remove(player);
 
-        if (state.getId() > 0 && getTeamByPlayer(player) != null/*&& !PlayerDamageListener.isFighting(player)*/) {
+        if (state.getId() > 0 && getTeamByPlayer(player) != null && !PlayerDamageListener.isFighting(player)) {
             savedData.put(
                     player.getUniqueId(),
                     new SaveData(
