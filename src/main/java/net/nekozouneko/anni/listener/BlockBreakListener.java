@@ -85,10 +85,7 @@ public class BlockBreakListener implements Listener {
         }
     }
 
-
     private static final Map<UUID, Consumer<Block>> QUEUED_ON_DAMAGE = new HashMap<>();
-    private static final Map<Material, Long> COOLDOWN = new EnumMap<>(Material.class);
-    private static final Map<Material, Long> NO_BLOCK_COOLDOWN = new EnumMap<>(Material.class);
     private static final List<Material> WOODS = new ArrayList<>(Arrays.asList(
             Material.ACACIA_LOG, Material.BIRCH_LOG, Material.DARK_OAK_LOG,
             Material.JUNGLE_LOG, Material.OAK_LOG, Material.SPRUCE_LOG,
