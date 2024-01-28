@@ -36,7 +36,7 @@ public class PointCharger extends AbstractGui {
 
         ItemStack chargeButton = ItemStackBuilder.of(Material.LIME_STAINED_GLASS_PANE)
                 .name(mm.build("gui.point_charger.charge"))
-                .persistentData(new NamespacedKey(ANNIPlugin.getInstance(), "action"), PersistentDataType.STRING, "start_charge")
+                .persistentData(new NamespacedKey(ANNIPlugin.getInstance(), "chargeraction"), PersistentDataType.STRING, "start_charge")
                 .build();
 
         for (int i = 45; i < inventory.getSize(); i++) inventory.setItem(i, chargeButton);
@@ -50,7 +50,7 @@ public class PointCharger extends AbstractGui {
 
         PersistentDataContainer pdc = event.getCurrentItem().getItemMeta().getPersistentDataContainer();
 
-        if (pdc.getOrDefault(new NamespacedKey(ANNIPlugin.getInstance(), "action"), PersistentDataType.STRING, "").equals("start_charge")) {
+        if (pdc.getOrDefault(new NamespacedKey(ANNIPlugin.getInstance(), "chargeraction"), PersistentDataType.STRING, "").equals("start_charge")) {
             event.setCancelled(true);
             Bukkit.getScheduler().runTask(ANNIPlugin.getInstance(), () ->
                     event.getWhoClicked().closeInventory()
