@@ -18,8 +18,7 @@ import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
 
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 public class GrapplingHook implements Listener {
 
@@ -27,6 +26,8 @@ public class GrapplingHook implements Listener {
             EntityType.WITHER, EntityType.ENDER_DRAGON, EntityType.ENDER_CRYSTAL,
             EntityType.AREA_EFFECT_CLOUD, EntityType.WARDEN, EntityType.IRON_GOLEM
     );
+
+    private static final Map<UUID, Long> cooldown = new HashMap<>();
 
     public static ItemStackBuilder builder() {
         MessageManager mm = ANNIPlugin.getInstance().getMessageManager();
@@ -98,9 +99,19 @@ public class GrapplingHook implements Listener {
                 return;
             }
 
+            if (isCooldownEnd(event.getPlayer().getUniqueId())) {
+                event.setCancelled(true);
+
+                event.getPlayer().sendMessage(ANNIPlugin.getInstance().getMessageManager().build(
+                        "command.err.cooldown", (getCooldown(event.getPlayer().getUniqueId()) - System.currentTimeMillis()) / 1000
+                ));
+                event.getPlayer().playSound(event.getPlayer().getLocation(), Sound.ENTITY_GENERIC_EXTINGUISH_FIRE, 1, 2);
+                return;
+            }
+
             event.getHook().getPersistentDataContainer()
                     .set(new NamespacedKey(ANNIPlugin.getInstance(), "grappling-hook"), PersistentDataType.INTEGER, 1);
-            event.getHook().setVelocity(event.getHook().getVelocity().multiply(1.5));
+            event.getHook().setVelocity(event.getHook().getVelocity().multiply(2));
         }
     }
 
@@ -109,5 +120,18 @@ public class GrapplingHook implements Listener {
 
         return vel.normalize().multiply(m);
     }
+
+    public static boolean isCooldownEnd(UUID player) {
+        return !cooldown.containsKey(player) || cooldown.get(player) <= System.currentTimeMillis();
+    }
+
+    public static void addCooldown(UUID player, long time) {
+        cooldown.put(player, System.currentTimeMillis() + 5000);
+    }
+
+    public static long getCooldown(UUID player) {
+        return cooldown.getOrDefault(player, System.currentTimeMillis());
+    }
+
 
 }

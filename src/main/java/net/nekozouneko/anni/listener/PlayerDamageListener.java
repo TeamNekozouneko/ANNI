@@ -3,6 +3,7 @@ package net.nekozouneko.anni.listener;
 import net.nekozouneko.anni.ANNIPlugin;
 import net.nekozouneko.anni.arena.spectator.SpectatorManager;
 import net.nekozouneko.anni.kit.ANNIKit;
+import net.nekozouneko.anni.kit.items.GrapplingHook;
 import net.nekozouneko.anni.message.MessageManager;
 import org.bukkit.Material;
 import org.bukkit.Sound;
@@ -53,10 +54,16 @@ public class PlayerDamageListener implements Listener {
             }
 
             if (ANNIPlugin.getInstance().getCurrentGame().getState().getId() >= 0) {
-                if (ANNIPlugin.getInstance().getCurrentGame().getKit(p).equals(ANNIKit.ACROBAT.getKit())) {
+                if (ANNIKit.get(ANNIPlugin.getInstance().getCurrentGame().getKit(p)) == ANNIKit.ACROBAT) {
                     if (e.getCause() == EntityDamageEvent.DamageCause.FALL) {
                         e.setCancelled(true);
                         return;
+                    }
+                }
+
+                if (ANNIKit.get(ANNIPlugin.getInstance().getCurrentGame().getKit(p)) == ANNIKit.SCOUTER) {
+                    if (e.getCause() != EntityDamageEvent.DamageCause.FALL) {
+                        GrapplingHook.addCooldown(p.getUniqueId(), 5000);
                     }
                 }
 
