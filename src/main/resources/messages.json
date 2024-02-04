@@ -1,5 +1,5 @@
 {
-  "version": "5",
+  "version": "7",
 
   "scoreboard.title": "&c&lANNI&9&lHI&a&lLA&e&lTION",
   "scoreboard.dateformat": "yyyy/MM/dd HH:mm",
@@ -426,13 +426,15 @@
   "big.y.8": "&7▒▒▒▒&-▒▒&7▒▒▒▒&r {8}",
   "big.y.9": "&7▒▒▒▒▒▒▒▒▒▒&r {9}",
 
-  "kit.assault.name": "アサルトキット",
+  "kit.assault.name": "アサルト",
   "kit.bow.name": "弓キット",
   "kit.default.name": "標準キット",
   "kit.defense.name": "防衛キット",
-  "kit.mochimochi.name": "もちもちキット",
+  "kit.mochimochi.name": "もちもち",
   "kit.miner.name": "採掘師",
-  "kit.acrobat.name": "アクロバットキット",
+  "kit.acrobat.name": "アクロバット",
+  "kit.scouter.name": "偵察員",
+  "kit.chaser.name": "追撃屋",
 
   "item.stun_grenade.name": "&cもちっと&bスタングレネード",
   "item.stun_grenade.lore.0": "&7ある高齢の職人が作ったもちっとスタンさせるグレネード。",
@@ -446,6 +448,11 @@
   "item.airjump.lore.0": "&7右クリックすることで大きなジャンプができる",
   "item.airjump.lore.1": "",
   "item.airjump.lore.2": "&9クールダウン: 20秒",
+
+  "item.grappling_hook.name": "&aグラップリングフック",
+  "item.grappling_hook.lore.0": "&7竿を投げ巻き戻すと竿のあった場所にめがけて飛ぶことができる。",
+  "item.grappling_hook.lore.1": "",
+  "item.grappling_hook.lore.2": "&9クールダウン：5秒",
 
   "actionbar.nexus_alert": "&c{0} によってネクサスが破壊されています！",
   "actionbar.spectator_mode": "&7観戦モード",

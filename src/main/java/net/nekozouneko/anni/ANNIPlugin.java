@@ -8,6 +8,8 @@ import net.nekozouneko.anni.board.BoardManager;
 import net.nekozouneko.anni.command.*;
 import net.nekozouneko.anni.kit.custom.CustomKitManager;
 import net.nekozouneko.anni.kit.items.AirJump;
+import net.nekozouneko.anni.kit.items.ChaserTrident;
+import net.nekozouneko.anni.kit.items.GrapplingHook;
 import net.nekozouneko.anni.kit.items.StunGrenade;
 import net.nekozouneko.anni.listener.*;
 import net.nekozouneko.anni.listener.votifier.VotifierListener;
@@ -34,7 +36,7 @@ import java.util.Map;
 
 public final class ANNIPlugin extends JavaPlugin {
 
-    public static final String LATEST_MESSAGE_VERSION = "5";
+    public static final String LATEST_MESSAGE_VERSION = "7";
     private static ANNIPlugin plugin;
 
     public static ANNIPlugin getInstance() {
@@ -126,6 +128,8 @@ public final class ANNIPlugin extends JavaPlugin {
 
         getServer().getPluginManager().registerEvents(new StunGrenade(), this);
         getServer().getPluginManager().registerEvents(new AirJump(), this);
+        getServer().getPluginManager().registerEvents(new GrapplingHook(), this);
+        getServer().getPluginManager().registerEvents(new ChaserTrident(), this);
 
         currentGame = new ANNIArena(this, "current");
         spectatorTask = new SpectatorTask();
