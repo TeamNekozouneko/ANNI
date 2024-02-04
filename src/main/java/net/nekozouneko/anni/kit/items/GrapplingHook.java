@@ -62,12 +62,7 @@ public class GrapplingHook implements Listener {
                 break;
             }
             case CAUGHT_ENTITY: {
-                if (CANT_PULL_ENTITIES.contains(event.getCaught().getType())) {
-                    Location change = event.getCaught().getLocation().subtract(event.getPlayer().getLocation());
-                    event.getPlayer().setVelocity(change.toVector().multiply(0.05));
-                    event.getPlayer().playSound(event.getPlayer(), Sound.ENTITY_ITEM_BREAK, 1, 0);
-                }
-                else {
+                if (!CANT_PULL_ENTITIES.contains(event.getCaught().getType())) {
                     event.getCaught().setVelocity(calculateVel(event.getCaught().getLocation(), event.getPlayer().getLocation(), 1.5));
                 }
                 break;
@@ -99,7 +94,7 @@ public class GrapplingHook implements Listener {
                 return;
             }
 
-            if (isCooldownEnd(event.getPlayer().getUniqueId())) {
+            if (!isCooldownEnd(event.getPlayer().getUniqueId())) {
                 event.setCancelled(true);
 
                 event.getPlayer().sendMessage(ANNIPlugin.getInstance().getMessageManager().build(
