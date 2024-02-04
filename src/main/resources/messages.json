@@ -1,5 +1,5 @@
 {
-  "version": "7",
+  "version": "8",
 
   "scoreboard.title": "&c&lANNI&9&lHI&a&lLA&e&lTION",
   "scoreboard.dateformat": "yyyy/MM/dd HH:mm",
@@ -435,6 +435,7 @@
   "kit.acrobat.name": "アクロバット",
   "kit.scouter.name": "偵察員",
   "kit.chaser.name": "追撃屋",
+  "kit.worker.name": "ワーカーキット",
 
   "item.stun_grenade.name": "&cもちっと&bスタングレネード",
   "item.stun_grenade.lore.0": "&7ある高齢の職人が作ったもちっとスタンさせるグレネード。",

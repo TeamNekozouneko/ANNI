@@ -348,6 +348,12 @@ public class ANNIArena extends BukkitRunnable {
                     ));
                     p1.playSound(p1.getLocation(), Sound.BLOCK_NOTE_BLOCK_HARP, 1, 2);
                 });
+
+                if (ANNIKit.get(getKit(player)) == ANNIKit.WORKER && !isNexusLost(getTeamByPlayer(player))) {
+                    if (rand.nextDouble() > 0.90) {
+                        healNexusHealth(getTeamByPlayer(player), 1);
+                    }
+                }
             }
             else {
                 getTeamPlayers(team).forEach(p1 -> p1.playSound(p1.getLocation(), Sound.BLOCK_NOTE_BLOCK_HARP, 1, 2));
