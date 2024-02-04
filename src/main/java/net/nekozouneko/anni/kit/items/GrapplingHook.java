@@ -23,8 +23,6 @@ public class GrapplingHook implements Listener {
             EntityType.AREA_EFFECT_CLOUD, EntityType.WARDEN, EntityType.IRON_GOLEM
     );
 
-    private final Map<UUID, Long> cooldown = new HashMap<>();
-
     public static ItemStackBuilder builder() {
         MessageManager mm = ANNIPlugin.getInstance().getMessageManager();
 
@@ -48,14 +46,13 @@ public class GrapplingHook implements Listener {
         if (c.getOrDefault(new NamespacedKey(ANNIPlugin.getInstance(), "grappling-hook"), PersistentDataType.INTEGER, 0) != 1) return;
 
         switch (event.getState()) {
-            case BITE: {
+            case BITE:
+            case REEL_IN: {
                 event.setCancelled(true);
                 break;
             }
-            case IN_GROUND:
-            case REEL_IN: {
-                event.getPlayer().setVelocity(calculateVel(event.getPlayer().getLocation(), event.getHook().getLocation(), 1.5));
-                setCooldown(event.getPlayer().getUniqueId(), System.currentTimeMillis() + 5000);
+            case IN_GROUND: {
+                event.getPlayer().setVelocity(calculateVel(event.getPlayer().getLocation(), event.getHook().getLocation(), 2));
                 break;
             }
             case CAUGHT_ENTITY: {
@@ -65,9 +62,8 @@ public class GrapplingHook implements Listener {
                     event.getPlayer().playSound(event.getPlayer(), Sound.ENTITY_ITEM_BREAK, 1, 0);
                 }
                 else {
-                    event.getCaught().setVelocity(calculateVel(event.getCaught().getLocation(), event.getPlayer().getLocation(), 1));
+                    event.getCaught().setVelocity(calculateVel(event.getCaught().getLocation(), event.getPlayer().getLocation(), 1.5));
                 }
-                setCooldown(event.getPlayer().getUniqueId(), System.currentTimeMillis() + 5000);
                 break;
             }
         }
@@ -82,12 +78,14 @@ public class GrapplingHook implements Listener {
         PersistentDataContainer c = item.getItemMeta().getPersistentDataContainer();
 
         if (c.getOrDefault(new NamespacedKey(ANNIPlugin.getInstance(), "special-item"), PersistentDataType.STRING, "").equals("grappling-hook")) {
-            if (!isCooldownEnd(event.getPlayer().getUniqueId())) {
-                event.getPlayer().sendMessage(ANNIPlugin.getInstance().getMessageManager()
-                        .build("command.err.cooldown", (getCooldown(event.getPlayer().getUniqueId()) - System.currentTimeMillis()) / 1000));
-                event.setCancelled(true);
-                return;
+            boolean canUse = event.getPlayer().isVisualFire();
+
+            try {
+                canUse = canUse || event.getPlayer().isFrozen();
             }
+            catch (Exception ignored) {}
+
+
 
             event.getHook().getPersistentDataContainer()
                     .set(new NamespacedKey(ANNIPlugin.getInstance(), "grappling-hook"), PersistentDataType.INTEGER, 1);
@@ -99,18 +97,6 @@ public class GrapplingHook implements Listener {
         Vector vel = to.subtract(from).toVector();
 
         return vel.normalize().multiply(m);
-    }
-
-    private boolean isCooldownEnd(UUID uuid) {
-        return !cooldown.containsKey(uuid) || cooldown.get(uuid) <= System.currentTimeMillis();
-    }
-
-    private void setCooldown(UUID uuid, long end) {
-        cooldown.put(uuid, end);
-    }
-
-    private long getCooldown(UUID uuid) {
-        return cooldown.getOrDefault(uuid, 0L);
     }
 
 }
