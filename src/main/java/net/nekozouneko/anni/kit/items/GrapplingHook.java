@@ -3,7 +3,10 @@ package net.nekozouneko.anni.kit.items;
 import net.nekozouneko.anni.ANNIPlugin;
 import net.nekozouneko.anni.message.MessageManager;
 import net.nekozouneko.commons.spigot.inventory.ItemStackBuilder;
-import org.bukkit.*;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
+import org.bukkit.Sound;
 import org.bukkit.entity.EntityType;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -12,9 +15,11 @@ import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
+import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.List;
 
 public class GrapplingHook implements Listener {
 
@@ -78,14 +83,20 @@ public class GrapplingHook implements Listener {
         PersistentDataContainer c = item.getItemMeta().getPersistentDataContainer();
 
         if (c.getOrDefault(new NamespacedKey(ANNIPlugin.getInstance(), "special-item"), PersistentDataType.STRING, "").equals("grappling-hook")) {
-            boolean canUse = event.getPlayer().isVisualFire();
+            boolean cantUse = event.getPlayer().isVisualFire();
+            cantUse = cantUse || event.getPlayer().hasPotionEffect(PotionEffectType.BLINDNESS);
+            cantUse = cantUse || event.getPlayer().hasPotionEffect(PotionEffectType.DARKNESS);
+            cantUse = cantUse || event.getPlayer().hasPotionEffect(PotionEffectType.LEVITATION);
 
             try {
-                canUse = canUse || event.getPlayer().isFrozen();
+                cantUse = cantUse || event.getPlayer().isFrozen();
             }
             catch (Exception ignored) {}
 
-
+            if (cantUse) {
+                event.setCancelled(true);
+                return;
+            }
 
             event.getHook().getPersistentDataContainer()
                     .set(new NamespacedKey(ANNIPlugin.getInstance(), "grappling-hook"), PersistentDataType.INTEGER, 1);
