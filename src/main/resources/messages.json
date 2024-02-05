@@ -1,5 +1,5 @@
 {
-  "version": "8",
+  "version": "9",
 
   "scoreboard.title": "&c&lANNI&9&lHI&a&lLA&e&lTION",
   "scoreboard.dateformat": "yyyy/MM/dd HH:mm",
@@ -427,15 +427,44 @@
   "big.y.9": "&7▒▒▒▒▒▒▒▒▒▒&r {9}",
 
   "kit.assault.name": "アサルト",
+  "kit.assault.about.0": "&7敵にどんどん突撃し、",
+  "kit.assault.about.1": "&7相手を疲弊させよう！",
+
   "kit.bow.name": "弓キット",
+  "kit.bow.about.0": "&7遠くから相手を撃ち、",
+  "kit.bow.about.1": "&7拠点から相手を離そう！",
+
   "kit.default.name": "標準キット",
+
   "kit.defense.name": "防衛キット",
+  "kit.defense.about.0": "&7重装備で抵抗しながら、",
+  "kit.defense.about.1": "&7防衛の心で、相手のネクサス破壊から妨害しよう！",
+
   "kit.mochimochi.name": "もちもち",
+  "kit.mochimochi.about.0": "&7もちっとスタングレネードを当てて、",
+  "kit.mochimochi.about.1": "&7敵の撤退を妨害しよう！",
+
   "kit.miner.name": "採掘師",
+  "kit.miner.about.0": "&7通常より多くの鉱物を持ち帰って、",
+  "kit.miner.about.1": "&7味方を支援しよう！",
+
   "kit.acrobat.name": "アクロバット",
+  "kit.acrobat.about.0": "&7落下耐性と空中ジャンプで考えられない移動をして、",
+  "kit.acrobat.about.1": "&7相手との距離を離そう！",
+
   "kit.scouter.name": "偵察員",
+  "kit.scouter.about.0": "&7グラップリングフックで素早く移動し、",
+  "kit.scouter.about.1": "&7敵のアイテムを盗み出そう！",
+
   "kit.chaser.name": "追撃屋",
+
   "kit.worker.name": "ワーカーキット",
+  "kit.worker.about.0": "&7敵のネクサスにダメージを与えて、",
+  "kit.worker.about.1": "&7一定の確率で自分のネクサスを回復しよう！",
+
+  "kit.vampire.name": "吸血鬼キット",
+  "kit.vampire.about.0": "&7敵に直接攻撃して、",
+  "kit.vampire.about.1": "&7体力を吸い取ろう！",
 
   "item.stun_grenade.name": "&cもちっと&bスタングレネード",
   "item.stun_grenade.lore.0": "&7ある高齢の職人が作ったもちっとスタンさせるグレネード。",
@@ -448,12 +477,21 @@
   "item.airjump.name": "&b空中ジャンプ",
   "item.airjump.lore.0": "&7右クリックすることで大きなジャンプができる",
   "item.airjump.lore.1": "",
-  "item.airjump.lore.2": "&9クールダウン: 20秒",
+  "item.airjump.lore.2": "&9クールタイム: 20秒",
 
   "item.grappling_hook.name": "&aグラップリングフック",
   "item.grappling_hook.lore.0": "&7竿を投げ巻き戻すと竿のあった場所にめがけて飛ぶことができる。",
   "item.grappling_hook.lore.1": "",
   "item.grappling_hook.lore.2": "&9クールダウン：5秒",
+
+  "item.defense_artifact.name": "&d&l防衛の心",
+  "item.defense_artifact.lore.0": "&7防衛をするという強い意志が込められたもの。",
+  "item.defense_artifact.lore.1": "&9効果時間： 10秒",
+  "item.defense_artifact.lore.2": "&9クールタイム： 180秒",
+  "item.defense_artifact_lore.3": "",
+  "item.defense_artifact_lore.4": "&9効果：",
+  "item.defense_artifact.lore.5": "&9* 近くの敵の視界が一瞬真っ暗",
+  "item.defense_artifact.lore.6": "&9* 近くの敵の攻撃力が10秒間低下",
 
   "actionbar.nexus_alert": "&c{0} によってネクサスが破壊されています！",
   "actionbar.spectator_mode": "&7観戦モード",
