@@ -12,33 +12,33 @@ public class SpectatorTask extends BukkitRunnable {
 
     @Override
     public void run() {
-        Bukkit.getOnlinePlayers().forEach(player ->
+        Bukkit.getOnlinePlayers().forEach(player -> {
+            if (SpectatorManager.isSpectating(player)) {
+                player.addPotionEffect(new PotionEffect(PotionEffectType.SATURATION, 40, 255, false, false, true));
+                player.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, 40, 1, false, false, true));
+                player.setAllowFlight(true);
+                player.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(ANNIPlugin.getInstance().getMessageManager()
+                        .build("actionbar.spectator_mode")
+                ));
+            }
+
             Bukkit.getOnlinePlayers().forEach(watcher -> {
                 if (player.equals(watcher)) return;
 
                 if (SpectatorManager.isSpectating(player)) {
-                    player.addPotionEffect(new PotionEffect(PotionEffectType.SATURATION, 40, 255, false, false, true));
-                    player.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, 40, 1, false, false, true));
-                    player.setAllowFlight(true);
-                    player.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(ANNIPlugin.getInstance().getMessageManager()
-                            .build("actionbar.spectator_mode")
-                    ));
-
                     if (SpectatorManager.isWatchable(watcher)) {
                         if (watcher.canSee(player)) return;
                         watcher.showPlayer(ANNIPlugin.getInstance(), player);
-                    }
-                    else {
+                    } else {
                         if (!watcher.canSee(player)) return;
                         watcher.hidePlayer(ANNIPlugin.getInstance(), player);
                     }
-                }
-                else {
+                } else {
                     if (watcher.canSee(player)) return;
                     watcher.showPlayer(ANNIPlugin.getInstance(), player);
                 }
-            })
-        );
+            });
+        });
     }
 
 }
