@@ -7,6 +7,7 @@ import net.nekozouneko.anni.message.MessageManager;
 import net.nekozouneko.commons.spigot.inventory.ItemStackBuilder;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
+import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -65,7 +66,13 @@ public class AirJump implements Listener {
                     e.getPlayer().getWorld().playSound(
                             e.getPlayer().getLocation(), Sound.ENTITY_WITHER_SHOOT, 1, 2
                     );
-                    e.getPlayer().setVelocity(e.getPlayer().getLocation().getDirection().setY(0.75));
+                    e.getPlayer().getWorld().spawnParticle(
+                            Particle.CLOUD, e.getPlayer().getLocation(), 100, .5, .5, .5, .1
+                    );
+                    e.getPlayer().getWorld().spawnParticle(
+                            Particle.SMOKE_NORMAL, e.getPlayer().getLocation(), 100, .5, .5, .5, .1
+                    );
+                    e.getPlayer().setVelocity(e.getPlayer().getLocation().getDirection().setY(2.5));
                 }
                 else {
                     e.getPlayer().spigot().sendMessage(ChatMessageType.ACTION_BAR,
