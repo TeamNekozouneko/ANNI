@@ -9,12 +9,10 @@ import org.bukkit.NamespacedKey;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.persistence.PersistentDataType;
 
-import java.util.ArrayList;
-
-public class ScouterKit extends AbsANNIKit {
+public class ScouterKit extends AbstractKit {
 
     ScouterKit() {
-        super("scouter", "SCT", "kit.scouter.name", Material.SPYGLASS.name(), new ArrayList<>());
+        super("scouter", "SCT", "kit.scouter.name", Material.SPYGLASS.name(), ANNIPlugin.getInstance().getMessageManager().buildList("kit.scouter.about"));
     }
 
     @Override

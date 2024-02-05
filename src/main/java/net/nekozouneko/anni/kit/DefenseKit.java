@@ -1,18 +1,18 @@
 package net.nekozouneko.anni.kit;
 
+import net.nekozouneko.anni.ANNIPlugin;
 import net.nekozouneko.commons.spigot.inventory.ItemStackBuilder;
 import net.nekozouneko.commons.spigot.inventory.special.LeatherArmorBuilder;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.Collections;
-
-public class DefenseKit extends AbsANNIKit{
+public class DefenseKit extends AbstractKit {
 
     DefenseKit() {
         super(
                 "defense", "DEF", "kit.defense.name",
-                Material.SHIELD.name(), Collections.emptyList()
+                Material.SHIELD.name(),
+                ANNIPlugin.getInstance().getMessageManager().buildList("kit.defense.about")
         );
     }
 

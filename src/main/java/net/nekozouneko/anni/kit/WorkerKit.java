@@ -1,16 +1,15 @@
 package net.nekozouneko.anni.kit;
 
+import net.nekozouneko.anni.ANNIPlugin;
 import net.nekozouneko.commons.spigot.inventory.ItemStackBuilder;
 import net.nekozouneko.commons.spigot.inventory.special.LeatherArmorBuilder;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.Collections;
-
-public class WorkerKit extends AbsANNIKit {
+public class WorkerKit extends AbstractKit {
 
     WorkerKit() {
-        super("worker", "WRK", "kit.worker.name", Material.CHIPPED_ANVIL.name(), Collections.emptyList());
+        super("worker", "WRK", "kit.worker.name", Material.CHIPPED_ANVIL.name(), ANNIPlugin.getInstance().getMessageManager().buildList("kit.worker.about"));
     }
 
     @Override

@@ -22,7 +22,7 @@ import net.nekozouneko.anni.arena.spectator.SpectatorManager;
 import net.nekozouneko.anni.arena.team.ANNITeam;
 import net.nekozouneko.anni.board.BoardManager;
 import net.nekozouneko.anni.kit.ANNIKit;
-import net.nekozouneko.anni.kit.AbsANNIKit;
+import net.nekozouneko.anni.kit.AbstractKit;
 import net.nekozouneko.anni.listener.PlayerDamageListener;
 import net.nekozouneko.anni.map.ANNIMap;
 import net.nekozouneko.anni.message.MessageManager;
@@ -617,11 +617,11 @@ public class ANNIArena extends BukkitRunnable {
         plugin.getLogger().info(message);
     }
 
-    public void setKit(Player player, AbsANNIKit ki) {
+    public void setKit(Player player, AbstractKit ki) {
         kit.put(player.getUniqueId(), ki.getId());
     }
 
-    public AbsANNIKit getKit(Player player) {
+    public AbstractKit getKit(Player player) {
         String id = kit.get(player.getUniqueId());
         return ANNIKit.getAbsKitOrCustomById(id);
     }

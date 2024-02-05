@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public abstract class AbsANNIKit {
+public abstract class AbstractKit {
 
     @Getter
     protected final String id;
@@ -25,7 +25,7 @@ public abstract class AbsANNIKit {
     @SerializedName("description")
     protected List<String> lore;
 
-    protected AbsANNIKit(String id, String shortName, String name, String icon, List<String> lore) {
+    protected AbstractKit(String id, String shortName, String name, String icon, List<String> lore) {
         this.id = id;
         this.shortName = shortName;
         this.name = name;

@@ -1,19 +1,19 @@
 package net.nekozouneko.anni.kit;
 
+import net.nekozouneko.anni.ANNIPlugin;
 import net.nekozouneko.commons.spigot.inventory.ItemStackBuilder;
 import net.nekozouneko.commons.spigot.inventory.special.LeatherArmorBuilder;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.Collections;
-
-public class BowKit extends AbsANNIKit{
+public class BowKit extends AbstractKit {
 
     BowKit() {
         super(
                 "bow", "BOW", "kit.bow.name",
-                Material.BOW.name(), Collections.emptyList()
+                Material.BOW.name(),
+                ANNIPlugin.getInstance().getMessageManager().buildList("kit.bow.about")
         );
     }
 

@@ -9,12 +9,10 @@ import org.bukkit.NamespacedKey;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.persistence.PersistentDataType;
 
-import java.util.Collections;
-
-public class AcrobatKit extends AbsANNIKit {
+public class AcrobatKit extends AbstractKit {
 
     AcrobatKit() {
-        super("acrobat", "ARC", "kit.acrobat.name", Material.FEATHER.name(), Collections.emptyList());
+        super("acrobat", "ARC", "kit.acrobat.name", Material.FEATHER.name(), ANNIPlugin.getInstance().getMessageManager().buildList("kit.acrobat.about"));
     }
 
     @Override

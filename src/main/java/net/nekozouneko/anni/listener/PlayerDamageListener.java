@@ -27,6 +27,12 @@ public class PlayerDamageListener implements Listener {
             Material.NETHERITE_AXE, Material.IRON_AXE
     );
 
+    private static final List<EntityDamageEvent.DamageCause> DIRECT_ATTACK_CAUSES = Arrays.asList(
+            EntityDamageEvent.DamageCause.ENTITY_ATTACK,
+            EntityDamageEvent.DamageCause.ENTITY_SWEEP_ATTACK,
+            EntityDamageEvent.DamageCause.THORNS
+    );
+
     public static boolean isFighting(Player player) {
         new HashSet<>(fighting.keySet()).forEach(key -> {
             if (fighting.getOrDefault(key, 0L) <= System.currentTimeMillis())
@@ -54,16 +60,19 @@ public class PlayerDamageListener implements Listener {
             }
 
             if (ANNIPlugin.getInstance().getCurrentGame().getState().getId() >= 0) {
-                if (ANNIKit.get(ANNIPlugin.getInstance().getCurrentGame().getKit(p)) == ANNIKit.ACROBAT) {
-                    if (e.getCause() == EntityDamageEvent.DamageCause.FALL) {
-                        e.setCancelled(true);
-                        return;
+                switch (ANNIKit.get(ANNIPlugin.getInstance().getCurrentGame().getKit(p))) {
+                    case ACROBAT: {
+                        if (e.getCause() == EntityDamageEvent.DamageCause.FALL) {
+                            e.setCancelled(true);
+                            return;
+                        }
+                        break;
                     }
-                }
-
-                if (ANNIKit.get(ANNIPlugin.getInstance().getCurrentGame().getKit(p)) == ANNIKit.SCOUTER) {
-                    if (e.getCause() != EntityDamageEvent.DamageCause.FALL) {
-                        GrapplingHook.addCooldown(p.getUniqueId(), 5000);
+                    case SCOUTER: {
+                        if (e.getCause() != EntityDamageEvent.DamageCause.FALL) {
+                            GrapplingHook.addCooldown(p.getUniqueId(), 5000);
+                        }
+                        break;
                     }
                 }
 
@@ -86,10 +95,17 @@ public class PlayerDamageListener implements Listener {
                 // 4ダメージより上なら4ダメージを減らして0.4 * ダメージ増加 (ない場合0)のレベル減らしてそうではないならそのまま通す
                 e.setDamage(Math.max(e.getDamage() > 2 ? e.getDamage() - 4 - (0.5 * main.getEnchantmentLevel(Enchantment.DAMAGE_ALL)) : e.getDamage(), 0));
             }
-        }
 
-        if (e.getDamager() instanceof Player && e.getEntity() instanceof Player) {
-            fighting.put(e.getEntity().getUniqueId(), System.currentTimeMillis() + 10000);
+            if (ANNIKit.get(ANNIPlugin.getInstance().getCurrentGame().getKit(damager)) == ANNIKit.VAMPIRE) {
+                if (DIRECT_ATTACK_CAUSES.contains(e.getCause()) && new Random().nextDouble() >= 0.75) {
+                    damager.playSound(e.getEntity().getLocation(), Sound.BLOCK_HONEY_BLOCK_SLIDE, 1, 0);
+                    damager.setHealth(damager.getHealth() + Math.min((e.getDamage() * ((double) (new Random().nextInt(15) + 1) / 100)), 3));
+                }
+            }
+
+            if (e.getEntity() instanceof Player) {
+                fighting.put(e.getEntity().getUniqueId(), System.currentTimeMillis() + 10000);
+            }
         }
     }
 

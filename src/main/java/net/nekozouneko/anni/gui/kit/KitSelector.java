@@ -5,7 +5,7 @@ import net.nekozouneko.anni.ANNIConfig;
 import net.nekozouneko.anni.ANNIPlugin;
 import net.nekozouneko.anni.gui.AbstractGui;
 import net.nekozouneko.anni.kit.ANNIKit;
-import net.nekozouneko.anni.kit.AbsANNIKit;
+import net.nekozouneko.anni.kit.AbstractKit;
 import net.nekozouneko.anni.message.MessageManager;
 import net.nekozouneko.commons.spigot.inventory.ItemStackBuilder;
 import org.bukkit.Bukkit;
@@ -32,7 +32,7 @@ public class KitSelector extends AbstractGui {
     public KitSelector(ANNIPlugin plugin, Player player, int page) {
         super(plugin, player);
 
-        List<List<AbsANNIKit>> part = getPartedKits();
+        List<List<AbstractKit>> part = getPartedKits();
 
         this.page = Math.max(page <= part.size() ? page : 1, 1);
     }
@@ -87,10 +87,10 @@ public class KitSelector extends AbstractGui {
 
         NamespacedKey kin = new NamespacedKey(plugin, "kit");
 
-        List<List<AbsANNIKit>> part = getPartedKits();
+        List<List<AbstractKit>> part = getPartedKits();
 
         if (!part.isEmpty()) {
-            List<AbsANNIKit> p = part.get(page - 1);
+            List<AbstractKit> p = part.get(page - 1);
             for (int i = 0;i < p.size() && i < 27; i++) {
                 inventory.setItem(i, ItemStackBuilder.of(p.get(i).getIcon())
                         .name("§f" + p.get(i).getName())
@@ -120,7 +120,7 @@ public class KitSelector extends AbstractGui {
             player.closeInventory();
         }
         else if (pdc.has(kin, PersistentDataType.STRING)) {
-            AbsANNIKit kit = ANNIKit.getAbsKitOrCustomById(
+            AbstractKit kit = ANNIKit.getAbsKitOrCustomById(
                     pdc.getOrDefault(kin, PersistentDataType.STRING, "default")
             );
 
@@ -149,8 +149,8 @@ public class KitSelector extends AbstractGui {
         return getPartedKits().size();
     }
 
-    private List<List<AbsANNIKit>> getPartedKits() {
-        List<AbsANNIKit> kits = new ArrayList<>();
+    private List<List<AbstractKit>> getPartedKits() {
+        List<AbstractKit> kits = new ArrayList<>();
         if (ANNIConfig.isEnabledCustomKits()) {
             if (!ANNIConfig.isCustomKitOnly()) {
                 kits.addAll(Arrays.stream(ANNIKit.values())

@@ -3,13 +3,12 @@ package net.nekozouneko.anni.kit.items;
 import net.nekozouneko.anni.ANNIPlugin;
 import net.nekozouneko.anni.message.MessageManager;
 import net.nekozouneko.commons.spigot.inventory.ItemStackBuilder;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.NamespacedKey;
-import org.bukkit.Sound;
+import org.bukkit.*;
 import org.bukkit.entity.EntityType;
+import org.bukkit.entity.FishHook;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.player.PlayerFishEvent;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
@@ -52,8 +51,7 @@ public class GrapplingHook implements Listener {
         if (c.getOrDefault(new NamespacedKey(ANNIPlugin.getInstance(), "grappling-hook"), PersistentDataType.INTEGER, 0) != 1) return;
 
         switch (event.getState()) {
-            case BITE:
-            case REEL_IN: {
+            case BITE: {
                 event.setCancelled(true);
                 break;
             }
@@ -63,11 +61,26 @@ public class GrapplingHook implements Listener {
             }
             case CAUGHT_ENTITY: {
                 if (!CANT_PULL_ENTITIES.contains(event.getCaught().getType())) {
-                    event.getCaught().setVelocity(calculateVel(event.getCaught().getLocation(), event.getPlayer().getLocation(), 1.5));
+                    event.getCaught().setVelocity(calculateVel(event.getCaught().getLocation(), event.getPlayer().getLocation(), 1));
                 }
                 break;
             }
         }
+    }
+
+    @EventHandler
+    public void onHit(ProjectileHitEvent event) {
+        if (!(event.getEntity() instanceof FishHook)) return;
+
+        PersistentDataContainer c = event.getEntity().getPersistentDataContainer();
+
+        if (c.getOrDefault(new NamespacedKey(ANNIPlugin.getInstance(), "grappling-hook"), PersistentDataType.INTEGER, 0) != 1) return;
+
+        World w = event.getEntity().getWorld();
+        Location pos = event.getEntity().getLocation();
+
+        w.playSound(pos, Sound.BLOCK_IRON_DOOR_OPEN, 3, 1.5f);
+        w.playSound(pos, Sound.BLOCK_WOODEN_DOOR_OPEN, 3, 0);
     }
 
     private void processRodIsGrapplingHook(PlayerFishEvent event) {

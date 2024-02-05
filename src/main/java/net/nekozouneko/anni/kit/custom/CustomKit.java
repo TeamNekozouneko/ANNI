@@ -2,7 +2,7 @@ package net.nekozouneko.anni.kit.custom;
 
 import com.google.common.base.Enums;
 import com.google.common.base.Preconditions;
-import net.nekozouneko.anni.kit.AbsANNIKit;
+import net.nekozouneko.anni.kit.AbstractKit;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.io.BukkitObjectInputStream;
@@ -16,7 +16,7 @@ import java.util.Base64;
 import java.util.Collections;
 import java.util.List;
 
-public class CustomKit extends AbsANNIKit {
+public class CustomKit extends AbstractKit {
 
     private String inventory;
     private List<String> blacklist;

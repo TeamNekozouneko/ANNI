@@ -11,7 +11,7 @@ import org.bukkit.persistence.PersistentDataType;
 
 import java.util.Collections;
 
-public class ChaserKit extends AbsANNIKit {
+public class ChaserKit extends AbstractKit {
 
     ChaserKit() {
         super("chaser", "CHS", "kit.chaser.name", Material.TRIDENT.name(), Collections.emptyList());
