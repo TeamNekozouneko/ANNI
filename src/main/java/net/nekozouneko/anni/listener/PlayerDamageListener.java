@@ -5,8 +5,11 @@ import net.nekozouneko.anni.arena.spectator.SpectatorManager;
 import net.nekozouneko.anni.kit.ANNIKit;
 import net.nekozouneko.anni.kit.items.GrapplingHook;
 import net.nekozouneko.anni.message.MessageManager;
+import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.attribute.Attribute;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -97,9 +100,21 @@ public class PlayerDamageListener implements Listener {
             }
 
             if (ANNIKit.get(ANNIPlugin.getInstance().getCurrentGame().getKit(damager)) == ANNIKit.VAMPIRE) {
-                if (DIRECT_ATTACK_CAUSES.contains(e.getCause()) && new Random().nextDouble() >= 0.75) {
-                    damager.playSound(e.getEntity().getLocation(), Sound.BLOCK_HONEY_BLOCK_SLIDE, 1, 0);
-                    damager.setHealth(damager.getHealth() + Math.min((e.getDamage() * ((double) (new Random().nextInt(15) + 1) / 100)), 3));
+                if (DIRECT_ATTACK_CAUSES.contains(e.getCause()) && new Random().nextBoolean()) {
+                    damager.getWorld().playSound(e.getEntity().getLocation(), Sound.BLOCK_HONEY_BLOCK_SLIDE, 1, 0);
+
+                    Location particlePos = e.getEntity().getLocation().clone();
+                    particlePos.setY(particlePos.getY() + 1);
+
+                    e.getEntity().getWorld().spawnParticle(
+                            Particle.BLOCK_DUST, particlePos,
+                            100, .1, .25, .1, 1,
+                            Material.REDSTONE_BLOCK.createBlockData()
+                    );
+                    damager.setHealth(Math.min(
+                            damager.getHealth() + Math.min((e.getDamage() * ((double) (new Random().nextInt(15) + 1) / 100)), 3),
+                            damager.getAttribute(Attribute.GENERIC_MAX_HEALTH) != null ? damager.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue() : 20D
+                    ));
                 }
             }
 
