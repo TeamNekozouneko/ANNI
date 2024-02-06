@@ -73,7 +73,6 @@ public class DefenseArtifact implements Listener {
                             GrapplingHook.addCooldown(victim.getUniqueId(), 5000);
                         }
 
-                        victim.addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, 40, 1, false, true, true));
                         victim.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 40, 1, false, true, true));
                     });
 
@@ -81,7 +80,7 @@ public class DefenseArtifact implements Listener {
         }
 
         private boolean isInCylinder(Location center, Location pos) {
-            boolean isPass = center.getY()+radius >= pos.getY() && pos.getY() >= center.getY()-radius;
+            boolean isPass = center.getY()+2.5 >= pos.getY() && pos.getY() >= center.getY()-2.5;
 
             isPass = isPass && radius >= Math.sqrt(Math.pow(pos.getX() - center.getX(), 2) + Math.pow(pos.getZ() - center.getZ(), 2));
 
@@ -153,7 +152,7 @@ public class DefenseArtifact implements Listener {
             return;
         }
 
-        EffectTask task = new EffectTask(event.getPlayer(), 20, 5);
+        EffectTask task = new EffectTask(event.getPlayer(), 20, 10);
         task.runTaskTimer(ANNIPlugin.getInstance(), 0, 20);
         TASKS.put(event.getPlayer().getUniqueId(), task);
         addCooldown(event.getPlayer().getUniqueId(), 60000);
