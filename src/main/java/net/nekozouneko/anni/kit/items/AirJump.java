@@ -67,12 +67,12 @@ public class AirJump implements Listener {
                             e.getPlayer().getLocation(), Sound.ENTITY_WITHER_SHOOT, 1, 2
                     );
                     e.getPlayer().getWorld().spawnParticle(
-                            Particle.CLOUD, e.getPlayer().getLocation(), 100, .5, .5, .5, .1
+                            Particle.CLOUD, e.getPlayer().getLocation(), 50, .5, .5, .5, .1
                     );
                     e.getPlayer().getWorld().spawnParticle(
-                            Particle.SMOKE_NORMAL, e.getPlayer().getLocation(), 100, .5, .5, .5, .1
+                            Particle.SMOKE_NORMAL, e.getPlayer().getLocation(), 50, .5, .5, .5, .1
                     );
-                    e.getPlayer().setVelocity(e.getPlayer().getLocation().getDirection().setY(2.5));
+                    e.getPlayer().setVelocity(e.getPlayer().getLocation().getDirection().setY(1));
                 }
                 else {
                     e.getPlayer().spigot().sendMessage(ChatMessageType.ACTION_BAR,
