@@ -23,6 +23,7 @@ import net.nekozouneko.anni.arena.team.ANNITeam;
 import net.nekozouneko.anni.board.BoardManager;
 import net.nekozouneko.anni.kit.ANNIKit;
 import net.nekozouneko.anni.kit.AbstractKit;
+import net.nekozouneko.anni.kit.items.DefenseArtifact;
 import net.nekozouneko.anni.listener.PlayerDamageListener;
 import net.nekozouneko.anni.map.ANNIMap;
 import net.nekozouneko.anni.message.MessageManager;
@@ -571,6 +572,8 @@ public class ANNIArena extends BukkitRunnable {
 
             log.info("Showing spectators...");
             SpectatorManager.clear();
+            log.info("Cancelling tasks...");
+            DefenseArtifact.cancelAllTasks();
             log.info("Initializing nexus...");
             nexus.clear();
             log.info("Initializing map...");

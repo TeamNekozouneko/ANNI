@@ -8,6 +8,7 @@ import net.nekozouneko.anni.board.BoardManager;
 import net.nekozouneko.anni.command.*;
 import net.nekozouneko.anni.kit.custom.CustomKitManager;
 import net.nekozouneko.anni.kit.items.AirJump;
+import net.nekozouneko.anni.kit.items.DefenseArtifact;
 import net.nekozouneko.anni.kit.items.GrapplingHook;
 import net.nekozouneko.anni.kit.items.StunGrenade;
 import net.nekozouneko.anni.listener.*;
@@ -128,6 +129,7 @@ public final class ANNIPlugin extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new StunGrenade(), this);
         getServer().getPluginManager().registerEvents(new AirJump(), this);
         getServer().getPluginManager().registerEvents(new GrapplingHook(), this);
+        getServer().getPluginManager().registerEvents(new DefenseArtifact(), this);
 
         currentGame = new ANNIArena(this, "current");
         spectatorTask = new SpectatorTask();
