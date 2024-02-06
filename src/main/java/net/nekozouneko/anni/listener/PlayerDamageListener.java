@@ -100,7 +100,7 @@ public class PlayerDamageListener implements Listener {
             }
 
             if (ANNIKit.get(ANNIPlugin.getInstance().getCurrentGame().getKit(damager)) == ANNIKit.VAMPIRE) {
-                if (DIRECT_ATTACK_CAUSES.contains(e.getCause()) && new Random().nextBoolean()) {
+                if (DIRECT_ATTACK_CAUSES.contains(e.getCause()) && new Random().nextDouble() >= 0.60) {
                     damager.getWorld().playSound(e.getEntity().getLocation(), Sound.BLOCK_HONEY_BLOCK_SLIDE, 1, 0);
 
                     Location particlePos = e.getEntity().getLocation().clone();
@@ -112,7 +112,7 @@ public class PlayerDamageListener implements Listener {
                             Material.REDSTONE_BLOCK.createBlockData()
                     );
                     damager.setHealth(Math.min(
-                            damager.getHealth() + Math.min((e.getDamage() * ((double) (new Random().nextInt(15) + 1) / 100)), 3),
+                            damager.getHealth() + Math.min((e.getDamage() * ((double) (new Random().nextInt(25) + 10) / 100)), 3),
                             damager.getAttribute(Attribute.GENERIC_MAX_HEALTH) != null ? damager.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue() : 20D
                     ));
                 }
