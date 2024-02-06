@@ -74,6 +74,7 @@ public class DefenseArtifact implements Listener {
                         }
 
                         victim.addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, 40, 1, false, true, true));
+                        victim.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 40, 1, false, true, true));
                     });
 
             time--;
@@ -155,7 +156,7 @@ public class DefenseArtifact implements Listener {
         EffectTask task = new EffectTask(event.getPlayer(), 20, 5);
         task.runTaskTimer(ANNIPlugin.getInstance(), 0, 20);
         TASKS.put(event.getPlayer().getUniqueId(), task);
-        addCooldown(event.getPlayer().getUniqueId(), 180000);
+        addCooldown(event.getPlayer().getUniqueId(), 60000);
     }
 
 }
