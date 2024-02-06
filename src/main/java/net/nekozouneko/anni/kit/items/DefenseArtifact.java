@@ -152,7 +152,7 @@ public class DefenseArtifact implements Listener {
             return;
         }
 
-        EffectTask task = new EffectTask(event.getPlayer(), 20, 10);
+        EffectTask task = new EffectTask(event.getPlayer(), 10, 10);
         task.runTaskTimer(ANNIPlugin.getInstance(), 0, 20);
         TASKS.put(event.getPlayer().getUniqueId(), task);
         addCooldown(event.getPlayer().getUniqueId(), 60000);
