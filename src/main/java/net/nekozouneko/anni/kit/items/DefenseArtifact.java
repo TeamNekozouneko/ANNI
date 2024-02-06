@@ -68,12 +68,12 @@ public class DefenseArtifact implements Listener {
                     .filter(p -> isInCylinder(player.getLocation(), p.getLocation()))
                     .forEach(victim -> {
                         if (for_first_check == time) {
-                            victim.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 20, 1, false, true, true));
+                            victim.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 20, 0, false, true, true));
                             victim.addPotionEffect(new PotionEffect(PotionEffectType.SLOW_DIGGING, 40, 1, false, true, true));
                             GrapplingHook.addCooldown(victim.getUniqueId(), 5000);
                         }
 
-                        victim.addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, 40, 2, false, true, true));
+                        victim.addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, 40, 1, false, true, true));
                     });
 
             time--;
