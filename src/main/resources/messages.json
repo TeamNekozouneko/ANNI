@@ -1,5 +1,5 @@
 {
-  "version": "9",
+  "version": "10",
 
   "scoreboard.title": "&c&lANNI&9&lHI&a&lLA&e&lTION",
   "scoreboard.dateformat": "yyyy/MM/dd HH:mm",
@@ -486,8 +486,8 @@
 
   "item.defense_artifact.name": "&d&l防衛の心",
   "item.defense_artifact.lore.0": "&7防衛をするという強い意志が込められたもの。",
-  "item.defense_artifact.lore.1": "&9効果時間： 10秒",
-  "item.defense_artifact.lore.2": "&9クールタイム： 180秒",
+  "item.defense_artifact.lore.1": "&9効果時間： 20秒",
+  "item.defense_artifact.lore.2": "&9クールタイム： 60秒",
   "item.defense_artifact_lore.3": "",
   "item.defense_artifact_lore.4": "&9効果：",
   "item.defense_artifact.lore.5": "&9* 近くの敵の視界が一瞬真っ暗",
