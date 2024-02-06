@@ -49,7 +49,8 @@ public class GrapplingHook implements Listener {
 
         PersistentDataContainer c = event.getHook().getPersistentDataContainer();
 
-        if (c.getOrDefault(new NamespacedKey(ANNIPlugin.getInstance(), "grappling-hook"), PersistentDataType.INTEGER, 0) != 1) return;
+        if (c.getOrDefault(new NamespacedKey(ANNIPlugin.getInstance(), "grappling-hook"), PersistentDataType.INTEGER, 0) != 1)
+            return;
 
         switch (event.getState()) {
             case BITE: {
@@ -75,9 +76,7 @@ public class GrapplingHook implements Listener {
         ItemStack item = event.getPlayer().getInventory().getItem(event.getHand());
         if (item == null || item.getType().isAir()) return;
 
-        PersistentDataContainer c = item.getItemMeta().getPersistentDataContainer();
-
-        if (c.getOrDefault(new NamespacedKey(ANNIPlugin.getInstance(), "special-item"), PersistentDataType.STRING, "").equals("grappling-hook")) {
+        if (isGrapplingHook(item)) {
             boolean cantUse = event.getPlayer().isVisualFire();
             cantUse = cantUse || event.getPlayer().hasPotionEffect(PotionEffectType.BLINDNESS);
             cantUse = cantUse || event.getPlayer().hasPotionEffect(PotionEffectType.DARKNESS);
@@ -105,8 +104,8 @@ public class GrapplingHook implements Listener {
 
             event.getHook().getPersistentDataContainer()
                     .set(new NamespacedKey(ANNIPlugin.getInstance(), "grappling-hook"), PersistentDataType.INTEGER, 1);
-            event.getHook().setVelocity(event.getHook().getVelocity().multiply(2));
-            addCooldown(event.getPlayer().getUniqueId(), 500);
+            event.getHook().setVelocity(event.getHook().getVelocity().multiply(1.75));
+            addCooldown(event.getPlayer().getUniqueId(), 1000);
         }
     }
 
@@ -128,5 +127,13 @@ public class GrapplingHook implements Listener {
         return cooldown.getOrDefault(player, System.currentTimeMillis());
     }
 
+    public static boolean isGrapplingHook(ItemStack item) {
+        if (item == null || item.getType().isAir()) return false;
+
+        return item.getItemMeta().getPersistentDataContainer().getOrDefault(
+                new NamespacedKey(ANNIPlugin.getInstance(), "special-item"),
+                PersistentDataType.STRING, ""
+        ).equals("grappling-hook");
+    }
 
 }
