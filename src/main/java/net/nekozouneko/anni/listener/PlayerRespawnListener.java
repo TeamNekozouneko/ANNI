@@ -5,7 +5,6 @@ import net.nekozouneko.anni.arena.ANNIArena;
 import net.nekozouneko.anni.arena.spectator.SpectatorManager;
 import net.nekozouneko.anni.arena.team.ANNITeam;
 import net.nekozouneko.anni.kit.ANNIKit;
-import net.nekozouneko.anni.kit.items.DefenseArtifact;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.event.EventHandler;
@@ -44,8 +43,6 @@ public class PlayerRespawnListener implements Listener {
                         e.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 200, 1, false, false, true));
                     }
             );
-
-            DefenseArtifact.addCooldown(e.getPlayer().getUniqueId(), 30000);
 
             e.getPlayer().setGameMode(GameMode.SURVIVAL);
             e.getPlayer().getInventory().setContents(
