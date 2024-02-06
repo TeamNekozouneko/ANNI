@@ -3,12 +3,13 @@ package net.nekozouneko.anni.kit.items;
 import net.nekozouneko.anni.ANNIPlugin;
 import net.nekozouneko.anni.message.MessageManager;
 import net.nekozouneko.commons.spigot.inventory.ItemStackBuilder;
-import org.bukkit.*;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
+import org.bukkit.Sound;
 import org.bukkit.entity.EntityType;
-import org.bukkit.entity.FishHook;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.player.PlayerFishEvent;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
@@ -68,21 +69,6 @@ public class GrapplingHook implements Listener {
         }
     }
 
-    @EventHandler
-    public void onHit(ProjectileHitEvent event) {
-        if (!(event.getEntity() instanceof FishHook)) return;
-
-        PersistentDataContainer c = event.getEntity().getPersistentDataContainer();
-
-        if (c.getOrDefault(new NamespacedKey(ANNIPlugin.getInstance(), "grappling-hook"), PersistentDataType.INTEGER, 0) != 1) return;
-
-        World w = event.getEntity().getWorld();
-        Location pos = event.getEntity().getLocation();
-
-        w.playSound(pos, Sound.BLOCK_IRON_DOOR_OPEN, 3, 1.5f);
-        w.playSound(pos, Sound.BLOCK_WOODEN_DOOR_OPEN, 3, 0);
-    }
-
     private void processRodIsGrapplingHook(PlayerFishEvent event) {
         if (event.getHand() == null) return;
 
@@ -120,6 +106,7 @@ public class GrapplingHook implements Listener {
             event.getHook().getPersistentDataContainer()
                     .set(new NamespacedKey(ANNIPlugin.getInstance(), "grappling-hook"), PersistentDataType.INTEGER, 1);
             event.getHook().setVelocity(event.getHook().getVelocity().multiply(2));
+            addCooldown(event.getPlayer().getUniqueId(), 500);
         }
     }
 
@@ -134,7 +121,7 @@ public class GrapplingHook implements Listener {
     }
 
     public static void addCooldown(UUID player, long time) {
-        cooldown.put(player, System.currentTimeMillis() + 5000);
+        cooldown.put(player, System.currentTimeMillis() + time);
     }
 
     public static long getCooldown(UUID player) {
