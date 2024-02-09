@@ -42,6 +42,9 @@ public class ANNIMap {
     }
 
     public boolean canUseOnArena() {
+        if (team_region == null) team_region = new EnumMap<>(ANNITeam.class);
+        if (spawn == null) spawn = new EnumMap<>(ANNITeam.class);
+        if (this.nexus == null) this.nexus = new EnumMap<>(ANNITeam.class);
         return (
                 getBukkitWorld() != null
                 && nexus.size() >= 4
