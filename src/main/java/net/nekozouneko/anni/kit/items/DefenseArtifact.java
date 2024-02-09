@@ -1,5 +1,10 @@
 package net.nekozouneko.anni.kit.items;
 
+import com.sk89q.worldedit.bukkit.BukkitAdapter;
+import com.sk89q.worldguard.WorldGuard;
+import com.sk89q.worldguard.protection.regions.ProtectedRegion;
+import net.md_5.bungee.api.ChatMessageType;
+import net.md_5.bungee.api.chat.TextComponent;
 import net.nekozouneko.anni.ANNIPlugin;
 import net.nekozouneko.anni.arena.ANNIArena;
 import net.nekozouneko.anni.arena.spectator.SpectatorManager;
@@ -50,17 +55,40 @@ public class DefenseArtifact implements Listener {
                 return;
             }
 
+            ANNIArena game = ANNIPlugin.getInstance().getCurrentGame();
+            String region = game.getMap().getTeamRegion(game.getTeamByPlayer(player));
+
+            if (region != null) {
+                ProtectedRegion pr = WorldGuard.getInstance().getPlatform().getRegionContainer()
+                        .get(BukkitAdapter.adapt(game.getCopyWorld()))
+                        .getRegion(region);
+
+                if (!pr.contains(BukkitAdapter.asBlockVector(player.getLocation()))) {
+                    player.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(
+                            ANNIPlugin.getInstance().getMessageManager().build(
+                                    "actionbar.out_of_team_region"
+                            )
+                    ));
+                    player.getWorld().playSound(player.getLocation(), Sound.BLOCK_GLASS_BREAK, 1, 0);
+
+                    cancel();
+                    new HashSet<>(TASKS.keySet()).forEach(key -> {
+                        if (Objects.equals(TASKS.get(key), this)) TASKS.remove(key);
+                    });
+                    return;
+                }
+            }
+
             if (for_first_check == time) {
                 player.getWorld().spawnParticle(
                         Particle.DRAGON_BREATH, player.getLocation(),
                         1000, .1, .1, .1, 1
                 );
                 player.getWorld().playSound(
-                        player.getLocation(), Sound.BLOCK_ANVIL_USE, 2, 0
+                        player.getLocation(), Sound.BLOCK_ANVIL_USE, 1, 0
                 );
             }
 
-            ANNIArena game = ANNIPlugin.getInstance().getCurrentGame();
             ANNIPlugin.getInstance().getCurrentGame().getPlayers().stream()
                     .filter(p -> !SpectatorManager.isSpectating(p))
                     .filter(p -> game.getTeamByPlayer(p) != null)
@@ -145,11 +173,29 @@ public class DefenseArtifact implements Listener {
         event.setCancelled(true);
 
         if (!isCooldownEnd(event.getPlayer().getUniqueId())) {
-            event.getPlayer().sendMessage(ANNIPlugin.getInstance().getMessageManager().build(
+            event.getPlayer().spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(ANNIPlugin.getInstance().getMessageManager().build(
                     "command.err.cooldown", (getCooldown(event.getPlayer().getUniqueId()) - System.currentTimeMillis()) / 1000
-            ));
+            )));
             event.getPlayer().playSound(event.getPlayer().getLocation(), Sound.ENTITY_GENERIC_EXTINGUISH_FIRE, 1, 2);
             return;
+        }
+
+        ANNIArena game = ANNIPlugin.getInstance().getCurrentGame();
+        String region = game.getMap().getTeamRegion(game.getTeamByPlayer(event.getPlayer()));
+
+        if (region != null) {
+            ProtectedRegion pr = WorldGuard.getInstance().getPlatform().getRegionContainer()
+                    .get(BukkitAdapter.adapt(game.getCopyWorld()))
+                    .getRegion(region);
+
+            if (!pr.contains(BukkitAdapter.asBlockVector(event.getPlayer().getLocation()))) {
+                event.getPlayer().spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(
+                        ANNIPlugin.getInstance().getMessageManager().build(
+                                "actionbar.out_of_team_region"
+                        )
+                ));
+                return;
+            }
         }
 
         EffectTask task = new EffectTask(event.getPlayer(), 10, 10);
