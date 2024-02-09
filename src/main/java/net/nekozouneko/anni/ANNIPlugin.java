@@ -36,7 +36,7 @@ import java.util.Map;
 
 public final class ANNIPlugin extends JavaPlugin {
 
-    public static final String LATEST_MESSAGE_VERSION = "10";
+    public static final String LATEST_MESSAGE_VERSION = "11";
     private static ANNIPlugin plugin;
 
     public static ANNIPlugin getInstance() {
@@ -103,7 +103,14 @@ public final class ANNIPlugin extends JavaPlugin {
 
         mapManager.load(defaultMapsDir);
 
-        lobby = FileUtil.readGson(new File(getDataFolder(), "lobby.json"), Location.class);
+        try {
+            lobby = FileUtil.readGson(new File(getDataFolder(), "lobby.json"), Location.class);
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+            lobby = null;
+            getLogger().warning("Lobby is not set!");
+        }
 
         pluginBoard = getServer().getScoreboardManager().getNewScoreboard();
 

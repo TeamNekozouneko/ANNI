@@ -1,5 +1,5 @@
 {
-  "version": "10",
+  "version": "11",
 
   "scoreboard.title": "&c&lANNI&9&lHI&a&lLA&e&lTION",
   "scoreboard.dateformat": "yyyy/MM/dd HH:mm",
@@ -150,6 +150,7 @@
   "command.err.kit_not_found": "&c「{0}」というキットは見つかりませんでした。",
   "command.err.material_not_defined": "&c「{0}」というマテリアルは存在しません。",
   "command.err.no_perm": "&c権限が不足しています。",
+  "command.err.region_not_found": "&c「{0}」という保護領域が見つかりませんでした。",
 
   "command.usage": "&c使用方法: {0}",
 
@@ -160,10 +161,10 @@
   "command.map.info.2": "&fワールド： {2}",
   "command.map.info.3": "&fアリーナで利用可能か： {3}",
   "command.map.info.4": "&fデフォルトスポーン地点： {4}",
-  "command.map.info.5": "&f赤チーム（ネクサス／スポーン地点）： &7{5} &f／ &7{9}",
-  "command.map.info.6": "&f青チーム（ネクサス／スポーン地点）： &7{6} &f／ &7{10}",
-  "command.map.info.7": "&f緑チーム（ネクサス／スポーン地点）： &7{7} &f／ &7{11}",
-  "command.map.info.8": "&f黄チーム（ネクサス／スポーン地点）： &7{8} &f／ &7{12}",
+  "command.map.info.5": "&f赤チーム（ネクサス／スポーン地点／拠点領域）： &7{5} &f／ &7{9} &f／ &7{13}",
+  "command.map.info.6": "&f青チーム（ネクサス／スポーン地点／拠点領域）： &7{6} &f／ &7{10} &f／ &7{14}",
+  "command.map.info.7": "&f緑チーム（ネクサス／スポーン地点／拠点領域）： &7{7} &f／ &7{11} &f／ &7{15}",
+  "command.map.info.8": "&f黄チーム（ネクサス／スポーン地点／拠点領域）： &7{8} &f／ &7{12} &f／ &7{16}",
 
   "command.map.info.2.avail": "&a利用可能",
   "command.map.info.2.not_avail": "&c利用不可",
@@ -496,6 +497,7 @@
   "actionbar.nexus_alert": "&c{0} によってネクサスが破壊されています！",
   "actionbar.spectator_mode": "&7観戦モード",
   "actionbar.cooldown_stats": "&cあと{0}秒後使用できます。",
+  "actionbar.out_of_team_region": "&cチームの領域外のため利用できません。",
 
   "chat.global": "{0}&a:&f {1}",
   "chat.global.format": "{0}%s&a:&f %s",
