@@ -52,6 +52,19 @@ public final class BlockPlaceListener implements Listener {
             ));
         }
 
+        black.add(Material.MELON);
+        black.add(Material.GRAVEL);
+
+        black.addAll(Arrays.asList( // 原木
+                Material.ACACIA_LOG, Material.BIRCH_LOG, Material.DARK_OAK_LOG,
+                Material.JUNGLE_LOG, Material.OAK_LOG, Material.SPRUCE_LOG,
+                Material.CRIMSON_STEM, Material.WARPED_STEM,
+                Material.STRIPPED_ACACIA_LOG, Material.STRIPPED_BIRCH_LOG,
+                Material.STRIPPED_DARK_OAK_LOG, Material.STRIPPED_JUNGLE_LOG,
+                Material.STRIPPED_OAK_LOG, Material.STRIPPED_SPRUCE_LOG,
+                Material.STRIPPED_CRIMSON_STEM, Material.STRIPPED_WARPED_STEM
+        ));
+
         BLACKLIST = Collections.unmodifiableList(black);
     }
 
