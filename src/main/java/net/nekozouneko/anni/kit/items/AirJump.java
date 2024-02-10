@@ -24,6 +24,7 @@ import java.util.UUID;
 
 public class AirJump implements Listener {
 
+    public static final long DEFAULT_COOLTIME = 10000;
     private static final Map<UUID, Long> COOLDOWN = new HashMap<>();
 
     public static void setCooldown(UUID target, Long end) {
@@ -62,7 +63,7 @@ public class AirJump implements Listener {
             ) {
                 e.setCancelled(true);
                 if (isCooldownEnd(e.getPlayer().getUniqueId())) {
-                    setCooldown(e.getPlayer().getUniqueId(), System.currentTimeMillis() + 15000);
+                    setCooldown(e.getPlayer().getUniqueId(), System.currentTimeMillis() + DEFAULT_COOLTIME);
                     e.getPlayer().getWorld().playSound(
                             e.getPlayer().getLocation(), Sound.ENTITY_WITHER_SHOOT, 1, 2
                     );
