@@ -1,7 +1,8 @@
 database:
+  enabled: true
   type: sqlite
 
-  prefix: anniv2_
+  prefix: anni_
 
   local:
     path: anni.db

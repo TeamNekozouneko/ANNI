@@ -19,6 +19,10 @@ public class ANNIConfig {
         ANNIConfig.conf = conf;
     }
 
+    public static boolean isDatabaseEnabled() {
+        return conf.getBoolean("database.enabled");
+    }
+
     public static DatabaseType getDatabaseType() {
         return Enums.getIfPresent(
                 DatabaseType.class,
