@@ -3,7 +3,7 @@ package net.nekozouneko.anni.database.impl;
 import net.nekozouneko.anni.ANNIConfig;
 import net.nekozouneko.anni.database.ANNIDatabase;
 import net.nekozouneko.anni.kit.ANNIKit;
-import net.nekozouneko.anni.kit.AbsANNIKit;
+import net.nekozouneko.anni.kit.AbstractKit;
 import net.nekozouneko.anni.util.CmnUtil;
 import net.nekozouneko.anni.util.FileUtil;
 
@@ -302,7 +302,7 @@ public class SQLiteDatabase implements ANNIDatabase {
     @Override
     public int getLevel(UUID player) {
         try (PreparedStatement ps = source.prepareStatement(
-                "SELECT level FROM " + ANNIConfig.getDBTablePrefix() + "level WHERE player = ? LIMIT 1"
+                "SELECT level FROM " + tableName("level") + " WHERE player = ? LIMIT 1"
         )){
             ps.setString(1, player.toString());
             ResultSet rs = ps.executeQuery();
@@ -319,7 +319,7 @@ public class SQLiteDatabase implements ANNIDatabase {
     @Override
     public void setLevel(UUID player, int level) {
         try (PreparedStatement ps = source.prepareStatement(
-                "UPDATE "+ANNIConfig.getDBTablePrefix()+"level SET level = ? WHERE player = ?"
+                "UPDATE "+tableName("level")+" SET level = ? WHERE player = ?"
         )) {
             ps.setInt(1, level);
             ps.setString(2, player.toString());
@@ -333,7 +333,7 @@ public class SQLiteDatabase implements ANNIDatabase {
     @Override
     public void addLevel(UUID player, int add) {
         try (PreparedStatement ps = source.prepareStatement(
-                "UPDATE "+ANNIConfig.getDBTablePrefix()+"level SET level + ? WHERE player = ?"
+                "UPDATE "+tableName("level")+" SET level + ? WHERE player = ?"
         )) {
             ps.setInt(1, add);
             ps.setString(2, player.toString());
@@ -347,7 +347,7 @@ public class SQLiteDatabase implements ANNIDatabase {
     @Override
     public void subtractLevel(UUID player, int subtract) {
         try (PreparedStatement ps = source.prepareStatement(
-                "UPDATE "+ANNIConfig.getDBTablePrefix()+"level SET level - ? WHERE player = ?"
+                "UPDATE "+tableName("level")+" SET level - ? WHERE player = ?"
         )) {
             ps.setInt(1, subtract);
             ps.setString(2, player.toString());
@@ -361,7 +361,7 @@ public class SQLiteDatabase implements ANNIDatabase {
     @Override
     public int getExp(UUID player) {
         try (PreparedStatement ps = source.prepareStatement(
-                "SELECT level FROM " + ANNIConfig.getDBTablePrefix() + "level WHERE player = ? LIMIT 1"
+                "SELECT level FROM " + tableName("level") + " WHERE player = ? LIMIT 1"
         )){
             ps.setString(1, player.toString());
             ResultSet rs = ps.executeQuery();
@@ -378,7 +378,7 @@ public class SQLiteDatabase implements ANNIDatabase {
     @Override
     public void setExp(UUID player, int exp) {
         try (PreparedStatement ps = source.prepareStatement(
-                "UPDATE "+ANNIConfig.getDBTablePrefix()+"level SET exp = ? WHERE player = ?"
+                "UPDATE "+tableName("level")+" SET exp = ? WHERE player = ?"
         )) {
             ps.setInt(1, exp);
             ps.setString(2, player.toString());
@@ -392,7 +392,7 @@ public class SQLiteDatabase implements ANNIDatabase {
     @Override
     public void addExp(UUID player, int add) {
         try (PreparedStatement ps = source.prepareStatement(
-                "UPDATE "+ANNIConfig.getDBTablePrefix()+"level SET exp + ? WHERE player = ?"
+                "UPDATE "+tableName("level")+" SET exp + ? WHERE player = ?"
         )) {
             ps.setInt(1, add);
             ps.setString(2, player.toString());
@@ -406,7 +406,7 @@ public class SQLiteDatabase implements ANNIDatabase {
     @Override
     public void subtractExp(UUID player, int subtract) {
         try (PreparedStatement ps = source.prepareStatement(
-                "UPDATE "+ANNIConfig.getDBTablePrefix()+"level SET exp - ? WHERE player = ?"
+                "UPDATE "+tableName("level")+" SET exp - ? WHERE player = ?"
         )) {
             ps.setInt(1, subtract);
             ps.setString(2, player.toString());
@@ -418,9 +418,9 @@ public class SQLiteDatabase implements ANNIDatabase {
     }
 
     @Override
-    public AbsANNIKit getKit(UUID player) {
+    public AbstractKit getKit(UUID player) {
         try (PreparedStatement ps = source.prepareStatement(
-                "SELECT kit FROM "+ANNIConfig.getDBTablePrefix()+"settings WHERE player = ?"
+                "SELECT kit FROM "+tableName("settings")+" WHERE player = ?"
         )) {
             ps.setString(1, player.toString());
             ResultSet rs = ps.executeQuery();
@@ -436,9 +436,9 @@ public class SQLiteDatabase implements ANNIDatabase {
     }
 
     @Override
-    public void setKit(UUID player, AbsANNIKit kit) {
+    public void setKit(UUID player, AbstractKit kit) {
         try (PreparedStatement ps = source.prepareStatement(
-                "UPDATE " + ANNIConfig.getDBTablePrefix()+"settings SET kit = ? WHERE player = ?"
+                "UPDATE " + tableName("settings") + " SET kit = ? WHERE player = ?"
         )) {
             ps.setString(1, kit.getId());
             ps.setString(2, player.toString());
@@ -567,5 +567,9 @@ public class SQLiteDatabase implements ANNIDatabase {
     @Override
     public long subtractLoseCount(UUID player, long subtract) {
         return 0;
+    }
+
+    private String tableName(String name) {
+        return ANNIConfig.getDBTablePrefix();
     }
 }

@@ -1,7 +1,7 @@
 package net.nekozouneko.anni.database;
 
 import net.nekozouneko.anni.kit.ANNIKit;
-import net.nekozouneko.anni.kit.AbsANNIKit;
+import net.nekozouneko.anni.kit.AbstractKit;
 
 import java.util.List;
 import java.util.UUID;
@@ -34,9 +34,9 @@ public interface ANNIDatabase {
 
     void subtractExp(UUID player, int subtract);
 
-    AbsANNIKit getKit(UUID player);
+    AbstractKit getKit(UUID player);
 
-    void setKit(UUID player, AbsANNIKit kit);
+    void setKit(UUID player, AbstractKit kit);
 
     List<String> getAvailableKits(UUID player);
 
