@@ -5,6 +5,8 @@ import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import com.sk89q.worldguard.protection.regions.RegionContainer;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 import net.nekozouneko.anni.ANNIPlugin;
 import net.nekozouneko.anni.arena.ANNIArena;
 import net.nekozouneko.anni.arena.team.ANNITeam;
@@ -21,15 +23,69 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffectType;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.*;
 import java.util.function.Consumer;
+import java.util.function.IntSupplier;
 
 public class BlockBreakListener implements Listener {
 
+    @AllArgsConstructor
+    public static class ANNIBlockInfo {
+        @Getter
+        private final int cooldown;
+        @Getter
+        private final boolean rare;
+        @Getter
+        private final Material blockOfInCooldown;
+        private final IntSupplier xp;
+
+        public int getXp() {
+            return xp.getAsInt();
+        }
+    }
+
+    private static class RegenerateBlockTask extends BukkitRunnable {
+        private int count = 0;
+        private final ANNIBlockInfo info;
+        private final Material block;
+        private final BlockData data;
+        private final Location location;
+
+        private RegenerateBlockTask(ANNIBlockInfo info, Material block, BlockData data, Location location) {
+            this.info = info;
+            this.block = block;
+            this.data = data.clone();
+            this.location = location.clone();
+        }
+
+        @Override
+        public void run() {
+            if (!location.isWorldLoaded()) {
+                cancel();
+                return;
+            }
+
+            if (count == 0) {
+                if (!(info.getBlockOfInCooldown() == null || info.getBlockOfInCooldown().isAir()))
+                    location.getBlock().setType(info.getBlockOfInCooldown());
+                count++;
+                return;
+            }
+
+            if (count >= info.getCooldown()) {
+                location.getBlock().setType(block);
+                location.getBlock().setBlockData(data);
+                cancel();
+                return;
+            }
+
+            count++;
+        }
+    }
+
     private static final Map<UUID, Consumer<Block>> QUEUED_ON_DAMAGE = new HashMap<>();
-    private static final Map<Material, Long> COOLDOWN = new EnumMap<>(Material.class);
-    private static final Map<Material, Long> NO_BLOCK_COOLDOWN = new EnumMap<>(Material.class);
     private static final List<Material> WOODS = new ArrayList<>(Arrays.asList(
             Material.ACACIA_LOG, Material.BIRCH_LOG, Material.DARK_OAK_LOG,
             Material.JUNGLE_LOG, Material.OAK_LOG, Material.SPRUCE_LOG,
@@ -39,35 +95,56 @@ public class BlockBreakListener implements Listener {
             Material.STRIPPED_OAK_LOG, Material.STRIPPED_SPRUCE_LOG,
             Material.STRIPPED_CRIMSON_STEM, Material.STRIPPED_WARPED_STEM
     ));
+    private static final Map<Material, ANNIBlockInfo> BLOCKS = new EnumMap<>(Material.class);
 
     public static Map<UUID, Consumer<Block>> getQueuedOnDamageMap() {
         return QUEUED_ON_DAMAGE;
     }
 
     static {
-        COOLDOWN.put(Material.COAL_ORE, 100L);
-        COOLDOWN.put(Material.DIAMOND_ORE, 600L);
-        COOLDOWN.put(Material.EMERALD_ORE, 600L);
-        COOLDOWN.put(Material.GOLD_ORE, 400L);
-        COOLDOWN.put(Material.GRAVEL, 100L);
-        COOLDOWN.put(Material.IRON_ORE, 200L);
-        COOLDOWN.put(Material.LAPIS_ORE, 200L);
-        COOLDOWN.put(Material.NETHER_GOLD_ORE, 400L);
-        COOLDOWN.put(Material.NETHER_QUARTZ_ORE, 200L);
-        COOLDOWN.put(Material.REDSTONE_ORE, 200L);
-        COOLDOWN.put(Material.GILDED_BLACKSTONE, 400L);
+        BLOCKS.put(Material.MELON, new ANNIBlockInfo(5, false, null, () -> 0));
+        BLOCKS.put(Material.GRAVEL, new ANNIBlockInfo(5, false, Material.COBBLESTONE, () -> 0));
+
+        ANNIBlockInfo lowInfo = new ANNIBlockInfo(
+                5, false, Material.COBBLESTONE,
+                () -> new Random().nextInt(4)
+        );
+        ANNIBlockInfo commonInfo = new ANNIBlockInfo(
+                10, false, Material.COBBLESTONE,
+                () -> new Random().nextInt(3) + 3
+        );
+        ANNIBlockInfo rareInfo = new ANNIBlockInfo(
+                30, true, Material.COBBLESTONE,
+                () -> new Random().nextInt(8) + 7
+        );
+
+        BLOCKS.put(Material.COAL_ORE, lowInfo);
+        BLOCKS.put(Material.IRON_ORE, commonInfo);
+        BLOCKS.put(Material.NETHER_QUARTZ_ORE, commonInfo);
+        BLOCKS.put(Material.REDSTONE_ORE, commonInfo);
+        BLOCKS.put(Material.LAPIS_ORE, commonInfo);
+        BLOCKS.put(Material.GOLD_ORE, new ANNIBlockInfo(
+                20, false, Material.COBBLESTONE,
+                () -> new Random().nextInt(7) + 6
+        ));
+        BLOCKS.put(Material.DIAMOND_ORE, rareInfo);
+        BLOCKS.put(Material.EMERALD_ORE, rareInfo);
+        BLOCKS.put(Material.NETHER_GOLD_ORE, commonInfo);
 
         // 1.17
         if (Enums.getIfPresent(Material.class, "DEEPSLATE").isPresent()) {
-            COOLDOWN.put(Material.DEEPSLATE_COAL_ORE, 100L);
-            COOLDOWN.put(Material.DEEPSLATE_DIAMOND_ORE, 600L);
-            COOLDOWN.put(Material.DEEPSLATE_EMERALD_ORE, 600L);
-            COOLDOWN.put(Material.DEEPSLATE_GOLD_ORE, 400L);
-            COOLDOWN.put(Material.DEEPSLATE_IRON_ORE, 200L);
-            COOLDOWN.put(Material.DEEPSLATE_LAPIS_ORE, 200L);
-            COOLDOWN.put(Material.DEEPSLATE_REDSTONE_ORE, 200L);
-            COOLDOWN.put(Material.COPPER_ORE, 100L);
-            COOLDOWN.put(Material.DEEPSLATE_COPPER_ORE, 100L);
+            BLOCKS.put(Material.DEEPSLATE_COAL_ORE, lowInfo);
+            BLOCKS.put(Material.COPPER_ORE, lowInfo);
+            BLOCKS.put(Material.DEEPSLATE_COPPER_ORE, lowInfo);
+            BLOCKS.put(Material.DEEPSLATE_IRON_ORE, commonInfo);
+            BLOCKS.put(Material.DEEPSLATE_LAPIS_ORE, commonInfo);
+            BLOCKS.put(Material.DEEPSLATE_REDSTONE_ORE, commonInfo);
+            BLOCKS.put(Material.DEEPSLATE_GOLD_ORE, new ANNIBlockInfo(
+                    20, false, Material.COBBLESTONE,
+                    () -> new Random().nextInt(7) + 6
+            ));
+            BLOCKS.put(Material.DEEPSLATE_DIAMOND_ORE, rareInfo);
+            BLOCKS.put(Material.DEEPSLATE_EMERALD_ORE, rareInfo);
         }
         // 1.19
         if (Enums.getIfPresent(Material.class, "MANGROVE_LOG").isPresent()) {
@@ -79,12 +156,12 @@ public class BlockBreakListener implements Listener {
             WOODS.add(Material.CHERRY_LOG);
             WOODS.add(Material.STRIPPED_CHERRY_LOG);
         }
-
-        NO_BLOCK_COOLDOWN.put(Material.MELON, 100L);
     }
 
     @EventHandler(ignoreCancelled = true)
     public void onBreak(BlockBreakEvent e) {
+        MessageManager mm = ANNIPlugin.getInstance().getMessageManager();
+
         Consumer<Block> cb = QUEUED_ON_DAMAGE.get(e.getPlayer().getUniqueId());
         if (cb != null) {
             cb.accept(e.getBlock());
@@ -139,63 +216,35 @@ public class BlockBreakListener implements Listener {
                 ItemStack mainHand = e.getPlayer().getInventory().getItemInMainHand();
 
                 if (e.getPlayer().hasPotionEffect(PotionEffectType.INVISIBILITY)) {
-                    MessageManager mm = ANNIPlugin.getInstance().getMessageManager();
                     e.getPlayer().removePotionEffect(PotionEffectType.INVISIBILITY);
                     e.getPlayer().playSound(e.getPlayer().getLocation(), Sound.ENTITY_GENERIC_EXTINGUISH_FIRE, 1, 2);
                     e.getPlayer().sendMessage(mm.build("notify.removed_invisibility"));
                 }
 
-                if (COOLDOWN.containsKey(e.getBlock().getType())) {
-                    if (e.getBlock().getDrops(mainHand).isEmpty()) {
-                        e.setCancelled(true);
-                        return;
-                    }
-                    if (((e.getBlock().getType() == Material.DIAMOND_ORE || e.getBlock().getType() == Material.EMERALD_ORE)) && current.getState().getId() < 3) {
-                        e.getPlayer().sendMessage(ANNIPlugin.getInstance().getMessageManager().build("notify.cant_mine_now", new ItemStack(e.getBlock().getType()).getItemMeta().getLocalizedName()));
-                        e.setCancelled(true);
-                        return;
-                    }
-
-                    CmnUtil.giveOrDrop(
-                            e.getPlayer(),
-                            e.getBlock().getDrops(mainHand).toArray(new ItemStack[0])
-                    );
-
-                    e.setDropItems(false);
-                    e.getPlayer().giveExp(e.getExpToDrop());
-                    e.setExpToDrop(0);
-
-                    BlockData cloned = e.getBlock().getBlockData().clone(); // ブロックデータを複製
-                    Material typ = e.getBlock().getType();
-                    Bukkit.getScheduler().runTask(plugin, () -> {
-                        e.getBlock().setType(Material.COBBLESTONE);
-                        Bukkit.getScheduler().runTaskLater(plugin, () -> {
-                            e.getBlock().setType(typ); // クールダウン終了後再生成
-                            e.getBlock().setBlockData(cloned); // 複製したデータに変更
-                        }, COOLDOWN.get(typ) - 1);
-                    });
-                }
-                else if (NO_BLOCK_COOLDOWN.containsKey(e.getBlock().getType())) {
+                if (BLOCKS.containsKey(e.getBlock().getType())) {
                     if (e.getBlock().getDrops(mainHand).isEmpty()) {
                         e.setCancelled(true);
                         return;
                     }
 
-                    CmnUtil.giveOrDrop(
-                            e.getPlayer(),
-                            e.getBlock().getDrops(mainHand).toArray(new ItemStack[0])
-                    );
+                    ANNIBlockInfo info = BLOCKS.get(e.getBlock().getType());
+                    if (info == null) return;
 
-                    e.setDropItems(false);
-                    e.getPlayer().giveExp(e.getExpToDrop());
+                    if (info.isRare() && current.getState().getId() < 3) {
+                        e.getPlayer().sendMessage(mm.build("notify.cant_mine_now"));
+                        e.setCancelled(true);
+                        return;
+                    }
+
+                    CmnUtil.giveOrDrop(e.getPlayer(), e.getBlock().getDrops(mainHand, e.getPlayer()));
+
                     e.setExpToDrop(0);
+                    e.setDropItems(false);
+                    int exp = info.getXp();
+                    if (exp > 0) e.getPlayer().giveExp(exp);
 
-                    BlockData cloned = e.getBlock().getBlockData().clone(); // ブロックデータを複製
-                    Material typ = e.getBlock().getType();
-                    Bukkit.getScheduler().runTaskLater(plugin, () -> {
-                        e.getBlock().setType(typ); // クールダウン終了後再生成
-                        e.getBlock().setBlockData(cloned); // 複製したデータに変更
-                    }, NO_BLOCK_COOLDOWN.get(typ));
+                    new RegenerateBlockTask(info, e.getBlock().getType(), e.getBlock().getBlockData(), e.getBlock().getLocation())
+                            .runTaskTimer(ANNIPlugin.getInstance(), 0, 20);
                 }
                 else if (WOODS.contains(e.getBlock().getType())) { // 木の処理
                     RegionContainer rc = WorldGuard.getInstance().getPlatform().getRegionContainer();

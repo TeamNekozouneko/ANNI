@@ -30,11 +30,11 @@ public class MapManager {
             }
         }
         else {
+            plugin.getLogger().info("Loading: " + f);
             Gson gson = FileUtil.createGson();
             try (Reader r = Files.newBufferedReader(f.toPath(), StandardCharsets.UTF_8)) {
                 ANNIMap mp = gson.fromJson(r, ANNIMap.class);
                 maps.put(mp.getId(), mp);
-
             }
             catch (IOException e) { e.printStackTrace(); }
         }

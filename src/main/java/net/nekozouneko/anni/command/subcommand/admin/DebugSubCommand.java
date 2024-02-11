@@ -9,6 +9,7 @@ import net.nekozouneko.anni.command.ASubCommand;
 import net.nekozouneko.anni.kit.ANNIKit;
 import net.nekozouneko.anni.kit.custom.CustomKit;
 import net.nekozouneko.anni.kit.items.AirJump;
+import net.nekozouneko.anni.kit.items.GrapplingHook;
 import net.nekozouneko.anni.kit.items.StunGrenade;
 import net.nekozouneko.anni.listener.BlockBreakListener;
 import net.nekozouneko.anni.util.CmdUtil;
@@ -90,6 +91,10 @@ public class DebugSubCommand extends ASubCommand {
                         .map(Player::getName)
                         .collect(Collectors.joining(", "))
                 );
+                break;
+            }
+            case "get-grapple": {
+                ((Player) sender).getInventory().addItem(GrapplingHook.builder().build());
                 break;
             }
             default: return false;

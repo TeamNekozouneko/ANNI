@@ -1,5 +1,5 @@
 {
-  "version": "3",
+  "version": "11",
 
   "scoreboard.title": "&c&lANNI&9&lHI&a&lLA&e&lTION",
   "scoreboard.dateformat": "yyyy/MM/dd HH:mm",
@@ -119,6 +119,11 @@
 
   "gui.customkit_editor.title": "カスタムキットエディター ({0})",
 
+  "gui.point_charger.title": "ポイントチャージ",
+  "gui.point_charger.charged": "§a合計 §f{0}§f {1} ({2}個)をチャージしました",
+  "gui.point_charger.not_charged": "§c無効なアイテムもしくは何もないためチャージされませんでした。",
+  "gui.point_charger.charge": "§aポイントをチャージ",
+
   "gui.next_page": "&a次のページ",
   "gui.prev_page": "&a前のページ",
   "gui.random": "&fランダム",
@@ -145,6 +150,7 @@
   "command.err.kit_not_found": "&c「{0}」というキットは見つかりませんでした。",
   "command.err.material_not_defined": "&c「{0}」というマテリアルは存在しません。",
   "command.err.no_perm": "&c権限が不足しています。",
+  "command.err.region_not_found": "&c「{0}」という保護領域が見つかりませんでした。",
 
   "command.usage": "&c使用方法: {0}",
 
@@ -155,10 +161,10 @@
   "command.map.info.2": "&fワールド： {2}",
   "command.map.info.3": "&fアリーナで利用可能か： {3}",
   "command.map.info.4": "&fデフォルトスポーン地点： {4}",
-  "command.map.info.5": "&f赤チーム（ネクサス／スポーン地点）： &7{5} &f／ &7{9}",
-  "command.map.info.6": "&f青チーム（ネクサス／スポーン地点）： &7{6} &f／ &7{10}",
-  "command.map.info.7": "&f緑チーム（ネクサス／スポーン地点）： &7{7} &f／ &7{11}",
-  "command.map.info.8": "&f黄チーム（ネクサス／スポーン地点）： &7{8} &f／ &7{12}",
+  "command.map.info.5": "&f赤チーム（ネクサス／スポーン地点／拠点領域）： &7{5} &f／ &7{9} &f／ &7{13}",
+  "command.map.info.6": "&f青チーム（ネクサス／スポーン地点／拠点領域）： &7{6} &f／ &7{10} &f／ &7{14}",
+  "command.map.info.7": "&f緑チーム（ネクサス／スポーン地点／拠点領域）： &7{7} &f／ &7{11} &f／ &7{15}",
+  "command.map.info.8": "&f黄チーム（ネクサス／スポーン地点／拠点領域）： &7{8} &f／ &7{12} &f／ &7{16}",
 
   "command.map.info.2.avail": "&a利用可能",
   "command.map.info.2.not_avail": "&c利用不可",
@@ -217,7 +223,7 @@
   "notify.no_player_team": "&c「&r{0}&c」にオンラインのプレイヤーがいないため自動的に敗退しました。",
   "notify.lost_nexus_by_player": "「{0}」のネクサスは、{1} により失われました！",
   "notify.lost_nexus": "「{0}」のネクサスは失われました！",
-  "notify.cant_mine_now": "&cこのフェーズでは、「{0}&c」を採掘することはできません。",
+  "notify.cant_mine_now": "&cこのフェーズでは採掘することはできません。",
   "notify.draw": "&6生存チームが0以下のため引き分けとなります。",
   "notify.stun": "&cもちっと&fスタン&cしてしまった！",
   "notify.deposit_points": "&a+{0} {1}",
@@ -421,13 +427,45 @@
   "big.y.8": "&7▒▒▒▒&-▒▒&7▒▒▒▒&r {8}",
   "big.y.9": "&7▒▒▒▒▒▒▒▒▒▒&r {9}",
 
-  "kit.assault.name": "アサルトキット",
+  "kit.assault.name": "アサルト",
+  "kit.assault.about.0": "&7敵にどんどん突撃し、",
+  "kit.assault.about.1": "&7相手を疲弊させよう！",
+
   "kit.bow.name": "弓キット",
+  "kit.bow.about.0": "&7遠くから相手を撃ち、",
+  "kit.bow.about.1": "&7拠点から相手を離そう！",
+
   "kit.default.name": "標準キット",
+
   "kit.defense.name": "防衛キット",
-  "kit.mochimochi.name": "もちもちキット",
+  "kit.defense.about.0": "&7重装備で抵抗しながら、",
+  "kit.defense.about.1": "&7防衛の心で、相手のネクサス破壊から妨害しよう！",
+
+  "kit.mochimochi.name": "もちもち",
+  "kit.mochimochi.about.0": "&7もちっとスタングレネードを当てて、",
+  "kit.mochimochi.about.1": "&7敵の撤退を妨害しよう！",
+
   "kit.miner.name": "採掘師",
-  "kit.acrobat.name": "アクロバットキット",
+  "kit.miner.about.0": "&7通常より多くの鉱物を持ち帰って、",
+  "kit.miner.about.1": "&7味方を支援しよう！",
+
+  "kit.acrobat.name": "アクロバット",
+  "kit.acrobat.about.0": "&7落下耐性と空中ジャンプで考えられない移動をして、",
+  "kit.acrobat.about.1": "&7相手との距離を離そう！",
+
+  "kit.scouter.name": "偵察員",
+  "kit.scouter.about.0": "&7グラップリングフックで素早く移動し、",
+  "kit.scouter.about.1": "&7敵のアイテムを盗み出そう！",
+
+  "kit.chaser.name": "追撃屋",
+
+  "kit.worker.name": "ワーカーキット",
+  "kit.worker.about.0": "&7敵のネクサスにダメージを与えて、",
+  "kit.worker.about.1": "&7一定の確率で自分のネクサスを回復しよう！",
+
+  "kit.vampire.name": "吸血鬼キット",
+  "kit.vampire.about.0": "&7敵に直接攻撃して、",
+  "kit.vampire.about.1": "&7体力を吸い取ろう！",
 
   "item.stun_grenade.name": "&cもちっと&bスタングレネード",
   "item.stun_grenade.lore.0": "&7ある高齢の職人が作ったもちっとスタンさせるグレネード。",
@@ -440,11 +478,26 @@
   "item.airjump.name": "&b空中ジャンプ",
   "item.airjump.lore.0": "&7右クリックすることで大きなジャンプができる",
   "item.airjump.lore.1": "",
-  "item.airjump.lore.2": "&9クールダウン: 20秒",
+  "item.airjump.lore.2": "&9クールタイム: 20秒",
+
+  "item.grappling_hook.name": "&aグラップリングフック",
+  "item.grappling_hook.lore.0": "&7竿を投げ巻き戻すと竿のあった場所にめがけて飛ぶことができる。",
+  "item.grappling_hook.lore.1": "",
+  "item.grappling_hook.lore.2": "&9クールダウン：5秒",
+
+  "item.defense_artifact.name": "&d&l防衛の心",
+  "item.defense_artifact.lore.0": "&7防衛をするという強い意志が込められたもの。",
+  "item.defense_artifact.lore.1": "&9効果時間： 20秒",
+  "item.defense_artifact.lore.2": "&9クールタイム： 60秒",
+  "item.defense_artifact_lore.3": "",
+  "item.defense_artifact_lore.4": "&9効果：",
+  "item.defense_artifact.lore.5": "&9* 近くの敵の視界が一瞬真っ暗",
+  "item.defense_artifact.lore.6": "&9* 近くの敵の攻撃力が10秒間低下",
 
   "actionbar.nexus_alert": "&c{0} によってネクサスが破壊されています！",
   "actionbar.spectator_mode": "&7観戦モード",
   "actionbar.cooldown_stats": "&cあと{0}秒後使用できます。",
+  "actionbar.out_of_team_region": "&cチームの領域外のため利用できません。",
 
   "chat.global": "{0}&a:&f {1}",
   "chat.global.format": "{0}%s&a:&f %s",

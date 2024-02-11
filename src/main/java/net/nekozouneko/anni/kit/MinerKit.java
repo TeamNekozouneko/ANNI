@@ -1,19 +1,19 @@
 package net.nekozouneko.anni.kit;
 
+import net.nekozouneko.anni.ANNIPlugin;
 import net.nekozouneko.commons.spigot.inventory.ItemStackBuilder;
 import net.nekozouneko.commons.spigot.inventory.special.LeatherArmorBuilder;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.Collections;
-
-public class MinerKit extends AbsANNIKit {
+public class MinerKit extends AbstractKit {
 
     public MinerKit() {
         super(
                 "miner", "MNR", "kit.miner.name",
-                Material.IRON_PICKAXE.name(), Collections.emptyList()
+                Material.IRON_PICKAXE.name(),
+                ANNIPlugin.getInstance().getMessageManager().buildList("kit.miner.about")
         );
     }
 

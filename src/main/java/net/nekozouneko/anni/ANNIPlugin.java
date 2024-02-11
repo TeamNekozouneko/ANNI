@@ -8,6 +8,8 @@ import net.nekozouneko.anni.board.BoardManager;
 import net.nekozouneko.anni.command.*;
 import net.nekozouneko.anni.kit.custom.CustomKitManager;
 import net.nekozouneko.anni.kit.items.AirJump;
+import net.nekozouneko.anni.kit.items.DefenseArtifact;
+import net.nekozouneko.anni.kit.items.GrapplingHook;
 import net.nekozouneko.anni.kit.items.StunGrenade;
 import net.nekozouneko.anni.listener.*;
 import net.nekozouneko.anni.listener.votifier.VotifierListener;
@@ -34,7 +36,7 @@ import java.util.Map;
 
 public final class ANNIPlugin extends JavaPlugin {
 
-    public static final String LATEST_MESSAGE_VERSION = "0";
+    public static final String LATEST_MESSAGE_VERSION = "11";
     private static ANNIPlugin plugin;
 
     public static ANNIPlugin getInstance() {
@@ -101,7 +103,14 @@ public final class ANNIPlugin extends JavaPlugin {
 
         mapManager.load(defaultMapsDir);
 
-        lobby = FileUtil.readGson(new File(getDataFolder(), "lobby.json"), Location.class);
+        try {
+            lobby = FileUtil.readGson(new File(getDataFolder(), "lobby.json"), Location.class);
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+            lobby = null;
+            getLogger().warning("Lobby is not set!");
+        }
 
         pluginBoard = getServer().getScoreboardManager().getNewScoreboard();
 
@@ -126,6 +135,8 @@ public final class ANNIPlugin extends JavaPlugin {
 
         getServer().getPluginManager().registerEvents(new StunGrenade(), this);
         getServer().getPluginManager().registerEvents(new AirJump(), this);
+        getServer().getPluginManager().registerEvents(new GrapplingHook(), this);
+        getServer().getPluginManager().registerEvents(new DefenseArtifact(), this);
 
         currentGame = new ANNIArena(this, "current");
         spectatorTask = new SpectatorTask();

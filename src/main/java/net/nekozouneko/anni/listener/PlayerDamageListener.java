@@ -3,9 +3,13 @@ package net.nekozouneko.anni.listener;
 import net.nekozouneko.anni.ANNIPlugin;
 import net.nekozouneko.anni.arena.spectator.SpectatorManager;
 import net.nekozouneko.anni.kit.ANNIKit;
+import net.nekozouneko.anni.kit.items.GrapplingHook;
 import net.nekozouneko.anni.message.MessageManager;
+import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.attribute.Attribute;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -24,6 +28,12 @@ public class PlayerDamageListener implements Listener {
             Material.STONE_AXE, Material.DIAMOND_AXE,
             Material.WOODEN_AXE, Material.STONE_AXE,
             Material.NETHERITE_AXE, Material.IRON_AXE
+    );
+
+    private static final List<EntityDamageEvent.DamageCause> DIRECT_ATTACK_CAUSES = Arrays.asList(
+            EntityDamageEvent.DamageCause.ENTITY_ATTACK,
+            EntityDamageEvent.DamageCause.ENTITY_SWEEP_ATTACK,
+            EntityDamageEvent.DamageCause.THORNS
     );
 
     public static boolean isFighting(Player player) {
@@ -53,10 +63,19 @@ public class PlayerDamageListener implements Listener {
             }
 
             if (ANNIPlugin.getInstance().getCurrentGame().getState().getId() >= 0) {
-                if (ANNIPlugin.getInstance().getCurrentGame().getKit(p).equals(ANNIKit.ACROBAT.getKit())) {
-                    if (e.getCause() == EntityDamageEvent.DamageCause.FALL) {
-                        e.setCancelled(true);
-                        return;
+                switch (ANNIKit.get(ANNIPlugin.getInstance().getCurrentGame().getKit(p))) {
+                    case ACROBAT: {
+                        if (e.getCause() == EntityDamageEvent.DamageCause.FALL) {
+                            e.setCancelled(true);
+                            return;
+                        }
+                        break;
+                    }
+                    case SCOUTER: {
+                        if (e.getCause() != EntityDamageEvent.DamageCause.FALL) {
+                            GrapplingHook.addCooldown(p.getUniqueId(), 5000);
+                        }
+                        break;
                     }
                 }
 
@@ -77,12 +96,31 @@ public class PlayerDamageListener implements Listener {
             // 斧で攻撃した場合
             if (AXES.contains(main.getType())) {
                 // 4ダメージより上なら4ダメージを減らして0.4 * ダメージ増加 (ない場合0)のレベル減らしてそうではないならそのまま通す
-                e.setDamage(e.getDamage() > 4 ? e.getDamage() - 4 - (0.4 * main.getEnchantmentLevel(Enchantment.DAMAGE_ALL)) : e.getDamage());
+                e.setDamage(Math.max(e.getDamage() > 2 ? e.getDamage() - 4 - (0.5 * main.getEnchantmentLevel(Enchantment.DAMAGE_ALL)) : e.getDamage(), 0));
             }
-        }
 
-        if (e.getDamager() instanceof Player && e.getEntity() instanceof Player) {
-            fighting.put(e.getEntity().getUniqueId(), System.currentTimeMillis() + 10000);
+            if (ANNIKit.get(ANNIPlugin.getInstance().getCurrentGame().getKit(damager)) == ANNIKit.VAMPIRE) {
+                if (DIRECT_ATTACK_CAUSES.contains(e.getCause()) && new Random().nextDouble() >= 0.60) {
+                    damager.getWorld().playSound(e.getEntity().getLocation(), Sound.BLOCK_HONEY_BLOCK_SLIDE, 1, 0);
+
+                    Location particlePos = e.getEntity().getLocation().clone();
+                    particlePos.setY(particlePos.getY() + 1);
+
+                    e.getEntity().getWorld().spawnParticle(
+                            Particle.BLOCK_DUST, particlePos,
+                            100, .1, .25, .1, 1,
+                            Material.REDSTONE_BLOCK.createBlockData()
+                    );
+                    damager.setHealth(Math.min(
+                            damager.getHealth() + Math.min((e.getDamage() * ((double) (new Random().nextInt(25) + 10) / 100)), 3),
+                            damager.getAttribute(Attribute.GENERIC_MAX_HEALTH) != null ? damager.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue() : 20D
+                    ));
+                }
+            }
+
+            if (e.getEntity() instanceof Player) {
+                fighting.put(e.getEntity().getUniqueId(), System.currentTimeMillis() + 10000);
+            }
         }
     }
 

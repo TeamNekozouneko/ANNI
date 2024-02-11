@@ -1,5 +1,9 @@
 package net.nekozouneko.anni.command.subcommand.admin;
 
+import com.google.common.base.Enums;
+import com.sk89q.worldedit.bukkit.BukkitAdapter;
+import com.sk89q.worldguard.WorldGuard;
+import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import net.nekozouneko.anni.ANNIPlugin;
 import net.nekozouneko.anni.arena.team.ANNITeam;
 import net.nekozouneko.anni.command.ASubCommand;
@@ -28,7 +32,7 @@ public class MapSubCommand extends ASubCommand {
 
     @Override
     public boolean execute(CommandSender sender, List<String> args) {
-        if (args.size() == 0) {
+        if (args.isEmpty()) {
             if (sender instanceof Player) {
                 new MapSelector(ANNIPlugin.getInstance(), (Player) sender, 1, false, (map) -> {
                     if (map != null)
@@ -71,7 +75,11 @@ public class MapSubCommand extends ASubCommand {
                     infoSpawnLoc(map, ANNITeam.RED),
                     infoSpawnLoc(map, ANNITeam.BLUE),
                     infoSpawnLoc(map, ANNITeam.GREEN),
-                    infoSpawnLoc(map, ANNITeam.YELLOW)
+                    infoSpawnLoc(map, ANNITeam.YELLOW),
+                    infoTeamRegion(map, ANNITeam.RED),
+                    infoTeamRegion(map, ANNITeam.BLUE),
+                    infoTeamRegion(map, ANNITeam.GREEN),
+                    infoTeamRegion(map, ANNITeam.YELLOW)
             ));
         }
         else { // other
@@ -151,6 +159,32 @@ public class MapSubCommand extends ASubCommand {
                             );
                     break;
                 }
+                case "region": {
+                    if (args.size() < 4) return false;
+
+                    ANNITeam at = Enums.getIfPresent(ANNITeam.class, args.get(2)).orNull();
+
+                    if (at == null) {
+                        sender.sendMessage(mem.build("command.err.team_undefined", args.get(2)));
+                        return true;
+                    }
+
+                    String region = args.get(3);
+
+                    ProtectedRegion pr = WorldGuard.getInstance().getPlatform().getRegionContainer()
+                            .get(BukkitAdapter.adapt(map.getBukkitWorld()))
+                            .getRegion(region);
+
+                    if (pr == null) {
+                        sender.sendMessage(mem.build("command.err.region_not_found", args.get(3)));
+                        return true;
+                    }
+
+                    map.setTeamRegion(at, region);
+                    FileUtil.writeGson(new File(plugin.getMapsDir(), map.getId() + ".json"), map, ANNIMap.class);
+                    plugin.getMapManager().reload();
+                    break;
+                }
                 default: return false;
             }
         }
@@ -168,10 +202,10 @@ public class MapSubCommand extends ASubCommand {
             );
         }
         else if (args.size() == 2) {
-            return CmdUtil.simpleTabComplete(args.get(1), "defaultspawn", "delete", "editor", "nexus", "spawn");
+            return CmdUtil.simpleTabComplete(args.get(1), "defaultspawn", "delete", "editor", "nexus", "region", "spawn");
         }
         else if (args.size() == 3) {
-            if (args.get(1).equals("nexus") || args.get(1).equals("spawn")) {
+            if (args.get(1).equals("nexus") || args.get(1).equals("spawn") || args.get(1).equals("region")) {
                 return CmdUtil.simpleTabComplete(
                         args.get(2),
                         Arrays.stream(ANNITeam.values())
@@ -196,6 +230,10 @@ public class MapSubCommand extends ASubCommand {
     private String infoSpawnLoc(ANNIMap map, ANNITeam team) {
         SpawnLocation sl = map.getSpawn(team);
         return sl != null ? mem.yawPitchLocationFormat(sl) : mem.build("command.map.info.unset");
+    }
+
+    private String infoTeamRegion(ANNIMap map, ANNITeam team) {
+        return map.getTeamRegion(team) == null ? mem.build("command.map.info.unset") : map.getTeamRegion(team);
     }
 
 }

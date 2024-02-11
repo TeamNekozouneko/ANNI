@@ -47,7 +47,6 @@ commands:
     aliases: [redeploy, kill]
     description: "Suicide command"
     permission: anniv2.command.suicide
-
     usage: "/<command>"
   point:
     description: "Point command"

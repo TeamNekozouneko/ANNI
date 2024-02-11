@@ -7,6 +7,7 @@ import net.nekozouneko.anni.message.MessageManager;
 import net.nekozouneko.commons.spigot.inventory.ItemStackBuilder;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
+import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -23,6 +24,7 @@ import java.util.UUID;
 
 public class AirJump implements Listener {
 
+    public static final long DEFAULT_COOLTIME = 10000;
     private static final Map<UUID, Long> COOLDOWN = new HashMap<>();
 
     public static void setCooldown(UUID target, Long end) {
@@ -61,11 +63,17 @@ public class AirJump implements Listener {
             ) {
                 e.setCancelled(true);
                 if (isCooldownEnd(e.getPlayer().getUniqueId())) {
-                    setCooldown(e.getPlayer().getUniqueId(), System.currentTimeMillis() + 15000);
+                    setCooldown(e.getPlayer().getUniqueId(), System.currentTimeMillis() + DEFAULT_COOLTIME);
                     e.getPlayer().getWorld().playSound(
                             e.getPlayer().getLocation(), Sound.ENTITY_WITHER_SHOOT, 1, 2
                     );
-                    e.getPlayer().setVelocity(e.getPlayer().getLocation().getDirection().setY(0.75));
+                    e.getPlayer().getWorld().spawnParticle(
+                            Particle.CLOUD, e.getPlayer().getLocation(), 50, .5, .5, .5, .1
+                    );
+                    e.getPlayer().getWorld().spawnParticle(
+                            Particle.SMOKE_NORMAL, e.getPlayer().getLocation(), 50, .5, .5, .5, .1
+                    );
+                    e.getPlayer().setVelocity(e.getPlayer().getLocation().getDirection().setY(1));
                 }
                 else {
                     e.getPlayer().spigot().sendMessage(ChatMessageType.ACTION_BAR,

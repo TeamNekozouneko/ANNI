@@ -3,6 +3,7 @@ package net.nekozouneko.anni.arena.team;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import com.google.gson.annotations.SerializedName;
+import lombok.Getter;
 import net.md_5.bungee.api.ChatColor;
 import net.nekozouneko.anni.ANNIPlugin;
 
@@ -11,18 +12,19 @@ import java.util.Map;
 
 public enum ANNITeam {
 
-    @SerializedName("red")
+    @SerializedName("RED")
     RED("team.red.display", "team.red.prefix", ChatColor.RED, 'r'),
-    @SerializedName("blue")
+    @SerializedName("BLUE")
     BLUE("team.blue.display", "team.blue.prefix", ChatColor.BLUE, 'b'),
-    @SerializedName("green")
+    @SerializedName("GREEN")
     GREEN("team.green.display", "team.green.prefix", ChatColor.GREEN, 'g'),
-    @SerializedName("yellow")
+    @SerializedName("YELLOW")
     YELLOW("team.yellow.display", "team.yellow.prefix", ChatColor.YELLOW, 'y');
 
     private final String name;
     private final String prefix;
     private final ChatColor cc;
+    @Getter
     private final char bigChar;
 
     private ANNITeam(String name, String prefix, ChatColor cc, char bigChar) {
@@ -72,10 +74,6 @@ public enum ANNITeam {
         }
 
         throw new RuntimeException(iae);
-    }
-
-    public char getBigChar() {
-        return bigChar;
     }
 
 }

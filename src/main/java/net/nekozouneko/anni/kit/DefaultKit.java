@@ -7,7 +7,7 @@ import org.bukkit.inventory.ItemStack;
 
 import java.util.Collections;
 
-public class DefaultKit extends AbsANNIKit{
+public class DefaultKit extends AbstractKit {
 
     DefaultKit() {
         super(

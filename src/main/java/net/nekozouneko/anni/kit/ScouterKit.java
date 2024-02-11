@@ -1,20 +1,18 @@
 package net.nekozouneko.anni.kit;
 
 import net.nekozouneko.anni.ANNIPlugin;
+import net.nekozouneko.anni.kit.items.GrapplingHook;
 import net.nekozouneko.commons.spigot.inventory.ItemStackBuilder;
 import net.nekozouneko.commons.spigot.inventory.special.LeatherArmorBuilder;
 import org.bukkit.Material;
-import org.bukkit.enchantments.Enchantment;
+import org.bukkit.NamespacedKey;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.persistence.PersistentDataType;
 
-public class BowKit extends AbstractKit {
+public class ScouterKit extends AbstractKit {
 
-    BowKit() {
-        super(
-                "bow", "BOW", "kit.bow.name",
-                Material.BOW.name(),
-                ANNIPlugin.getInstance().getMessageManager().buildList("kit.bow.about")
-        );
+    ScouterKit() {
+        super("scouter", "SCT", "kit.scouter.name", Material.SPYGLASS.name(), ANNIPlugin.getInstance().getMessageManager().buildList("kit.scouter.about"));
     }
 
     @Override
@@ -25,12 +23,9 @@ public class BowKit extends AbstractKit {
         inv[1] = ItemStackBuilder.of(Material.STONE_PICKAXE).build();
         inv[2] = ItemStackBuilder.of(Material.STONE_AXE).build();
         inv[3] = ItemStackBuilder.of(Material.STONE_SHOVEL).build();
-        inv[4] = ItemStackBuilder.of(Material.BOW)
-                .enchant(Enchantment.DURABILITY, 3, false)
-                .build();
-        inv[8] = ItemStackBuilder.of(Material.BREAD).amount(16).build();
-        inv[9] = ItemStackBuilder.of(Material.ARROW)
-                .amount(32)
+        inv[7] = ItemStackBuilder.of(Material.BREAD).amount(16).build();
+        inv[8] = GrapplingHook.builder()
+                .persistentData(new NamespacedKey(ANNIPlugin.getInstance(), "no-remove"), PersistentDataType.INTEGER, 1)
                 .build();
 
         inv[39] = LeatherArmorBuilder.of(Material.LEATHER_HELMET).build();

@@ -22,7 +22,10 @@ public enum ANNIKit {
     DEFAULT(new DefaultKit()),
     DEFENSE(new DefenseKit()),
     MOCHI_MOCHI(new MochiMochiKit()),
-    MINER(new MinerKit());
+    MINER(new MinerKit()),
+    SCOUTER(new ScouterKit()),
+    WORKER(new WorkerKit()),
+    VAMPIRE(new VampireKit());
 
     private static final Map<String, ANNIKit> ID_MAP = new HashMap<>();
 
@@ -34,15 +37,18 @@ public enum ANNIKit {
         ID_MAP.put(DEFENSE.getKit().getId(), DEFENSE);
         ID_MAP.put(MOCHI_MOCHI.getKit().getId(), MOCHI_MOCHI);
         ID_MAP.put(MINER.getKit().getId(), MINER);
+        ID_MAP.put(SCOUTER.getKit().getId(), SCOUTER);
+        ID_MAP.put(WORKER.getKit().getId(), WORKER);
+        ID_MAP.put(VAMPIRE.getKit().getId(), VAMPIRE);
     }
 
-    private final AbsANNIKit kit;
+    private final AbstractKit kit;
 
-    private ANNIKit(AbsANNIKit kit) {
+    private ANNIKit(AbstractKit kit) {
         this.kit = kit;
     }
 
-    public AbsANNIKit getKit() {
+    public AbstractKit getKit() {
         return kit;
     }
 
@@ -50,24 +56,24 @@ public enum ANNIKit {
         return ID_MAP.getOrDefault(id, DEFAULT);
     }
 
-    public static AbsANNIKit getAbsKitOrCustomById(String id) {
+    public static AbstractKit getAbsKitOrCustomById(String id) {
         return ANNIPlugin.getInstance().getCustomKitManager().getKit(id) != null ? ANNIPlugin.getInstance().getCustomKitManager().getKit(id) : getKitById(id).getKit();
     }
 
-    public static boolean isDefaultKit(AbsANNIKit kit) {
+    public static boolean isDefaultKit(AbstractKit kit) {
         return Arrays.stream(values())
                 .map(ANNIKit::getKit)
                 .anyMatch(kit::equals);
     }
 
-    public static ANNIKit get(AbsANNIKit kit) {
+    public static ANNIKit get(AbstractKit kit) {
         for (ANNIKit k : values()) {
             if (k.getKit().equals(kit)) return k;
         }
         return DEFAULT;
     }
 
-    public static ItemStack[] teamColor(AbsANNIKit kit, ANNITeam team) {
+    public static ItemStack[] teamColor(AbstractKit kit, ANNITeam team) {
         ItemStack[] arr = Arrays.copyOf(kit.getKitContents(), kit.getKitContents().length);
         for (ItemStack is : arr) {
             if (is == null) continue;

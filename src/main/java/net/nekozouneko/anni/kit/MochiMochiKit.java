@@ -9,14 +9,13 @@ import org.bukkit.NamespacedKey;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.persistence.PersistentDataType;
 
-import java.util.Collections;
-
-public class MochiMochiKit extends AbsANNIKit{
+public class MochiMochiKit extends AbstractKit {
 
     MochiMochiKit() {
         super(
                 "mochimochi", "MOC", "kit.mochimochi.name",
-                Material.HONEY_BLOCK.name(), Collections.emptyList()
+                Material.HONEY_BLOCK.name(),
+                ANNIPlugin.getInstance().getMessageManager().buildList("kit.mochimochi.about")
         );
     }
 

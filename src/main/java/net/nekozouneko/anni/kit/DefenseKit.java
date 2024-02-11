@@ -1,18 +1,21 @@
 package net.nekozouneko.anni.kit;
 
+import net.nekozouneko.anni.ANNIPlugin;
+import net.nekozouneko.anni.kit.items.DefenseArtifact;
 import net.nekozouneko.commons.spigot.inventory.ItemStackBuilder;
 import net.nekozouneko.commons.spigot.inventory.special.LeatherArmorBuilder;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.persistence.PersistentDataType;
 
-import java.util.Collections;
-
-public class DefenseKit extends AbsANNIKit{
+public class DefenseKit extends AbstractKit {
 
     DefenseKit() {
         super(
                 "defense", "DEF", "kit.defense.name",
-                Material.SHIELD.name(), Collections.emptyList()
+                Material.SHIELD.name(),
+                ANNIPlugin.getInstance().getMessageManager().buildList("kit.defense.about")
         );
     }
 
@@ -25,14 +28,15 @@ public class DefenseKit extends AbsANNIKit{
         inv[2] = ItemStackBuilder.of(Material.STONE_AXE).build();
         inv[3] = ItemStackBuilder.of(Material.STONE_SHOVEL).build();
 
-        inv[8] = ItemStackBuilder.of(Material.BREAD).amount(16).build();
+        inv[7] = ItemStackBuilder.of(Material.BREAD).amount(16).build();
+        inv[8] = DefenseArtifact.builder()
+                .persistentData(new NamespacedKey(ANNIPlugin.getInstance(), "no-remove"), PersistentDataType.INTEGER, 1)
+                .build();
 
         inv[39] = LeatherArmorBuilder.of(Material.CHAINMAIL_HELMET).build();
         inv[38] = LeatherArmorBuilder.of(Material.LEATHER_CHESTPLATE).build();
         inv[37] = LeatherArmorBuilder.of(Material.CHAINMAIL_LEGGINGS).build();
         inv[36] = LeatherArmorBuilder.of(Material.CHAINMAIL_BOOTS).build();
-
-        inv[40] = ItemStackBuilder.of(Material.SHIELD).build();
 
         return inv;
     }

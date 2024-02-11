@@ -22,7 +22,9 @@ import net.nekozouneko.anni.arena.spectator.SpectatorManager;
 import net.nekozouneko.anni.arena.team.ANNITeam;
 import net.nekozouneko.anni.board.BoardManager;
 import net.nekozouneko.anni.kit.ANNIKit;
-import net.nekozouneko.anni.kit.AbsANNIKit;
+import net.nekozouneko.anni.kit.AbstractKit;
+import net.nekozouneko.anni.kit.items.DefenseArtifact;
+import net.nekozouneko.anni.listener.PlayerDamageListener;
 import net.nekozouneko.anni.map.ANNIMap;
 import net.nekozouneko.anni.message.MessageManager;
 import net.nekozouneko.anni.util.CmnUtil;
@@ -126,7 +128,10 @@ public class ANNIArena extends BukkitRunnable {
         if (getState().getId() > 0) {
             SaveData sd = savedData.remove(player.getUniqueId());
             if (sd != null) setTeam(player, sd.getTeam());
-            else assignPlayer(player);
+            else {
+                Players.clearPotionEffects(player);
+                assignPlayer(player);
+            }
             if (!isNexusLost(getTeamByPlayer(player))) {
                 player.teleport(map.getSpawnOrDefault(getTeamByPlayer(player)).toLocation(copy));
                 ANNITeam at = getTeamByPlayer(player);
@@ -154,7 +159,7 @@ public class ANNIArena extends BukkitRunnable {
     public void leave(Player player) {
         players.remove(player);
 
-        if (state.getId() > 0 && getTeamByPlayer(player) != null/*&& !PlayerDamageListener.isFighting(player)*/) {
+        if (state.getId() > 0 && getTeamByPlayer(player) != null && !PlayerDamageListener.isFighting(player)) {
             savedData.put(
                     player.getUniqueId(),
                     new SaveData(
@@ -327,7 +332,13 @@ public class ANNIArena extends BukkitRunnable {
             nexus.put(team, health <= 0 ? null : health);
 
             if (player != null) {
-                bb.setProgress(1);
+                double leftHealth = CmnUtil.bossBarProgress(ANNIConfig.getDefaultHealth(), health);
+                if (leftHealth <= 0.2) bb.setColor(BarColor.RED);
+                else if (leftHealth <= 0.5) bb.setColor(BarColor.YELLOW);
+                else bb.setColor(BarColor.GREEN);
+
+                bb.setProgress(leftHealth);
+
                 bb.setTitle(ANNIPlugin.getInstance().getMessageManager().build(
                         "bossbar.damaged_nexus",
                         player.getName(), team.getTeamName()
@@ -338,6 +349,12 @@ public class ANNIArena extends BukkitRunnable {
                     ));
                     p1.playSound(p1.getLocation(), Sound.BLOCK_NOTE_BLOCK_HARP, 1, 2);
                 });
+
+                if (ANNIKit.get(getKit(player)) == ANNIKit.WORKER && !isNexusLost(getTeamByPlayer(player))) {
+                    if (rand.nextDouble() > 0.90) {
+                        healNexusHealth(getTeamByPlayer(player), 1);
+                    }
+                }
             }
             else {
                 getTeamPlayers(team).forEach(p1 -> p1.playSound(p1.getLocation(), Sound.BLOCK_NOTE_BLOCK_HARP, 1, 2));
@@ -544,6 +561,7 @@ public class ANNIArena extends BukkitRunnable {
             players.forEach(player -> {
                 player.spigot().respawn();
                 initPlayer(player);
+                Players.clearPotionEffects(player);
                 player.teleport(plugin.getLobby());
             });
             log.info("Removing player from team...");
@@ -554,6 +572,8 @@ public class ANNIArena extends BukkitRunnable {
 
             log.info("Showing spectators...");
             SpectatorManager.clear();
+            log.info("Cancelling tasks...");
+            DefenseArtifact.cancelAllTasks();
             log.info("Initializing nexus...");
             nexus.clear();
             log.info("Initializing map...");
@@ -600,17 +620,21 @@ public class ANNIArena extends BukkitRunnable {
         plugin.getLogger().info(message);
     }
 
-    public void setKit(Player player, AbsANNIKit ki) {
+    public void setKit(Player player, AbstractKit ki) {
         kit.put(player.getUniqueId(), ki.getId());
     }
 
-    public AbsANNIKit getKit(Player player) {
+    public AbstractKit getKit(Player player) {
         String id = kit.get(player.getUniqueId());
         return ANNIKit.getAbsKitOrCustomById(id);
     }
 
     @Override
     public void run() {
+        if (isEnabledTimer() && timer > 0) {
+            timer--;
+        }
+
         if (state == ArenaState.WAITING || state == ArenaState.STARTING) {
             players.forEach(player -> {
                 Players.healExhaustion(player);
@@ -646,7 +670,7 @@ public class ANNIArena extends BukkitRunnable {
 
         updateBossBar();
         updateScoreboard();
-        tickTimer();
+        updatePhase();
 
         if (state.getId() >= 0) {
             if (state.getId() > 0) {
@@ -720,6 +744,7 @@ public class ANNIArena extends BukkitRunnable {
     private void updateBossBar() {
         players.forEach(bb::addPlayer);
 
+        bb.setColor(BarColor.BLUE);
         switch (state) {
             case PHASE_ONE:
             case PHASE_TWO:
@@ -857,11 +882,7 @@ public class ANNIArena extends BukkitRunnable {
         return getNexusHealth(team) != null ? getNexusHealth(team) : 0;
     }
 
-    private void tickTimer() {
-        if (isEnabledTimer() && timer > 0) {
-            timer--;
-        }
-
+    private void updatePhase() {
         switch (state) {
             case WAITING: {
                 if (players.size() >= getTeams().size() * 2) {
