@@ -15,36 +15,40 @@ commands:
   anni-admin:
     aliases: ["anniadmin"]
     description: "ANNI administration command"
-    permission: anniv2.command.admin
+    permission: anni.command.admin
     usage: "/<command> (arena|createMap|debug|map|set-lobby) <args>"
   anni:
     description: "ANNI command"
-    permission: anniv2.command.anni
+    permission: anni.command.anni
     usage: "/<command> (help|version)"
   combat-shop:
     aliases: ["cshop", "shop-combat"]
     description: "Combat Shop command"
-    permission: "anniv2.command.combatshop"
+    permission: "anni.command.combatshop"
     usage: "/<command>"
   potion-shop:
     aliases: ["pshop", "shop-potion"]
     description: "Potion Shop Command"
-    permission: "anniv2.command.potionshop"
+    permission: "anni.command.potionshop"
     usage: "/<command>"
   vote:
     description: "Vote command"
-    permission: anniv2.command.vote
+    permission: anni.command.vote
     usage: "/<command> <map>"
   kit:
     description: "Kit command"
-    permission: anniv2.command.kit
+    permission: anni.command.kit
     usage: "/<command>"
   suicide:
     aliases: [redeploy, kill]
     description: "Suicide command"
-    permission: anniv2.command.suicide
+    permission: anni.command.suicide
     usage: "/<command>"
   point:
     description: "Point command"
-    permission: anniv2.command.point
+    permission: anni.command.point
     usage: "/<command> [target]"
+  charge:
+    description: "Charge command"
+    permission: anni.command.charge
+    usage: "/<command>"
