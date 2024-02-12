@@ -40,8 +40,12 @@ import org.bukkit.block.Block;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
 import org.bukkit.boss.KeyedBossBar;
+import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Firework;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.FireworkMeta;
+import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -350,10 +354,39 @@ public class ANNIArena extends BukkitRunnable {
                     p1.playSound(p1.getLocation(), Sound.BLOCK_NOTE_BLOCK_HARP, 1, 2);
                 });
 
+                VaultUtil.ifAvail((eco) -> {
+                    if (getTeamByPlayer(player) == null) return;
+
+                    getTeamPlayers(getTeamByPlayer(player)).forEach(teammate -> {
+                        eco.depositPlayer(teammate, 10);
+                        teammate.sendMessage(
+                                mm.build("notify.deposit_points", "10", mm.build("gui.shop.full_ext"))
+                        );
+                    });
+                });
+
                 if (ANNIKit.get(getKit(player)) == ANNIKit.WORKER && !isNexusLost(getTeamByPlayer(player))) {
-                    if (rand.nextDouble() > 0.90) {
-                        healNexusHealth(getTeamByPlayer(player), 1);
+                    boolean isPass;
+                    switch (getState()) {
+                        case PHASE_TWO: {
+                            isPass = rand.nextDouble() >= 0.70;
+                            break;
+                        }
+                        case PHASE_THREE: {
+                            isPass = rand.nextDouble() >= 0.80;
+                            break;
+                        }
+                        case PHASE_FOUR: {
+                            isPass = rand.nextDouble() >= 0.85;
+                            break;
+                        }
+                        default: {
+                            isPass = false;
+                            break;
+                        }
                     }
+
+                    if (isPass) healNexusHealth(getTeamByPlayer(player), 1);
                 }
             }
             else {
@@ -672,6 +705,8 @@ public class ANNIArena extends BukkitRunnable {
         updateScoreboard();
         updatePhase();
 
+        if (state == ArenaState.GAME_OVER) launchFireworkRocket();
+
         if (state.getId() >= 0) {
             if (state.getId() > 0) {
                 // プレイヤー数が0のチームを退場させる
@@ -949,6 +984,50 @@ public class ANNIArena extends BukkitRunnable {
                 }
                 break;
         }
+    }
+
+    private void launchFireworkRocket() {
+        Map<ANNITeam, Color> colorMap = new HashMap<>();
+        colorMap.put(ANNITeam.RED, Color.RED);
+        colorMap.put(ANNITeam.BLUE, Color.BLUE);
+        colorMap.put(ANNITeam.GREEN, Color.GREEN);
+        colorMap.put(ANNITeam.YELLOW, Color.YELLOW);
+
+        List<ANNITeam> living = getTeams().keySet().stream()
+                .filter(team -> !isNexusLost(team))
+                .collect(Collectors.toList());
+
+        if (living.size() != 1) return;
+
+        getTeamPlayers(living.get(0)).forEach(winner -> {
+            if (winner.getWorld() != copy) return;
+
+            Firework fw = (Firework) copy.spawnEntity(winner.getLocation(), EntityType.FIREWORK);
+
+            fw.getPersistentDataContainer().set(
+                    new NamespacedKey(plugin, "winner-rocket"),
+                    PersistentDataType.INTEGER, 1
+            );
+
+            FireworkMeta fm = fw.getFireworkMeta();
+
+            fm.addEffect(
+                    rand.nextBoolean() ?
+                            FireworkEffect.builder()
+                                    .with(FireworkEffect.Type.BALL)
+                                    .withColor(colorMap.get(living.get(0)))
+                                    .build()
+                            :
+                            FireworkEffect.builder()
+                                    .with(FireworkEffect.Type.BALL)
+                                    .withFlicker()
+                                    .withColor(colorMap.get(living.get(0)))
+                                    .build()
+            );
+            fm.setPower(1);
+
+            fw.setFireworkMeta(fm);
+        });
     }
 
     private void assignPlayer(Player player) {
