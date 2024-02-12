@@ -1,22 +1,22 @@
 package net.nekozouneko.anni.listener;
 
 import net.nekozouneko.anni.ANNIPlugin;
+import net.nekozouneko.anni.arena.ArenaState;
 import net.nekozouneko.anni.arena.spectator.SpectatorManager;
 import net.nekozouneko.anni.kit.ANNIKit;
 import net.nekozouneko.anni.kit.items.GrapplingHook;
 import net.nekozouneko.anni.message.MessageManager;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.Particle;
-import org.bukkit.Sound;
+import org.bukkit.*;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.entity.Firework;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.potion.PotionEffectType;
 
 import java.util.*;
@@ -90,7 +90,19 @@ public class PlayerDamageListener implements Listener {
 
     @EventHandler(ignoreCancelled = true)
     public void onDamageByEntity(EntityDamageByEntityEvent e) {
+        if (e.getDamager() instanceof Firework) {
+            boolean isWinnerRocket = e.getDamager().getPersistentDataContainer().getOrDefault(new NamespacedKey(plugin, "winner-rocket"), PersistentDataType.INTEGER, 0) == 1;
+
+            if (isWinnerRocket) e.setCancelled(true);
+            return;
+        }
+
         if (e.getDamager() instanceof Player) {
+            if (ANNIPlugin.getInstance().getCurrentGame().getState() == ArenaState.GAME_OVER) {
+                e.setCancelled(true);
+                return;
+            }
+
             Player damager = (Player) e.getDamager();
             ItemStack main = damager.getInventory().getItemInMainHand();
             // 斧で攻撃した場合
