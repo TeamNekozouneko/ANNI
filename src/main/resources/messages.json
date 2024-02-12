@@ -1,5 +1,5 @@
 {
-  "version": "11",
+  "version": "12",
 
   "scoreboard.title": "&c&lANNI&9&lHI&a&lLA&e&lTION",
   "scoreboard.dateformat": "yyyy/MM/dd HH:mm",
@@ -120,7 +120,7 @@
   "gui.customkit_editor.title": "カスタムキットエディター ({0})",
 
   "gui.point_charger.title": "ポイントチャージ",
-  "gui.point_charger.charged": "§a合計 §f{0}§f {1} ({2}個)をチャージしました",
+  "gui.point_charger.charged": "§a合計 §f{0}§f {1}をチャージしました",
   "gui.point_charger.not_charged": "§c無効なアイテムもしくは何もないためチャージされませんでした。",
   "gui.point_charger.charge": "§aポイントをチャージ",
 

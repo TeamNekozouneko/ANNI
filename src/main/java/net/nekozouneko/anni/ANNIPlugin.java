@@ -36,7 +36,7 @@ import java.util.Map;
 
 public final class ANNIPlugin extends JavaPlugin {
 
-    public static final String LATEST_MESSAGE_VERSION = "11";
+    public static final String LATEST_MESSAGE_VERSION = "12";
     private static ANNIPlugin plugin;
 
     public static ANNIPlugin getInstance() {
@@ -151,6 +151,7 @@ public final class ANNIPlugin extends JavaPlugin {
         getCommand("vote").setExecutor(new VoteCommand());
         getCommand("kit").setExecutor(new KitCommand());
         getCommand("point").setExecutor(new PointCommand());
+        getCommand("charge").setExecutor(new ChargeCommand());
 
         registerRecipe();
     }
