@@ -141,7 +141,7 @@ public final class ANNIPlugin extends JavaPlugin {
         currentGame = new ANNIArena(this, "current");
         spectatorTask = new SpectatorTask();
         currentGame.runTaskTimer(this, 0, 20);
-        spectatorTask.runTaskTimer(this, 0, 1);
+        spectatorTask.runTaskTimer(this, 0, 20);
 
         getCommand("anni-admin").setExecutor(new ANNIAdminCommand());
         getCommand("anni").setExecutor(new ANNICommand());
