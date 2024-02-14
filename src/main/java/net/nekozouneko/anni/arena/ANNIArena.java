@@ -990,9 +990,9 @@ public class ANNIArena extends BukkitRunnable {
     }
 
     private void launchFireworkRocket() {
-        if (fireworkTimer <= 0) timer = 3;
+        if (fireworkTimer <= 0) fireworkTimer = 3;
         else {
-            timer--;
+            fireworkTimer--;
             return;
         }
 
