@@ -91,6 +91,7 @@ public class ANNIArena extends BukkitRunnable {
     private boolean enabledTimer = false;
     @Getter @Setter
     private long timer = 0;
+    private int fireworkTimer = 0;
 
     private final Map<ANNITeam, Integer> nexus = new EnumMap<>(ANNITeam.class);
     private final Map<UUID, String> kit = new HashMap<>();
@@ -358,9 +359,9 @@ public class ANNIArena extends BukkitRunnable {
                     if (getTeamByPlayer(player) == null) return;
 
                     getTeamPlayers(getTeamByPlayer(player)).forEach(teammate -> {
-                        eco.depositPlayer(teammate, 10);
+                        eco.depositPlayer(teammate, 3);
                         teammate.sendMessage(
-                                mm.build("notify.deposit_points", "10", mm.build("gui.shop.full_ext"))
+                                mm.build("notify.deposit_points", "3", mm.build("gui.shop.full_ext"))
                         );
                     });
                 });
@@ -635,6 +636,8 @@ public class ANNIArena extends BukkitRunnable {
                 log.info("Deleting map...");
                 FileUtil.deleteWorld(copy);
                 copy = null;
+
+                fireworkTimer = 0;
             }
             if (VoteManager.isNowVoting(id)) VoteManager.endVote(id);
         }
@@ -987,6 +990,12 @@ public class ANNIArena extends BukkitRunnable {
     }
 
     private void launchFireworkRocket() {
+        if (fireworkTimer <= 0) timer = 3;
+        else {
+            timer--;
+            return;
+        }
+
         Map<ANNITeam, Color> colorMap = new HashMap<>();
         colorMap.put(ANNITeam.RED, Color.RED);
         colorMap.put(ANNITeam.BLUE, Color.BLUE);
