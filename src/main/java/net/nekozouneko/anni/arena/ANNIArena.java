@@ -460,7 +460,7 @@ public class ANNIArena extends BukkitRunnable {
                     List<ANNIMap> filtered = plugin.getMapManager().getMaps().stream()
                             .filter(ANNIMap::canUseOnArena)
                             .collect(Collectors.toList());
-                    if (filtered.size() == 0) return false;
+                    if (filtered.isEmpty()) return false;
                     map = filtered.get(rand.nextInt(filtered.size()));
                 }
             }
@@ -558,7 +558,7 @@ public class ANNIArena extends BukkitRunnable {
 
             log.info("Assigning players...");
             savedData.clear();
-            players.forEach(this::assignPlayer);
+            players.forEach(player -> setTeam(player, assignTeam()));
             nexus.clear();
             getTeams().forEach((at, team) -> {
                 setNexusHealth(at, ANNIConfig.getDefaultHealth());
@@ -568,6 +568,7 @@ public class ANNIArena extends BukkitRunnable {
                         .map(offp -> Bukkit.getPlayer(offp.getUniqueId()))
                         .forEach(p -> {
                             p.teleport(sl);
+                            p.setGameMode(GameMode.SURVIVAL);
                             initPlayer(p);
                             p.getInventory().setContents(ANNIKit.teamColor(getKit(p), at));
                         });
@@ -1120,6 +1121,7 @@ public class ANNIArena extends BukkitRunnable {
 
         SaveData data = savedData.remove(player.getUniqueId());
         ANNITeam team = data == null ? assignTeam() : data.getTeam();
+        setTeam(player, team);
 
         if (isNexusLost(team)) {
             Players.clearPotionEffects(player);
