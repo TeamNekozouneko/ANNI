@@ -189,7 +189,7 @@ public class AsyncPlayerChatListener implements Listener {
                             .filter(Objects::nonNull)
                             .collect(Collectors.toList())
             );
-            String form = plugin.getMessageManager().build("chat.spectator");
+            String form = plugin.getMessageManager().build("chat.spectator.format");
             e.setFormat(form);
         }
         catch (UnsupportedOperationException e1) {
