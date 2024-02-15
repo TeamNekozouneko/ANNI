@@ -594,6 +594,7 @@ public class ANNIArena extends BukkitRunnable {
         log.info("Starting clean up.");
         try {
             log.info("Initializing players...");
+            SpectatorManager.clear();
             savedData.clear();
             players.forEach(player -> {
                 player.spigot().respawn();
@@ -606,9 +607,6 @@ public class ANNIArena extends BukkitRunnable {
                     team.getEntries().forEach(team::removeEntry);
                     log.info(team.getEntries().toString());
             });
-
-            log.info("Showing spectators...");
-            SpectatorManager.clear();
             log.info("Cancelling tasks...");
             DefenseArtifact.cancelAllTasks();
             log.info("Initializing nexus...");
