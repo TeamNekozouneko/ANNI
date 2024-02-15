@@ -504,5 +504,7 @@
   "chat.team": "&8[{0}§8]&r {1}&a:&f {2}",
   "chat.team.format": "&8[{0}§8]&r %s&a:&f %s",
   "chat.tell.receive": "&f[&7{0} から]&a:&f {1}",
-  "chat.tell.send": "&f[&7{0} へ]&a:&f {1}"
+  "chat.tell.send": "&f[&7{0} へ]&a:&f {1}",
+  "chat.spectator": "&8[&7観戦&8]&r {1}&a:&r {1}",
+  "chat.spectator.format": "&8[&7観戦&8]&r %s&a:&r %s"
 }
