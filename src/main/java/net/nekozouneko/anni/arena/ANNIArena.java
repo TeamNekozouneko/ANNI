@@ -55,6 +55,7 @@ import org.bukkit.scoreboard.Team;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.Map.Entry;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
@@ -64,6 +65,7 @@ public class ANNIArena extends BukkitRunnable {
 
     @Getter @AllArgsConstructor
     private static class SaveData {
+        private final boolean isSpectator;
         private final ANNITeam team;
         private final ItemStack[] inventory;
         private final float exp;
@@ -168,6 +170,7 @@ public class ANNIArena extends BukkitRunnable {
             savedData.put(
                     player.getUniqueId(),
                     new SaveData(
+                            isNexusLost(getTeamByPlayer(player)) && SpectatorManager.isSpectating(player),
                             getTeamByPlayer(player),
                             player.getInventory().getContents(),
                             player.getExp(),
@@ -1103,5 +1106,81 @@ public class ANNIArena extends BukkitRunnable {
         player.getEnderChest().clear();
         player.setLevel(0);
         player.setExp(0);
+    }
+
+    public void join2(Player player) {
+        if (players.contains(player)) return;
+
+        players.add(player);
+        player.setScoreboard(plugin.getPluginBoard());
+
+        if (state.getId() <= 0) {
+            initPlayer(player);
+            if (plugin.getLobby() != null) player.teleport(plugin.getLobby());
+            return;
+        }
+
+        SaveData data = savedData.remove(player.getUniqueId());
+        ANNITeam team = data == null ? assignTeam() : data.getTeam();
+
+        if (isNexusLost(team)) {
+            Players.clearPotionEffects(player);
+            initPlayer(player);
+            SpectatorManager.add(player);
+            player.teleport(map.getSpawnOrDefault(team).toLocation(copy));
+            return;
+        }
+
+        player.setGameMode(GameMode.SURVIVAL);
+        if (data != null) {
+            player.getInventory().setContents(data.getInventory());
+            player.setExp(data.getExp());
+            player.setLevel(data.getLevel());
+            player.setHealth(data.getHealth());
+        }
+        else {
+            Players.clearPotionEffects(player);
+            initPlayer(player);
+            player.teleport(map.getSpawnOrDefault(team).toLocation(copy));
+        }
+
+
+        player.sendMessage(mm.buildBigChar(CmnUtil.numberToChar(state.getId()), Character.toString(team.getCCChar()),
+                (Object[]) mm.buildArray("notify.big.mid_join", team.getTeamName())
+        ));
+    }
+
+    private ANNITeam assignTeam() {
+        Map<ANNITeam, Integer> sizeOfTeam = new HashMap<>();
+        teams.keySet().stream()
+                .filter(this::isEnabledTeam)
+                .filter(t -> !isNexusLost(t))
+                .forEach(t ->
+                    sizeOfTeam.put(t, getTeamPlayers(t).size())
+                );
+
+        ANNITeam assigned;
+
+        if (Collections3.allValueEquals(sizeOfTeam.values(), sizeOfTeam.values().iterator().next())) {
+            List<ANNITeam> list = new ArrayList<>(sizeOfTeam.keySet());
+            assigned = list.get(rand.nextInt(list.size()));
+        }
+        else {
+            Entry<ANNITeam, Integer> least = null;
+            for (Entry<ANNITeam, Integer> entry : sizeOfTeam.entrySet()) {
+                if (least == null) {
+                    least = entry;
+                    continue;
+                }
+
+                boolean update = rand.nextBoolean();
+                if ((least.getValue().equals(entry.getValue()) && update) || least.getValue() > entry.getValue())
+                    least = entry;
+            }
+
+            assigned = least.getKey();
+        }
+
+        return assigned;
     }
 }
