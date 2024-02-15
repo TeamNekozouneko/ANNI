@@ -52,3 +52,8 @@ commands:
     description: "Charge command"
     permission: anni.command.charge
     usage: "/<command>"
+
+permissions:
+  anni.mod.global_chat_on_spectator:
+    default: op
+    description: "If you have this permission, can use global chat on spectator"
