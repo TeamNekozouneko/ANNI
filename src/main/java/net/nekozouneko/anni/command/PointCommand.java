@@ -30,7 +30,7 @@ public class PointCommand implements CommandExecutor, TabCompleter {
             }
         }
         else {
-            if (sender.hasPermission("anniv2.command.point.other")) {
+            if (sender.hasPermission("anni.command.point.other")) {
                 OfflinePlayer op = Bukkit.getOfflinePlayer(args[0]);
 
                 if (VaultUtil.getEco().hasAccount(op)) {
@@ -57,7 +57,7 @@ public class PointCommand implements CommandExecutor, TabCompleter {
     
     @Override
     public List<String> onTabComplete(CommandSender sender, Command cmd, String label, String[] args) {
-        if (sender.hasPermission("anniv2.command.point.other")) {
+        if (sender.hasPermission("anni.command.point.other")) {
             return TabCompletes.players(args[0], Bukkit.getOnlinePlayers());
         }
 
