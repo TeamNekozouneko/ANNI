@@ -208,6 +208,7 @@ public class AsyncPlayerChatListener implements Listener {
                     .map(Bukkit::getPlayer)
                     .filter(Objects::nonNull)
                     .forEach(p -> p.sendMessage(mes));
+            Bukkit.getConsoleSender().sendMessage(mes);
         }
     }
 
