@@ -130,37 +130,41 @@ public class ANNIArena extends BukkitRunnable {
         players.add(player);
         player.setScoreboard(plugin.getPluginBoard());
 
-        initPlayer(player);
+        if (state.getId() <= 0) {
+            initPlayer(player);
+            if (plugin.getLobby() != null) player.teleport(plugin.getLobby());
+            return;
+        }
 
-        if (getState().getId() > 0) {
-            SaveData sd = savedData.remove(player.getUniqueId());
-            if (sd != null) setTeam(player, sd.getTeam());
-            else {
-                Players.clearPotionEffects(player);
-                assignPlayer(player);
-            }
-            if (!isNexusLost(getTeamByPlayer(player))) {
-                player.teleport(map.getSpawnOrDefault(getTeamByPlayer(player)).toLocation(copy));
-                ANNITeam at = getTeamByPlayer(player);
-                player.sendMessage(mm.buildBigChar(CmnUtil.numberToChar(state.getId()), Character.toString(at.getCCChar()),
-                        (Object[]) mm.buildArray("notify.big.mid_join", at.getTeamName())
-                ));
-                if (sd != null) {
-                    player.getInventory().setContents(sd.getInventory());
-                    player.setExp(sd.getExp());
-                    player.setLevel(sd.getLevel());
-                    player.setHealth(sd.getHealth());
-                }
-                else player.getInventory().setContents(ANNIKit.teamColor(getKit(player), at));
-            }
-            else {
-                player.teleport(map.getSpawnOrDefault(getTeamByPlayer(player)).toLocation(copy));
-                SpectatorManager.add(player);
-            }
+        SaveData data = savedData.remove(player.getUniqueId());
+        ANNITeam team = data == null ? assignTeam() : data.getTeam();
+        setTeam(player, team);
+
+        if (isNexusLost(team)) {
+            Players.clearPotionEffects(player);
+            initPlayer(player);
+            SpectatorManager.add(player);
+            player.teleport(map.getSpawnOrDefault(team).toLocation(copy));
+            return;
+        }
+
+        player.setGameMode(GameMode.SURVIVAL);
+        if (data != null) {
+            player.getInventory().setContents(data.getInventory());
+            player.setExp(data.getExp());
+            player.setLevel(data.getLevel());
+            player.setHealth(data.getHealth());
         }
         else {
-            if (plugin.getLobby() != null) player.teleport(plugin.getLobby());
+            Players.clearPotionEffects(player);
+            initPlayer(player);
+            player.teleport(map.getSpawnOrDefault(team).toLocation(copy));
         }
+
+
+        player.sendMessage(mm.buildBigChar(CmnUtil.numberToChar(state.getId()), Character.toString(team.getCCChar()),
+                (Object[]) mm.buildArray("notify.big.mid_join", team.getTeamName())
+        ));
     }
 
     public void leave(Player player) {
@@ -1043,47 +1047,6 @@ public class ANNIArena extends BukkitRunnable {
                 });
     }
 
-    private void assignPlayer(Player player) {
-        if (player.getScoreboard() != plugin.getPluginBoard())
-            player.setScoreboard(plugin.getPluginBoard());
-        if (CmnUtil.getJoinedTeam(player) != null) return;
-
-        Map<Team, Integer> teamSize = new HashMap<>();
-        getTeams().entrySet().stream()
-                .filter(ent -> state.getId() < 0 || !isNexusLost(ent.getKey()))
-                .map(Map.Entry::getValue)
-                .forEach(t ->
-                        teamSize.put(
-                                t,
-                                (int) t.getPlayers().stream()
-                                        .map(OfflinePlayer::isOnline)
-                                        .count()
-                        )
-                );
-
-        if ( // 全部の値が一緒なら
-                Collections3.allValueEquals(
-                        teamSize.values(),
-                        teamSize.values().iterator().next() // チーム人数リストの最初の要素
-                )
-        ) {
-            List<Team> teams2 = new ArrayList<>(getTeams().values());
-            Team sel = teams2.get(rand.nextInt(teams2.size()));
-            sel.addPlayer(player); // ランダムなチームに参加させる
-        }
-        else { // 一緒じゃなければ均等に分散させる
-            Map.Entry<Team, Integer> minTeam = null; // 人数が少ないチーム
-
-            for (Map.Entry<Team, Integer> entry : teamSize.entrySet()) {
-                if (minTeam == null || minTeam.getValue() > entry.getValue()) {
-                    minTeam = entry; // minTeamがnullもしくはminTeamの人数より少なければentryに置き換える
-                }
-            }
-
-            minTeam.getKey().addPlayer(player);
-        }
-    }
-
     private List<Map.Entry<ANNIMap, Integer>> getMapRanking(Multimap<Object, OfflinePlayer> multimap) {
         Map<ANNIMap, Integer> rank = new HashMap<>();
         multimap.keySet().forEach((obj) -> {
@@ -1107,49 +1070,6 @@ public class ANNIArena extends BukkitRunnable {
         player.getEnderChest().clear();
         player.setLevel(0);
         player.setExp(0);
-    }
-
-    public void join2(Player player) {
-        if (players.contains(player)) return;
-
-        players.add(player);
-        player.setScoreboard(plugin.getPluginBoard());
-
-        if (state.getId() <= 0) {
-            initPlayer(player);
-            if (plugin.getLobby() != null) player.teleport(plugin.getLobby());
-            return;
-        }
-
-        SaveData data = savedData.remove(player.getUniqueId());
-        ANNITeam team = data == null ? assignTeam() : data.getTeam();
-        setTeam(player, team);
-
-        if (isNexusLost(team)) {
-            Players.clearPotionEffects(player);
-            initPlayer(player);
-            SpectatorManager.add(player);
-            player.teleport(map.getSpawnOrDefault(team).toLocation(copy));
-            return;
-        }
-
-        player.setGameMode(GameMode.SURVIVAL);
-        if (data != null) {
-            player.getInventory().setContents(data.getInventory());
-            player.setExp(data.getExp());
-            player.setLevel(data.getLevel());
-            player.setHealth(data.getHealth());
-        }
-        else {
-            Players.clearPotionEffects(player);
-            initPlayer(player);
-            player.teleport(map.getSpawnOrDefault(team).toLocation(copy));
-        }
-
-
-        player.sendMessage(mm.buildBigChar(CmnUtil.numberToChar(state.getId()), Character.toString(team.getCCChar()),
-                (Object[]) mm.buildArray("notify.big.mid_join", team.getTeamName())
-        ));
     }
 
     private ANNITeam assignTeam() {
