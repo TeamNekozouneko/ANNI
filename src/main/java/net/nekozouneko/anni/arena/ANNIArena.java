@@ -1010,35 +1010,37 @@ public class ANNIArena extends BukkitRunnable {
 
         if (living.size() != 1) return;
 
-        getTeamPlayers(living.get(0)).forEach(winner -> {
-            if (winner.getWorld() != copy) return;
+        getTeamPlayers(living.get(0)).stream()
+                .filter(p -> !SpectatorManager.isSpectating(p.getUniqueId()))
+                .forEach(winner -> {
+                        if (winner.getWorld() != copy) return;
 
-            Firework fw = (Firework) copy.spawnEntity(winner.getLocation(), EntityType.FIREWORK);
+                        Firework fw = (Firework) copy.spawnEntity(winner.getLocation(), EntityType.FIREWORK);
 
-            fw.getPersistentDataContainer().set(
-                    new NamespacedKey(plugin, "winner-rocket"),
-                    PersistentDataType.INTEGER, 1
-            );
+                        fw.getPersistentDataContainer().set(
+                                new NamespacedKey(plugin, "winner-rocket"),
+                                PersistentDataType.INTEGER, 1
+                        );
 
-            FireworkMeta fm = fw.getFireworkMeta();
+                        FireworkMeta fm = fw.getFireworkMeta();
 
-            fm.addEffect(
-                    rand.nextBoolean() ?
-                            FireworkEffect.builder()
-                                    .with(FireworkEffect.Type.BALL)
-                                    .withColor(colorMap.get(living.get(0)))
-                                    .build()
-                            :
-                            FireworkEffect.builder()
-                                    .with(FireworkEffect.Type.BALL)
-                                    .withFlicker()
-                                    .withColor(colorMap.get(living.get(0)))
-                                    .build()
-            );
-            fm.setPower(1);
+                        fm.addEffect(
+                                rand.nextBoolean() ?
+                                        FireworkEffect.builder()
+                                                .with(FireworkEffect.Type.BALL)
+                                                .withColor(colorMap.get(living.get(0)))
+                                                .build()
+                                        :
+                                        FireworkEffect.builder()
+                                                .with(FireworkEffect.Type.BALL)
+                                                .withFlicker()
+                                                .withColor(colorMap.get(living.get(0)))
+                                                .build()
+                        );
+                        fm.setPower(1);
 
-            fw.setFireworkMeta(fm);
-        });
+                        fw.setFireworkMeta(fm);
+                });
     }
 
     private void assignPlayer(Player player) {
@@ -1152,9 +1154,8 @@ public class ANNIArena extends BukkitRunnable {
 
     private ANNITeam assignTeam() {
         Map<ANNITeam, Integer> sizeOfTeam = new HashMap<>();
-        teams.keySet().stream()
-                .filter(this::isEnabledTeam)
-                .filter(t -> !isNexusLost(t))
+        getTeams().keySet().stream()
+                .filter(t -> !state.isInArena() || !isNexusLost(t))
                 .forEach(t ->
                     sizeOfTeam.put(t, getTeamPlayers(t).size())
                 );
