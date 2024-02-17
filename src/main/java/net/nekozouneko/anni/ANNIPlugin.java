@@ -123,6 +123,7 @@ public final class ANNIPlugin extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new PlayerJoinListener(), this);
         getServer().getPluginManager().registerEvents(new PlayerQuitListener(), this);
         getServer().getPluginManager().registerEvents(new PlayerRespawnListener(), this);
+        getServer().getPluginManager().registerEvents(new ProjectileLaunchListener(), this);
 
         if (ANNIConfig.isVotifierVoteEnabled()) {
             try {
