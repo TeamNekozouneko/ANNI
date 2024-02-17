@@ -1,6 +1,7 @@
 package net.nekozouneko.anni.command;
 
 import net.nekozouneko.anni.ANNIPlugin;
+import net.nekozouneko.anni.arena.spectator.SpectatorManager;
 import net.nekozouneko.anni.gui.shop.PointCharger;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -24,7 +25,7 @@ public class ChargeCommand implements CommandExecutor, TabCompleter {
             return true;
         }
 
-        if (!(ANNIPlugin.getInstance().getCurrentGame().getState().getId() > 0)) {
+        if (!(ANNIPlugin.getInstance().getCurrentGame().getState().getId() > 0) || SpectatorManager.isSpectating((Player) sender)) {
             return true;
         }
 

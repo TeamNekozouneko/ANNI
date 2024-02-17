@@ -1,6 +1,7 @@
 package net.nekozouneko.anni.command;
 
 import net.nekozouneko.anni.ANNIPlugin;
+import net.nekozouneko.anni.arena.spectator.SpectatorManager;
 import net.nekozouneko.anni.gui.shop.CombatShop;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -21,6 +22,8 @@ public class CombatShopCommand implements CommandExecutor, TabCompleter {
             );
             return true;
         }
+
+        if (SpectatorManager.isSpectating((Player) sender)) return true;
 
         if (ANNIPlugin.getInstance().getCurrentGame().getState().getId() >= 0) {
             new CombatShop(ANNIPlugin.getInstance(), (Player) sender).open();
