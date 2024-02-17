@@ -158,6 +158,7 @@ public class ANNIArena extends BukkitRunnable {
         else {
             Players.clearPotionEffects(player);
             initPlayer(player);
+            player.getInventory().setContents(ANNIKit.teamColor(getKit(player), team));
             player.teleport(map.getSpawnOrDefault(team).toLocation(copy));
         }
 
@@ -420,7 +421,7 @@ public class ANNIArena extends BukkitRunnable {
     }
 
     public boolean isNexusLost(ANNITeam team) {
-        return nexus.get(team) == null;
+        return nexus.get(team) == null || nexus.get(team) <= 0;
     }
 
     public void restoreNexus(ANNITeam team, Integer health) {
