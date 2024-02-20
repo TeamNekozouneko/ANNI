@@ -15,6 +15,7 @@ import net.nekozouneko.anni.listener.*;
 import net.nekozouneko.anni.listener.votifier.VotifierListener;
 import net.nekozouneko.anni.map.MapManager;
 import net.nekozouneko.anni.message.MessageManager;
+import net.nekozouneko.anni.task.CooldownManager;
 import net.nekozouneko.anni.util.FileUtil;
 import net.nekozouneko.commons.spigot.inventory.ItemStackBuilder;
 import org.bukkit.Location;
@@ -36,7 +37,7 @@ import java.util.Map;
 
 public final class ANNIPlugin extends JavaPlugin {
 
-    public static final String LATEST_MESSAGE_VERSION = "13";
+    public static final String LATEST_MESSAGE_VERSION = "14";
     private static ANNIPlugin plugin;
 
     public static ANNIPlugin getInstance() {
@@ -49,6 +50,8 @@ public final class ANNIPlugin extends JavaPlugin {
     private BoardManager boardManager;
     @Getter
     private MapManager mapManager;
+    @Getter
+    private CooldownManager cooldownManager;
 
     @Getter
     private ANNIArena currentGame;
@@ -102,6 +105,9 @@ public final class ANNIPlugin extends JavaPlugin {
         customKitManager = new CustomKitManager(this);
 
         mapManager.load(defaultMapsDir);
+
+        cooldownManager = new CooldownManager();
+        cooldownManager.runTaskTimer(this, 0, 5);
 
         try {
             lobby = FileUtil.readGson(new File(getDataFolder(), "lobby.json"), Location.class);
