@@ -3,6 +3,7 @@ package net.nekozouneko.anni.kit.items;
 import net.nekozouneko.anni.ANNIPlugin;
 import net.nekozouneko.anni.arena.team.ANNITeam;
 import net.nekozouneko.anni.message.MessageManager;
+import net.nekozouneko.anni.task.CooldownManager;
 import net.nekozouneko.anni.util.CmnUtil;
 import net.nekozouneko.commons.spigot.inventory.ItemStackBuilder;
 import org.bukkit.*;
@@ -28,8 +29,6 @@ public class GrapplingHook implements Listener {
             EntityType.WITHER, EntityType.ENDER_DRAGON, EntityType.ENDER_CRYSTAL,
             EntityType.AREA_EFFECT_CLOUD, EntityType.WARDEN, EntityType.IRON_GOLEM
     );
-
-    private static final Map<UUID, Long> cooldown = new HashMap<>();
 
     public static ItemStackBuilder builder() {
         MessageManager mm = ANNIPlugin.getInstance().getMessageManager();
@@ -114,11 +113,13 @@ public class GrapplingHook implements Listener {
                 return;
             }
 
-            if (!isCooldownEnd(event.getPlayer().getUniqueId())) {
+            CooldownManager cm = ANNIPlugin.getInstance().getCooldownManager();
+
+            if (!cm.isCooldownEnd(event.getPlayer().getUniqueId(), CooldownManager.Type.GRAPPLING_HOOK)) {
                 event.setCancelled(true);
 
                 event.getPlayer().sendMessage(ANNIPlugin.getInstance().getMessageManager().build(
-                        "command.err.cooldown", (getCooldown(event.getPlayer().getUniqueId()) - System.currentTimeMillis()) / 1000
+                        "command.err.cooldown", cm.getTimeLeftFormatted(event.getPlayer().getUniqueId(), CooldownManager.Type.GRAPPLING_HOOK)
                 ));
                 event.getPlayer().playSound(event.getPlayer().getLocation(), Sound.ENTITY_GENERIC_EXTINGUISH_FIRE, 1, 2);
                 return;
@@ -127,7 +128,7 @@ public class GrapplingHook implements Listener {
             event.getHook().getPersistentDataContainer()
                     .set(new NamespacedKey(ANNIPlugin.getInstance(), "grappling-hook"), PersistentDataType.INTEGER, 1);
             event.getHook().setVelocity(event.getHook().getVelocity().multiply(1.75));
-            addCooldown(event.getPlayer().getUniqueId(), 1000);
+            cm.set(event.getPlayer().getUniqueId(), CooldownManager.Type.GRAPPLING_HOOK, 1000);
         }
     }
 
@@ -135,18 +136,6 @@ public class GrapplingHook implements Listener {
         Vector vel = to.subtract(from).toVector();
 
         return vel.normalize().multiply(m);
-    }
-
-    public static boolean isCooldownEnd(UUID player) {
-        return !cooldown.containsKey(player) || cooldown.get(player) <= System.currentTimeMillis();
-    }
-
-    public static void addCooldown(UUID player, long time) {
-        cooldown.put(player, System.currentTimeMillis() + time);
-    }
-
-    public static long getCooldown(UUID player) {
-        return cooldown.getOrDefault(player, System.currentTimeMillis());
     }
 
     public static boolean isGrapplingHook(ItemStack item) {

@@ -4,6 +4,7 @@ import net.nekozouneko.anni.ANNIPlugin;
 import net.nekozouneko.anni.kit.items.AirJump;
 import net.nekozouneko.anni.kit.items.DefenseArtifact;
 import net.nekozouneko.anni.message.MessageManager;
+import net.nekozouneko.anni.task.CooldownManager;
 import net.nekozouneko.anni.util.CmnUtil;
 import net.nekozouneko.anni.util.VaultUtil;
 import org.bukkit.ChatColor;
@@ -80,7 +81,7 @@ public class PlayerDeathListener implements Listener {
                 })
                 .forEach(e.getDrops()::remove); // ドロップするアイテムから削除
 
-        AirJump.setCooldown(e.getEntity().getUniqueId(), null);
+        ANNIPlugin.getInstance().getCooldownManager().resetCooldown(e.getEntity().getUniqueId(), CooldownManager.Type.AIR_JUMP);
         PlayerDamageListener.setNotFighting(e.getEntity());
     }
 

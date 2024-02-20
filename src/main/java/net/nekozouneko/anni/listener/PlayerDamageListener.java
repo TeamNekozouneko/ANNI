@@ -4,8 +4,8 @@ import net.nekozouneko.anni.ANNIPlugin;
 import net.nekozouneko.anni.arena.ArenaState;
 import net.nekozouneko.anni.arena.spectator.SpectatorManager;
 import net.nekozouneko.anni.kit.ANNIKit;
-import net.nekozouneko.anni.kit.items.GrapplingHook;
 import net.nekozouneko.anni.message.MessageManager;
+import net.nekozouneko.anni.task.CooldownManager;
 import org.bukkit.*;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.enchantments.Enchantment;
@@ -73,7 +73,9 @@ public class PlayerDamageListener implements Listener {
                     }
                     case SCOUTER: {
                         if (e.getCause() != EntityDamageEvent.DamageCause.FALL) {
-                            GrapplingHook.addCooldown(p.getUniqueId(), 5000);
+                            ANNIPlugin.getInstance().getCooldownManager().set(
+                                    p.getUniqueId(), CooldownManager.Type.GRAPPLING_HOOK, 5000
+                            );
                         }
                         break;
                     }

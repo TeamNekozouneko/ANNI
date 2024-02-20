@@ -8,6 +8,7 @@ import net.md_5.bungee.api.chat.TextComponent;
 import net.nekozouneko.anni.ANNIPlugin;
 import net.nekozouneko.anni.arena.ANNIArena;
 import net.nekozouneko.anni.arena.spectator.SpectatorManager;
+import net.nekozouneko.anni.task.CooldownManager;
 import net.nekozouneko.commons.spigot.inventory.ItemStackBuilder;
 import org.bukkit.*;
 import org.bukkit.enchantments.Enchantment;
@@ -28,7 +29,6 @@ import java.util.*;
 public class DefenseArtifact implements Listener {
 
     private static final Map<UUID, EffectTask> TASKS = new HashMap<>();
-    private static final Map<UUID, Long> COOLDOWN = new HashMap<>();
 
     public static class EffectTask extends BukkitRunnable {
 
@@ -98,7 +98,7 @@ public class DefenseArtifact implements Listener {
                         if (for_first_check == time) {
                             victim.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 20, 0, false, true, true));
                             victim.addPotionEffect(new PotionEffect(PotionEffectType.SLOW_DIGGING, 40, 1, false, true, true));
-                            GrapplingHook.addCooldown(victim.getUniqueId(), 5000);
+                            ANNIPlugin.getInstance().getCooldownManager().set(victim.getUniqueId(), CooldownManager.Type.GRAPPLING_HOOK, 5000);
                         }
 
                         victim.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 40, 1, false, true, true));
@@ -148,18 +148,6 @@ public class DefenseArtifact implements Listener {
         TASKS.clear();
     }
 
-    public static long getCooldown(UUID player) {
-        return COOLDOWN.getOrDefault(player, System.currentTimeMillis());
-    }
-
-    public static void addCooldown(UUID player, long time) {
-        COOLDOWN.put(player, System.currentTimeMillis() + time);
-    }
-
-    public static boolean isCooldownEnd(UUID player) {
-        return getCooldown(player) <= System.currentTimeMillis();
-    }
-
     @EventHandler
     public void onUse(PlayerInteractEvent event) {
         if (!(event.getAction() == Action.RIGHT_CLICK_AIR || event.getAction() == Action.RIGHT_CLICK_BLOCK)) return;
@@ -172,9 +160,11 @@ public class DefenseArtifact implements Listener {
 
         event.setCancelled(true);
 
-        if (!isCooldownEnd(event.getPlayer().getUniqueId())) {
+        CooldownManager cm = ANNIPlugin.getInstance().getCooldownManager();
+
+        if (!cm.isCooldownEnd(event.getPlayer().getUniqueId(), CooldownManager.Type.DEFENSE_ARTIFACT)) {
             event.getPlayer().spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(ANNIPlugin.getInstance().getMessageManager().build(
-                    "command.err.cooldown", (getCooldown(event.getPlayer().getUniqueId()) - System.currentTimeMillis()) / 1000
+                    "command.err.cooldown", cm.getTimeLeftFormatted(event.getPlayer().getUniqueId(), CooldownManager.Type.GRAPPLING_HOOK)
             )));
             event.getPlayer().playSound(event.getPlayer().getLocation(), Sound.ENTITY_GENERIC_EXTINGUISH_FIRE, 1, 2);
             return;
@@ -201,7 +191,7 @@ public class DefenseArtifact implements Listener {
         EffectTask task = new EffectTask(event.getPlayer(), 10, 10);
         task.runTaskTimer(ANNIPlugin.getInstance(), 0, 20);
         TASKS.put(event.getPlayer().getUniqueId(), task);
-        addCooldown(event.getPlayer().getUniqueId(), 60000);
+        cm.set(event.getPlayer().getUniqueId(), CooldownManager.Type.DEFENSE_ARTIFACT, 60000);
     }
 
 }

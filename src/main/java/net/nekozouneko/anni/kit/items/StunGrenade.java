@@ -2,6 +2,7 @@ package net.nekozouneko.anni.kit.items;
 
 import net.nekozouneko.anni.ANNIPlugin;
 import net.nekozouneko.anni.message.MessageManager;
+import net.nekozouneko.anni.task.CooldownManager;
 import net.nekozouneko.anni.util.CmnUtil;
 import net.nekozouneko.commons.spigot.inventory.ItemStackBuilder;
 import org.bukkit.*;
@@ -122,8 +123,10 @@ public class StunGrenade implements Listener {
 
                     hit.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 200, 2));
                     hit.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 20, 0));
-                    GrapplingHook.addCooldown(hit.getUniqueId(), 15000);
-                    AirJump.setCooldown(hit.getUniqueId(), System.currentTimeMillis() + 10000);
+
+                    CooldownManager cm = ANNIPlugin.getInstance().getCooldownManager();
+                    cm.set(hit.getUniqueId(), CooldownManager.Type.AIR_JUMP, 10000);
+                    cm.set(hit.getUniqueId(), CooldownManager.Type.GRAPPLING_HOOK, 15000);
                 }
             }
         }
