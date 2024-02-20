@@ -1,5 +1,7 @@
 package net.nekozouneko.anni.kit.items;
 
+import net.md_5.bungee.api.ChatMessageType;
+import net.md_5.bungee.api.chat.TextComponent;
 import net.nekozouneko.anni.ANNIPlugin;
 import net.nekozouneko.anni.arena.team.ANNITeam;
 import net.nekozouneko.anni.message.MessageManager;
@@ -53,6 +55,8 @@ public class GrapplingHook implements Listener {
         if (c.getOrDefault(new NamespacedKey(ANNIPlugin.getInstance(), "grappling-hook"), PersistentDataType.INTEGER, 0) != 1)
             return;
 
+        CooldownManager cm = ANNIPlugin.getInstance().getCooldownManager();
+
         switch (event.getState()) {
             case BITE: {
                 event.setCancelled(true);
@@ -60,11 +64,13 @@ public class GrapplingHook implements Listener {
             }
             case IN_GROUND: {
                 event.getPlayer().setVelocity(calculateVel(event.getPlayer().getLocation(), event.getHook().getLocation(), 2));
+                cm.set(event.getPlayer().getUniqueId(), CooldownManager.Type.GRAPPLING_HOOK, 1000);
                 break;
             }
             case CAUGHT_ENTITY: {
                 if (!CANT_PULL_ENTITIES.contains(event.getCaught().getType())) {
                     event.getCaught().setVelocity(calculateVel(event.getCaught().getLocation(), event.getPlayer().getLocation(), 1));
+                    cm.set(event.getPlayer().getUniqueId(), CooldownManager.Type.GRAPPLING_HOOK, 1000);
                 }
                 break;
             }
@@ -118,9 +124,15 @@ public class GrapplingHook implements Listener {
             if (!cm.isCooldownEnd(event.getPlayer().getUniqueId(), CooldownManager.Type.GRAPPLING_HOOK)) {
                 event.setCancelled(true);
 
-                event.getPlayer().sendMessage(ANNIPlugin.getInstance().getMessageManager().build(
-                        "command.err.cooldown", cm.getTimeLeftFormatted(event.getPlayer().getUniqueId(), CooldownManager.Type.GRAPPLING_HOOK)
-                ));
+                event.getPlayer().spigot().sendMessage(ChatMessageType.ACTION_BAR,
+                        new TextComponent(
+                                ANNIPlugin.getInstance().getMessageManager().build(
+                                    "command.err.cooldown",
+                                        cm.getTimeLeftFormatted(event.getPlayer().getUniqueId(), CooldownManager.Type.GRAPPLING_HOOK)
+
+                                )
+                        )
+                );
                 event.getPlayer().playSound(event.getPlayer().getLocation(), Sound.ENTITY_GENERIC_EXTINGUISH_FIRE, 1, 2);
                 return;
             }
@@ -128,7 +140,6 @@ public class GrapplingHook implements Listener {
             event.getHook().getPersistentDataContainer()
                     .set(new NamespacedKey(ANNIPlugin.getInstance(), "grappling-hook"), PersistentDataType.INTEGER, 1);
             event.getHook().setVelocity(event.getHook().getVelocity().multiply(1.75));
-            cm.set(event.getPlayer().getUniqueId(), CooldownManager.Type.GRAPPLING_HOOK, 1000);
         }
     }
 
