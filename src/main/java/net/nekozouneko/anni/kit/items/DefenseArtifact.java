@@ -164,7 +164,7 @@ public class DefenseArtifact implements Listener {
 
         if (!cm.isCooldownEnd(event.getPlayer().getUniqueId(), CooldownManager.Type.DEFENSE_ARTIFACT)) {
             event.getPlayer().spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(ANNIPlugin.getInstance().getMessageManager().build(
-                    "command.err.cooldown", cm.getTimeLeftFormatted(event.getPlayer().getUniqueId(), CooldownManager.Type.GRAPPLING_HOOK)
+                    "command.err.cooldown", cm.getTimeLeftFormatted(event.getPlayer().getUniqueId(), CooldownManager.Type.DEFENSE_ARTIFACT)
             )));
             event.getPlayer().playSound(event.getPlayer().getLocation(), Sound.ENTITY_GENERIC_EXTINGUISH_FIRE, 1, 2);
             return;
