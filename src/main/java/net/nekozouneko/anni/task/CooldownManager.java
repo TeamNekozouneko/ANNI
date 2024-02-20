@@ -20,8 +20,7 @@ public class CooldownManager extends BukkitRunnable {
     public enum Type {
         AIR_JUMP("item.airjump.name"),
         DEFENSE_ARTIFACT("item.defense_artifact.name"),
-        GRAPPLING_HOOK("item.grappling_hook.name"),
-        STUN_GRENADE("item.stun_grenade.name");
+        GRAPPLING_HOOK("item.grappling_hook.name");
 
         @Getter
         private final String key;
@@ -54,7 +53,7 @@ public class CooldownManager extends BukkitRunnable {
 
     public String getTimeLeftFormatted(UUID player, Type type) {
         Map<UUID, Long> map = cooldown.computeIfAbsent(type, k -> new HashMap<>());
-        double left = Math.max(0, (map.getOrDefault(player, 0L) / 1000) - System.currentTimeMillis());
+        double left = Math.max(0, ((double) map.getOrDefault(player, 0L) / 1000) - ((double) System.currentTimeMillis() / 1000));
 
         return String.format("%.1f", left);
     }
