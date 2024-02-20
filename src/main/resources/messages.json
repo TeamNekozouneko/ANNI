@@ -497,7 +497,7 @@
   "actionbar.nexus_alert": "&c{0} によってネクサスが破壊されています！",
   "actionbar.spectator_mode": "&7観戦モード",
   "actionbar.cooldown_stats": "&cあと{0}秒後使用できます。",
-  "actionbar.cooldown_ended": "&a{0}のクールダウンが終わりました。",
+  "actionbar.cooldown_ended": "&a{0}&aのクールダウンが終わりました。",
   "actionbar.out_of_team_region": "&cチームの領域外のため利用できません。",
 
   "chat.global": "{0}&a:&f {1}",
