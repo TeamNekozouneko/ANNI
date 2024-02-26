@@ -48,62 +48,32 @@ public class SQLiteDatabase implements ANNIDatabase {
         }
     }
 
-    // 現状データベースは更新しないためコメントアウト
-    /*private List<String> getColumns(String table) {
-        List<String> columns = new ArrayList<>();
-        try (PreparedStatement ps = source.prepareStatement(
-                "SELECT * FROM " + table + " LIMIT 0"
-        )) {
-            for (int i = 0; i < cs.getMetaData().getColumnCount(); i++) {
-                columns.add(cs.getMetaData().getColumnName(i));
-            }
-        }
-        catch (SQLException sqlex) {
-            throw new RuntimeException(sqlex);
-        }
-
-        return columns;
-    }
-
-    private void appendColumnIfNotContains(String table, String name, String modifiers) {
-        if (!getColumns(table).contains(name)) {
-            try (PreparedStatement ps = source.prepareStatement(
-                    "ALTER TABLE "+ table +" ADD COLUMN " + name + " " + modifiers
-            )) {
-                ps.execute();
-            }
-            catch (SQLException sqlex) {
-                throw new RuntimeException(sqlex);
-            }
-        }
-    }*/
-
     private void reset(UUID player) {
         try {
             // clean up
             try (PreparedStatement ps = source.prepareStatement(
-                    "DELETE FROM level WHERE player = ?"
+                    "DELETE FROM " + tableName("level") + " WHERE player = ?"
             )) {
                 ps.setString(1, player.toString());
                 ps.execute();
             }
 
             try (PreparedStatement ps = source.prepareStatement(
-                    "DELETE FROM settings WHERE player = ?"
+                    "DELETE FROM " + tableName("settings") + " WHERE player = ?"
             )) {
                 ps.setString(1, player.toString());
                 ps.execute();
             }
 
             try (PreparedStatement ps = source.prepareStatement(
-                    "DELETE FROM available_kits WHERE player = ?"
+                    "DELETE FROM " + tableName("available_kits") + " WHERE player = ?"
             )) {
                 ps.setString(1, player.toString());
                 ps.execute();
             }
 
             try (PreparedStatement ps = source.prepareStatement(
-                    "DELETE FROM statistic WHERE player = ?"
+                    "DELETE FROM " + tableName("statistic") + " WHERE player = ?"
             )) {
                 ps.setString(1, player.toString());
                 ps.execute();
@@ -136,7 +106,7 @@ public class SQLiteDatabase implements ANNIDatabase {
             }
 
             try (PreparedStatement ps = source.prepareStatement(
-                    "INSERT INTO "+ANNIConfig.getDBTablePrefix()+"available_kits VALUES (?, ?)"
+                    "INSERT INTO " + tableName("available_kits") + " VALUES (?, ?)"
             )) { // 利用可能なキット
                 ps.setString(1, player.toString());
                 ps.setString(2, FileUtil.createGson().toJson(Collections.singletonList("default"), List.class));
@@ -144,7 +114,7 @@ public class SQLiteDatabase implements ANNIDatabase {
             }
 
             try (PreparedStatement ps = source.prepareStatement(
-                    "INSERT INTO "+ANNIConfig.getDBTablePrefix()+"statistic VALUES (?, ?, ?, ?, ?, ?)"
+                    "INSERT INTO " +tableName("statistic") + " VALUES (?, ?, ?, ?, ?, ?)"
             )) { // 統計
                 ps.setString(1, player.toString());
                 ps.setLong(2, 0);
@@ -166,7 +136,7 @@ public class SQLiteDatabase implements ANNIDatabase {
             // init level
             boolean isInitializedLevel;
             try (PreparedStatement ps = source.prepareStatement(
-                    "SELECT * FROM " + ANNIConfig.getDBTablePrefix() + "level WHERE player = ? LIMIT 1"
+                    "SELECT * FROM " + tableName("level") + " WHERE player = ? LIMIT 1"
             )) {
                 ps.setString(1, player.toString());
                 ResultSet rs = ps.executeQuery();
@@ -175,7 +145,7 @@ public class SQLiteDatabase implements ANNIDatabase {
 
             if (!isInitializedLevel) {
                 try (PreparedStatement ps = source.prepareStatement(
-                        "INSERT INTO "+ANNIConfig.getDBTablePrefix()+"level VALUES (?, ?, ?)"
+                        "INSERT INTO "+ tableName("level") + " VALUES (?, ?, ?)"
                 )) {
                     ps.setString(1, player.toString());
                     ps.setInt(2, 1);
@@ -187,7 +157,7 @@ public class SQLiteDatabase implements ANNIDatabase {
             // init selected kit
             boolean isInitializedSettings;
             try (PreparedStatement ps = source.prepareStatement(
-                    "SELECT * FROM " + ANNIConfig.getDBTablePrefix() + "settings WHERE player = ? LIMIT 1"
+                    "SELECT * FROM " + tableName("settings") + " WHERE player = ? LIMIT 1"
             )) {
                 ps.setString(1, player.toString());
                 ResultSet rs = ps.executeQuery();
@@ -216,7 +186,7 @@ public class SQLiteDatabase implements ANNIDatabase {
 
             if (!isInitializedAvailableKits) {
                 try (PreparedStatement ps = source.prepareStatement(
-                        "INSERT INTO "+ANNIConfig.getDBTablePrefix()+"available_kits VALUES (?, ?)"
+                        "INSERT INTO " + tableName("available_kits") + " VALUES (?, ?)"
                 )) {
                     ps.setString(1, player.toString());
                     ps.setString(2, FileUtil.createGson().toJson(Collections.singletonList("default"), List.class));
@@ -227,7 +197,7 @@ public class SQLiteDatabase implements ANNIDatabase {
             // init statistic
             boolean isInitializedStatistic;
             try (PreparedStatement ps = source.prepareStatement(
-                    "SELECT * FROM " + ANNIConfig.getDBTablePrefix() + "statistic WHERE player = ? LIMIT 1"
+                    "SELECT * FROM " + tableName("statistic") + " WHERE player = ? LIMIT 1"
             )) {
                 ps.setString(1, player.toString());
                 ResultSet rs = ps.executeQuery();
@@ -236,7 +206,7 @@ public class SQLiteDatabase implements ANNIDatabase {
 
             if (!isInitializedStatistic) {
                 try (PreparedStatement ps = source.prepareStatement(
-                        "INSERT INTO "+ANNIConfig.getDBTablePrefix()+"statistic VALUES (?, ?, ?, ?, ?, ?)"
+                        "INSERT INTO " + tableName("statistic") + " VALUES (?, ?, ?, ?, ?, ?)"
                 )) {
                     ps.setString(1, player.toString());
                     ps.setLong(2, 0);
