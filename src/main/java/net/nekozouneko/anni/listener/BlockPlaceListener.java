@@ -65,6 +65,9 @@ public final class BlockPlaceListener implements Listener {
                 Material.STRIPPED_CRIMSON_STEM, Material.STRIPPED_WARPED_STEM
         ));
 
+        black.add(Material.LAVA);
+        black.add(Material.LAVA_BUCKET);
+
         BLACKLIST = Collections.unmodifiableList(black);
     }
 
