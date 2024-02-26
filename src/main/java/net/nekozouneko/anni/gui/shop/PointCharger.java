@@ -89,7 +89,7 @@ public class PointCharger extends AbstractGui {
         }
 
         MessageManager mm = ANNIPlugin.getInstance().getMessageManager();
-        double deposit = 300 * ingots + 500 * emeralds;
+        double deposit = 50 * ingots + 100 * emeralds;
 
         if (deposit > 0) {
             VaultUtil.getEco().depositPlayer((OfflinePlayer) event.getPlayer(), deposit);
