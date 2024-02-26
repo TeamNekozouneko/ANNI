@@ -1,12 +1,10 @@
 package net.nekozouneko.anni.arena.spectator;
 
+import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 public final class SpectatorManager {
 
@@ -75,6 +73,16 @@ public final class SpectatorManager {
     }
 
     public static void clear() {
+        spectating.stream()
+                .map(Bukkit::getPlayer)
+                .filter(Objects::nonNull)
+                .forEach(p -> {
+                    if (p.getPreviousGameMode() != GameMode.ADVENTURE)
+                        p.setGameMode(GameMode.SURVIVAL);
+
+                    if (p.getGameMode() == GameMode.ADVENTURE || p.getGameMode() == GameMode.SURVIVAL)
+                        p.setAllowFlight(false);
+                });
         spectating.clear();
     }
 
