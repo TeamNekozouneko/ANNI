@@ -15,7 +15,7 @@ public class SpectatorTask extends BukkitRunnable {
         Bukkit.getOnlinePlayers().forEach(player -> {
             if (SpectatorManager.isSpectating(player)) {
                 player.addPotionEffect(new PotionEffect(PotionEffectType.SATURATION, 40, 255, false, false, true));
-                player.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, 40, 1, false, false, true));
+                player.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, 40, 0, false, false, true));
                 player.setAllowFlight(true);
                 player.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(ANNIPlugin.getInstance().getMessageManager()
                         .build("actionbar.spectator_mode")

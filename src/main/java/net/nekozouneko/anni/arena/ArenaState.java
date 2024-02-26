@@ -53,4 +53,8 @@ public enum ArenaState {
         return nextPhase;
     }
 
+    public boolean isInArena() {
+        return id >= 0;
+    }
+
 }

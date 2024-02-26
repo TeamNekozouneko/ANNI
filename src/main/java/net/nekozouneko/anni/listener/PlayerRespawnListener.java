@@ -28,11 +28,16 @@ public class PlayerRespawnListener implements Listener {
                 e.setRespawnLocation(current.getMap().getSpawnOrDefault(at).toLocation(current.getCopyWorld()));
 
                 if (current.isNexusLost(at)) {
+                    e.getPlayer().getInventory().clear();
+                    e.getPlayer().getEnderChest().clear();
+                    e.getPlayer().setExp(0);
+                    e.getPlayer().setLevel(0);
                     SpectatorManager.add(e.getPlayer());
                     return;
                 }
             }
             else {
+                SpectatorManager.remove(e.getPlayer());
                 if (plugin.getLobby() != null) e.setRespawnLocation(plugin.getLobby());
                 return;
             }
@@ -52,6 +57,7 @@ public class PlayerRespawnListener implements Listener {
             );
         }
         else {
+            SpectatorManager.remove(e.getPlayer());
             if (plugin.getLobby() != null) e.setRespawnLocation(plugin.getLobby());
         }
     }

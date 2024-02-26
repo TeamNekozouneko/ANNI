@@ -40,8 +40,12 @@ import org.bukkit.block.Block;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
 import org.bukkit.boss.KeyedBossBar;
+import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Firework;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.FireworkMeta;
+import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -51,6 +55,7 @@ import org.bukkit.scoreboard.Team;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.Map.Entry;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
@@ -60,6 +65,7 @@ public class ANNIArena extends BukkitRunnable {
 
     @Getter @AllArgsConstructor
     private static class SaveData {
+        private final boolean isSpectator;
         private final ANNITeam team;
         private final ItemStack[] inventory;
         private final float exp;
@@ -87,6 +93,7 @@ public class ANNIArena extends BukkitRunnable {
     private boolean enabledTimer = false;
     @Getter @Setter
     private long timer = 0;
+    private int fireworkTimer = 0;
 
     private final Map<ANNITeam, Integer> nexus = new EnumMap<>(ANNITeam.class);
     private final Map<UUID, String> kit = new HashMap<>();
@@ -123,37 +130,42 @@ public class ANNIArena extends BukkitRunnable {
         players.add(player);
         player.setScoreboard(plugin.getPluginBoard());
 
-        initPlayer(player);
+        if (state.getId() <= 0) {
+            initPlayer(player);
+            if (plugin.getLobby() != null) player.teleport(plugin.getLobby());
+            return;
+        }
 
-        if (getState().getId() > 0) {
-            SaveData sd = savedData.remove(player.getUniqueId());
-            if (sd != null) setTeam(player, sd.getTeam());
-            else {
-                Players.clearPotionEffects(player);
-                assignPlayer(player);
-            }
-            if (!isNexusLost(getTeamByPlayer(player))) {
-                player.teleport(map.getSpawnOrDefault(getTeamByPlayer(player)).toLocation(copy));
-                ANNITeam at = getTeamByPlayer(player);
-                player.sendMessage(mm.buildBigChar(CmnUtil.numberToChar(state.getId()), Character.toString(at.getCCChar()),
-                        (Object[]) mm.buildArray("notify.big.mid_join", at.getTeamName())
-                ));
-                if (sd != null) {
-                    player.getInventory().setContents(sd.getInventory());
-                    player.setExp(sd.getExp());
-                    player.setLevel(sd.getLevel());
-                    player.setHealth(sd.getHealth());
-                }
-                else player.getInventory().setContents(ANNIKit.teamColor(getKit(player), at));
-            }
-            else {
-                player.teleport(map.getSpawnOrDefault(getTeamByPlayer(player)).toLocation(copy));
-                SpectatorManager.add(player);
-            }
+        SaveData data = savedData.remove(player.getUniqueId());
+        ANNITeam team = data == null ? assignTeam() : data.getTeam();
+        setTeam(player, team);
+
+        if (isNexusLost(team)) {
+            Players.clearPotionEffects(player);
+            initPlayer(player);
+            SpectatorManager.add(player);
+            player.teleport(map.getSpawnOrDefault(team).toLocation(copy));
+            return;
+        }
+
+        player.setGameMode(GameMode.SURVIVAL);
+        if (data != null) {
+            player.getInventory().setContents(data.getInventory());
+            player.setExp(data.getExp());
+            player.setLevel(data.getLevel());
+            player.setHealth(data.getHealth());
         }
         else {
-            if (plugin.getLobby() != null) player.teleport(plugin.getLobby());
+            Players.clearPotionEffects(player);
+            initPlayer(player);
+            player.getInventory().setContents(ANNIKit.teamColor(getKit(player), team));
+            player.teleport(map.getSpawnOrDefault(team).toLocation(copy));
         }
+
+
+        player.sendMessage(mm.buildBigChar(CmnUtil.numberToChar(state.getId()), Character.toString(team.getCCChar()),
+                (Object[]) mm.buildArray("notify.big.mid_join", team.getTeamName())
+        ));
     }
 
     public void leave(Player player) {
@@ -163,6 +175,7 @@ public class ANNIArena extends BukkitRunnable {
             savedData.put(
                     player.getUniqueId(),
                     new SaveData(
+                            isNexusLost(getTeamByPlayer(player)) && SpectatorManager.isSpectating(player),
                             getTeamByPlayer(player),
                             player.getInventory().getContents(),
                             player.getExp(),
@@ -350,10 +363,39 @@ public class ANNIArena extends BukkitRunnable {
                     p1.playSound(p1.getLocation(), Sound.BLOCK_NOTE_BLOCK_HARP, 1, 2);
                 });
 
+                VaultUtil.ifAvail((eco) -> {
+                    if (getTeamByPlayer(player) == null) return;
+
+                    getTeamPlayers(getTeamByPlayer(player)).forEach(teammate -> {
+                        eco.depositPlayer(teammate, 3);
+                        teammate.sendMessage(
+                                mm.build("notify.deposit_points", "3", mm.build("gui.shop.full_ext"))
+                        );
+                    });
+                });
+
                 if (ANNIKit.get(getKit(player)) == ANNIKit.WORKER && !isNexusLost(getTeamByPlayer(player))) {
-                    if (rand.nextDouble() > 0.90) {
-                        healNexusHealth(getTeamByPlayer(player), 1);
+                    boolean isPass;
+                    switch (getState()) {
+                        case PHASE_TWO: {
+                            isPass = rand.nextDouble() >= 0.70;
+                            break;
+                        }
+                        case PHASE_THREE: {
+                            isPass = rand.nextDouble() >= 0.80;
+                            break;
+                        }
+                        case PHASE_FOUR: {
+                            isPass = rand.nextDouble() >= 0.85;
+                            break;
+                        }
+                        default: {
+                            isPass = false;
+                            break;
+                        }
                     }
+
+                    if (isPass) healNexusHealth(getTeamByPlayer(player), 1);
                 }
             }
             else {
@@ -379,7 +421,7 @@ public class ANNIArena extends BukkitRunnable {
     }
 
     public boolean isNexusLost(ANNITeam team) {
-        return nexus.get(team) == null;
+        return nexus.get(team) == null || nexus.get(team) <= 0;
     }
 
     public void restoreNexus(ANNITeam team, Integer health) {
@@ -423,7 +465,7 @@ public class ANNIArena extends BukkitRunnable {
                     List<ANNIMap> filtered = plugin.getMapManager().getMaps().stream()
                             .filter(ANNIMap::canUseOnArena)
                             .collect(Collectors.toList());
-                    if (filtered.size() == 0) return false;
+                    if (filtered.isEmpty()) return false;
                     map = filtered.get(rand.nextInt(filtered.size()));
                 }
             }
@@ -521,7 +563,7 @@ public class ANNIArena extends BukkitRunnable {
 
             log.info("Assigning players...");
             savedData.clear();
-            players.forEach(this::assignPlayer);
+            players.forEach(player -> setTeam(player, assignTeam()));
             nexus.clear();
             getTeams().forEach((at, team) -> {
                 setNexusHealth(at, ANNIConfig.getDefaultHealth());
@@ -531,6 +573,7 @@ public class ANNIArena extends BukkitRunnable {
                         .map(offp -> Bukkit.getPlayer(offp.getUniqueId()))
                         .forEach(p -> {
                             p.teleport(sl);
+                            p.setGameMode(GameMode.SURVIVAL);
                             initPlayer(p);
                             p.getInventory().setContents(ANNIKit.teamColor(getKit(p), at));
                         });
@@ -557,6 +600,7 @@ public class ANNIArena extends BukkitRunnable {
         log.info("Starting clean up.");
         try {
             log.info("Initializing players...");
+            SpectatorManager.clear();
             savedData.clear();
             players.forEach(player -> {
                 player.spigot().respawn();
@@ -569,9 +613,6 @@ public class ANNIArena extends BukkitRunnable {
                     team.getEntries().forEach(team::removeEntry);
                     log.info(team.getEntries().toString());
             });
-
-            log.info("Showing spectators...");
-            SpectatorManager.clear();
             log.info("Cancelling tasks...");
             DefenseArtifact.cancelAllTasks();
             log.info("Initializing nexus...");
@@ -602,6 +643,8 @@ public class ANNIArena extends BukkitRunnable {
                 log.info("Deleting map...");
                 FileUtil.deleteWorld(copy);
                 copy = null;
+
+                fireworkTimer = 0;
             }
             if (VoteManager.isNowVoting(id)) VoteManager.endVote(id);
         }
@@ -671,6 +714,8 @@ public class ANNIArena extends BukkitRunnable {
         updateBossBar();
         updateScoreboard();
         updatePhase();
+
+        if (state == ArenaState.GAME_OVER) launchFireworkRocket();
 
         if (state.getId() >= 0) {
             if (state.getId() > 0) {
@@ -951,45 +996,56 @@ public class ANNIArena extends BukkitRunnable {
         }
     }
 
-    private void assignPlayer(Player player) {
-        if (player.getScoreboard() != plugin.getPluginBoard())
-            player.setScoreboard(plugin.getPluginBoard());
-        if (CmnUtil.getJoinedTeam(player) != null) return;
-
-        Map<Team, Integer> teamSize = new HashMap<>();
-        getTeams().entrySet().stream()
-                .filter(ent -> state.getId() < 0 || !isNexusLost(ent.getKey()))
-                .map(Map.Entry::getValue)
-                .forEach(t ->
-                        teamSize.put(
-                                t,
-                                (int) t.getPlayers().stream()
-                                        .map(OfflinePlayer::isOnline)
-                                        .count()
-                        )
-                );
-
-        if ( // 全部の値が一緒なら
-                Collections3.allValueEquals(
-                        teamSize.values(),
-                        teamSize.values().iterator().next() // チーム人数リストの最初の要素
-                )
-        ) {
-            List<Team> teams2 = new ArrayList<>(getTeams().values());
-            Team sel = teams2.get(rand.nextInt(teams2.size()));
-            sel.addPlayer(player); // ランダムなチームに参加させる
+    private void launchFireworkRocket() {
+        if (fireworkTimer <= 0) fireworkTimer = 3;
+        else {
+            fireworkTimer--;
+            return;
         }
-        else { // 一緒じゃなければ均等に分散させる
-            Map.Entry<Team, Integer> minTeam = null; // 人数が少ないチーム
 
-            for (Map.Entry<Team, Integer> entry : teamSize.entrySet()) {
-                if (minTeam == null || minTeam.getValue() > entry.getValue()) {
-                    minTeam = entry; // minTeamがnullもしくはminTeamの人数より少なければentryに置き換える
-                }
-            }
+        Map<ANNITeam, Color> colorMap = new HashMap<>();
+        colorMap.put(ANNITeam.RED, Color.RED);
+        colorMap.put(ANNITeam.BLUE, Color.BLUE);
+        colorMap.put(ANNITeam.GREEN, Color.GREEN);
+        colorMap.put(ANNITeam.YELLOW, Color.YELLOW);
 
-            minTeam.getKey().addPlayer(player);
-        }
+        List<ANNITeam> living = getTeams().keySet().stream()
+                .filter(team -> !isNexusLost(team))
+                .collect(Collectors.toList());
+
+        if (living.size() != 1) return;
+
+        getTeamPlayers(living.get(0)).stream()
+                .filter(p -> !SpectatorManager.isSpectating(p.getUniqueId()))
+                .forEach(winner -> {
+                        if (winner.getWorld() != copy) return;
+
+                        Firework fw = (Firework) copy.spawnEntity(winner.getLocation(), EntityType.FIREWORK);
+
+                        fw.getPersistentDataContainer().set(
+                                new NamespacedKey(plugin, "winner-rocket"),
+                                PersistentDataType.INTEGER, 1
+                        );
+
+                        FireworkMeta fm = fw.getFireworkMeta();
+
+                        fm.addEffect(
+                                rand.nextBoolean() ?
+                                        FireworkEffect.builder()
+                                                .with(FireworkEffect.Type.BALL)
+                                                .withColor(colorMap.get(living.get(0)))
+                                                .build()
+                                        :
+                                        FireworkEffect.builder()
+                                                .with(FireworkEffect.Type.BALL)
+                                                .withFlicker()
+                                                .withColor(colorMap.get(living.get(0)))
+                                                .build()
+                        );
+                        fm.setPower(1);
+
+                        fw.setFireworkMeta(fm);
+                });
     }
 
     private List<Map.Entry<ANNIMap, Integer>> getMapRanking(Multimap<Object, OfflinePlayer> multimap) {
@@ -1015,5 +1071,38 @@ public class ANNIArena extends BukkitRunnable {
         player.getEnderChest().clear();
         player.setLevel(0);
         player.setExp(0);
+    }
+
+    private ANNITeam assignTeam() {
+        Map<ANNITeam, Integer> sizeOfTeam = new HashMap<>();
+        getTeams().keySet().stream()
+                .filter(t -> !state.isInArena() || !isNexusLost(t))
+                .forEach(t ->
+                    sizeOfTeam.put(t, getTeamPlayers(t).size())
+                );
+
+        ANNITeam assigned;
+
+        if (Collections3.allValueEquals(sizeOfTeam.values(), sizeOfTeam.values().iterator().next())) {
+            List<ANNITeam> list = new ArrayList<>(sizeOfTeam.keySet());
+            assigned = list.get(rand.nextInt(list.size()));
+        }
+        else {
+            Entry<ANNITeam, Integer> least = null;
+            for (Entry<ANNITeam, Integer> entry : sizeOfTeam.entrySet()) {
+                if (least == null) {
+                    least = entry;
+                    continue;
+                }
+
+                boolean update = rand.nextBoolean();
+                if ((least.getValue().equals(entry.getValue()) && update) || least.getValue() > entry.getValue())
+                    least = entry;
+            }
+
+            assigned = least.getKey();
+        }
+
+        return assigned;
     }
 }

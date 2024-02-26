@@ -15,6 +15,7 @@ import net.nekozouneko.anni.listener.*;
 import net.nekozouneko.anni.listener.votifier.VotifierListener;
 import net.nekozouneko.anni.map.MapManager;
 import net.nekozouneko.anni.message.MessageManager;
+import net.nekozouneko.anni.task.CooldownManager;
 import net.nekozouneko.anni.util.FileUtil;
 import net.nekozouneko.commons.spigot.inventory.ItemStackBuilder;
 import org.bukkit.Location;
@@ -36,7 +37,7 @@ import java.util.Map;
 
 public final class ANNIPlugin extends JavaPlugin {
 
-    public static final String LATEST_MESSAGE_VERSION = "11";
+    public static final String LATEST_MESSAGE_VERSION = "14";
     private static ANNIPlugin plugin;
 
     public static ANNIPlugin getInstance() {
@@ -49,6 +50,8 @@ public final class ANNIPlugin extends JavaPlugin {
     private BoardManager boardManager;
     @Getter
     private MapManager mapManager;
+    @Getter
+    private CooldownManager cooldownManager;
 
     @Getter
     private ANNIArena currentGame;
@@ -103,6 +106,9 @@ public final class ANNIPlugin extends JavaPlugin {
 
         mapManager.load(defaultMapsDir);
 
+        cooldownManager = new CooldownManager();
+        cooldownManager.runTaskTimer(this, 0, 5);
+
         try {
             lobby = FileUtil.readGson(new File(getDataFolder(), "lobby.json"), Location.class);
         }
@@ -123,6 +129,7 @@ public final class ANNIPlugin extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new PlayerJoinListener(), this);
         getServer().getPluginManager().registerEvents(new PlayerQuitListener(), this);
         getServer().getPluginManager().registerEvents(new PlayerRespawnListener(), this);
+        getServer().getPluginManager().registerEvents(new ProjectileLaunchListener(), this);
 
         if (ANNIConfig.isVotifierVoteEnabled()) {
             try {
@@ -141,7 +148,7 @@ public final class ANNIPlugin extends JavaPlugin {
         currentGame = new ANNIArena(this, "current");
         spectatorTask = new SpectatorTask();
         currentGame.runTaskTimer(this, 0, 20);
-        spectatorTask.runTaskTimer(this, 0, 1);
+        spectatorTask.runTaskTimer(this, 0, 20);
 
         getCommand("anni-admin").setExecutor(new ANNIAdminCommand());
         getCommand("anni").setExecutor(new ANNICommand());
@@ -151,6 +158,7 @@ public final class ANNIPlugin extends JavaPlugin {
         getCommand("vote").setExecutor(new VoteCommand());
         getCommand("kit").setExecutor(new KitCommand());
         getCommand("point").setExecutor(new PointCommand());
+        getCommand("charge").setExecutor(new ChargeCommand());
 
         registerRecipe();
     }

@@ -32,7 +32,7 @@ public class PointCharger extends AbstractGui {
         MessageManager mm = ANNIPlugin.getInstance().getMessageManager();
 
         if (inventory == null)
-            Bukkit.createInventory(this, 54, mm.build("gui.point_charger.title"));
+            inventory = Bukkit.createInventory(this, 54, mm.build("gui.point_charger.title"));
 
         ItemStack chargeButton = ItemStackBuilder.of(Material.LIME_STAINED_GLASS_PANE)
                 .name(mm.build("gui.point_charger.charge"))
@@ -58,7 +58,12 @@ public class PointCharger extends AbstractGui {
             return;
         }
 
-        if (event.getCurrentItem().getType() != Material.GOLD_INGOT) event.setCancelled(true);
+        ItemStack goldIngot = new ItemStack(Material.GOLD_INGOT);
+        ItemStack emerald = new ItemStack(Material.EMERALD);
+
+        if (!(goldIngot.isSimilar(event.getCurrentItem()) || emerald.isSimilar(event.getCurrentItem()))) {
+            event.setCancelled(true);
+        }
     }
 
     @EventHandler
@@ -66,20 +71,32 @@ public class PointCharger extends AbstractGui {
         if (event.getInventory().getHolder() != this) return;
 
         int ingots = 0;
+        int emeralds = 0;
         List<ItemStack> returns = new ArrayList<>();
         for (int i = 0; i < 45; i++) {
             ItemStack item = inventory.getItem(i);
             if (item == null || item.getType().isAir()) continue;
 
-            if (item.getType() == Material.GOLD_INGOT) {
+            if (new ItemStack(Material.GOLD_INGOT).isSimilar(item)) {
                 ingots += item.getAmount();
+            }
+            else if (new ItemStack(Material.EMERALD).isSimilar(item)) {
+                emeralds += item.getAmount();
             }
             else {
                 returns.add(item);
             }
         }
 
-        VaultUtil.getEco().depositPlayer((OfflinePlayer) event.getPlayer(), 500 * ingots);
+        MessageManager mm = ANNIPlugin.getInstance().getMessageManager();
+        double deposit = 50 * ingots + 100 * emeralds;
+
+        if (deposit > 0) {
+            VaultUtil.getEco().depositPlayer((OfflinePlayer) event.getPlayer(), deposit);
+            player.sendMessage(mm.build("gui.point_charger.charged", deposit, mm.build("gui.shop.ext")));
+        }
+        else player.sendMessage(mm.build("gui.point_charger.not_charged"));
+
         CmnUtil.giveOrDrop(player, returns);
         unregisterAllGuiListeners((Player) event.getPlayer());
     }
