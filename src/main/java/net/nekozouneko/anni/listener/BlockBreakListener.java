@@ -101,6 +101,10 @@ public class BlockBreakListener implements Listener {
         return QUEUED_ON_DAMAGE;
     }
 
+    public static Set<Material> getRegenerativeBlocks() {
+        return Collections.unmodifiableSet(BLOCKS.keySet());
+    }
+
     static {
         BLOCKS.put(Material.MELON, new ANNIBlockInfo(5, false, null, () -> 0));
         BLOCKS.put(Material.GRAVEL, new ANNIBlockInfo(5, false, Material.COBBLESTONE, () -> 0));
