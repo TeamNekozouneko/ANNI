@@ -602,6 +602,7 @@ public class ANNIArena extends BukkitRunnable {
             log.info("Initializing players...");
             SpectatorManager.clear();
             savedData.clear();
+            plugin.getCooldownManager().clear();
             players.forEach(player -> {
                 player.spigot().respawn();
                 initPlayer(player);
