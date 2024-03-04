@@ -23,7 +23,7 @@ import net.nekozouneko.anni.arena.team.ANNITeam;
 import net.nekozouneko.anni.board.BoardManager;
 import net.nekozouneko.anni.kit.ANNIKit;
 import net.nekozouneko.anni.kit.AbstractKit;
-import net.nekozouneko.anni.kit.items.DefenseArtifact;
+import net.nekozouneko.anni.item.DefenseArtifact;
 import net.nekozouneko.anni.listener.PlayerDamageListener;
 import net.nekozouneko.anni.map.ANNIMap;
 import net.nekozouneko.anni.message.MessageManager;

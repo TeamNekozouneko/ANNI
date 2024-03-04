@@ -1,4 +1,4 @@
-package net.nekozouneko.anni.kit.items;
+package net.nekozouneko.anni.item;
 
 import net.nekozouneko.anni.ANNIPlugin;
 import net.nekozouneko.commons.spigot.inventory.ItemStackBuilder;

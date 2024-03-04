@@ -1,7 +1,7 @@
 package net.nekozouneko.anni.kit;
 
 import net.nekozouneko.anni.ANNIPlugin;
-import net.nekozouneko.anni.kit.items.StunGrenade;
+import net.nekozouneko.anni.item.StunGrenade;
 import net.nekozouneko.commons.spigot.inventory.ItemStackBuilder;
 import net.nekozouneko.commons.spigot.inventory.special.LeatherArmorBuilder;
 import org.bukkit.Material;
