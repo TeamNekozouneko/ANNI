@@ -48,7 +48,7 @@ public class FlyingBook implements Listener {
                     new TextComponent(
                             ANNIPlugin.getInstance().getMessageManager().build(
                                     "command.err.cooldown",
-                                    cm.getTimeLeftFormatted(event.getPlayer().getUniqueId(), CooldownManager.Type.GRAPPLING_HOOK)
+                                    cm.getTimeLeftFormatted(event.getPlayer().getUniqueId(), CooldownManager.Type.FLYING_BOOK)
 
                             )
                     )
@@ -57,7 +57,7 @@ public class FlyingBook implements Listener {
             return;
         }
 
-        event.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.LEVITATION, 200, 4, false, true, true));
+        event.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.LEVITATION, 200, 2, false, true, true));
         cm.set(event.getPlayer().getUniqueId(), CooldownManager.Type.FLYING_BOOK, 60000);
     }
 
