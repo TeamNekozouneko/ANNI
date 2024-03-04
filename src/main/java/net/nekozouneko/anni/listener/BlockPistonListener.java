@@ -4,17 +4,18 @@ import net.nekozouneko.anni.ANNIPlugin;
 import net.nekozouneko.anni.arena.ANNIArena;
 import org.bukkit.block.Block;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockPistonExtendEvent;
 import org.bukkit.event.block.BlockPistonRetractEvent;
 
 public class BlockPistonListener implements Listener {
 
-    @EventHandler(ignoreCancelled = true)
+    @EventHandler(priority = EventPriority.HIGH)
     public void onExtendPiston(BlockPistonExtendEvent event) {
         ANNIArena game = ANNIPlugin.getInstance().getCurrentGame();
 
-        if (game.getCopyWorld() == null || event.getBlock().getWorld().equals(game.getCopyWorld())) return;
+        if (game.getCopyWorld() == null || !event.getBlock().getWorld().equals(game.getCopyWorld())) return;
 
         boolean cancel = false;
 
@@ -28,11 +29,11 @@ public class BlockPistonListener implements Listener {
         if (cancel) event.setCancelled(true);
     }
 
-    @EventHandler(ignoreCancelled = true)
+    @EventHandler(priority = EventPriority.HIGH)
     public void onRetractPiston(BlockPistonRetractEvent event) {
         ANNIArena game = ANNIPlugin.getInstance().getCurrentGame();
 
-        if (game.getCopyWorld() == null || event.getBlock().getWorld().equals(game.getCopyWorld())) return;
+        if (game.getCopyWorld() == null || !event.getBlock().getWorld().equals(game.getCopyWorld())) return;
 
         boolean cancel = false;
 
