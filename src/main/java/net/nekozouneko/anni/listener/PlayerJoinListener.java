@@ -14,6 +14,7 @@ public class PlayerJoinListener implements Listener {
         Bukkit.getScheduler().runTask(ANNIPlugin.getInstance(), () ->
                 ANNIPlugin.getInstance().getCurrentGame().join(e.getPlayer())
         );
+        ANNIPlugin.getInstance().getDatabase().initPlayerIfNotInitialized(e.getPlayer().getUniqueId());
     }
 
 }

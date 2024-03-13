@@ -11,6 +11,10 @@ website: '${project.url}'
 softdepend: [Votifier]
 depend: [Vault, WorldEdit, WorldGuard]
 
+libraries:
+  - "com.zaxxer:HikariCP:4.0.3"
+  - "org.xerial:sqlite-jdbc:3.42.0.0"
+
 commands:
   anni-admin:
     aliases: ["anniadmin"]
