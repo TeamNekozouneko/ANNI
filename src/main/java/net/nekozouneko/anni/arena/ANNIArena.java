@@ -691,7 +691,10 @@ public class ANNIArena extends BukkitRunnable {
                     if (VoteManager.isNowVoting(id)) {
                         List<Map.Entry<ANNIMap, Integer>> l = getMapRanking(VoteManager.endVote(id));
                         if (l.isEmpty() || Collections3.allValueEquals(l, l.get(0))) {
-                            map = plugin.getMapManager().getMaps().get(rand.nextInt(plugin.getMapManager().getMaps().size()));
+                            List<ANNIMap> filtered = plugin.getMapManager().getMaps().stream()
+                                    .filter(ANNIMap::canUseOnArena)
+                                    .collect(Collectors.toList());
+                            map = filtered.get(rand.nextInt(filtered.size()));
                         }
                         else map = l.get(0).getKey();
                     }
@@ -1061,7 +1064,6 @@ public class ANNIArena extends BukkitRunnable {
 
         LinkedList<Map.Entry<ANNIMap, Integer>> ll = new LinkedList<>(rank.entrySet());
         ll.sort(Map.Entry.comparingByValue(Comparator.reverseOrder()));
-
         return ll;
     }
 

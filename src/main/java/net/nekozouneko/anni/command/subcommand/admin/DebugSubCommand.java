@@ -6,13 +6,14 @@ import net.nekozouneko.anni.arena.ArenaState;
 import net.nekozouneko.anni.arena.spectator.SpectatorManager;
 import net.nekozouneko.anni.arena.team.ANNITeam;
 import net.nekozouneko.anni.command.ASubCommand;
-import net.nekozouneko.anni.kit.ANNIKit;
-import net.nekozouneko.anni.kit.custom.CustomKit;
 import net.nekozouneko.anni.item.AirJump;
 import net.nekozouneko.anni.item.GrapplingHook;
 import net.nekozouneko.anni.item.StunGrenade;
+import net.nekozouneko.anni.kit.ANNIKit;
+import net.nekozouneko.anni.kit.custom.CustomKit;
 import net.nekozouneko.anni.listener.BlockBreakListener;
 import net.nekozouneko.anni.util.CmdUtil;
+import net.nekozouneko.anni.vote.VoteManager;
 import net.nekozouneko.commons.spigot.command.TabCompletes;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
@@ -97,6 +98,10 @@ public class DebugSubCommand extends ASubCommand {
                 ((Player) sender).getInventory().addItem(GrapplingHook.builder().build());
                 break;
             }
+            case "vote": {
+                VoteManager.vote(ANNIPlugin.getInstance().getCurrentGame().getId(), Bukkit.getOfflinePlayer(UUID.randomUUID()), args.get(1));
+                break;
+            }
             default: return false;
         }
 
@@ -127,6 +132,12 @@ public class DebugSubCommand extends ASubCommand {
                                 .map(CustomKit::getId).collect(Collectors.toList()));
 
                         return TabCompletes.sorted(args.get(1), ids);
+                    }
+                    case "vote": {
+                        String id = ANNIPlugin.getInstance().getCurrentGame().getId();
+                        if (VoteManager.isNowVoting(id)) {
+                            return TabCompletes.sorted(args.get(1), VoteManager.getChoices(id).stream().map(Object::toString).collect(Collectors.toList()));
+                        }
                     }
                 }
             }
