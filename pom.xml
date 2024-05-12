@@ -7,7 +7,7 @@
 
     <groupId>net.nekozouneko</groupId>
     <artifactId>ANNI</artifactId>
-    <version>3.6.3</version>
+    <version>3.7</version>
     <packaging>jar</packaging>
 
     <name>ANNI</name>
@@ -132,7 +132,7 @@
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-            <version>1.18.30</version>
+            <version>1.18.32</version>
         </dependency>
 
         <dependency>
@@ -176,7 +176,7 @@
             <exclusions>
                 <exclusion>
                     <groupId>org.bukkit</groupId>
-                    <artifactId>bukkit-api</artifactId>
+                    <artifactId>bukkit</artifactId>
                 </exclusion>
                 <exclusion>
                     <groupId>junit</groupId>

@@ -148,7 +148,7 @@ public class BlockBreakListener implements Listener {
                     () -> new Random().nextInt(7) + 6
             ));
             BLOCKS.put(Material.DEEPSLATE_DIAMOND_ORE, rareInfo);
-            BLOCKS.put(Material.DEEPSLATE_EMERALD_ORE, rareInfo);
+            BLOCKS.put(Material.DEEPSLATE_EMERALD_ORE, new ANNIBlockInfo(30, true, Material.COBBLESTONE, () -> new Random().nextInt(15) + 10));
         }
         // 1.19
         if (Enums.getIfPresent(Material.class, "MANGROVE_LOG").isPresent()) {
