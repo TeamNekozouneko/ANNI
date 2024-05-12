@@ -34,12 +34,9 @@ import java.util.Map;
 
 public final class ANNIPlugin extends JavaPlugin {
 
-    public static final String LATEST_MESSAGE_VERSION = "15";
-    private static ANNIPlugin plugin;
-
-    public static ANNIPlugin getInstance() {
-        return plugin;
-    }
+    public static final String LATEST_MESSAGE_VERSION = "16";
+    @Getter
+    private static ANNIPlugin instance;
 
     @Getter
     private MessageManager messageManager;
@@ -90,7 +87,7 @@ public final class ANNIPlugin extends JavaPlugin {
 
     @Override
     public void onEnable() {
-        plugin = this;
+        instance = this;
 
         saveDefaultConfig();
         ANNIConfig.setConfig(getConfig());
@@ -143,6 +140,7 @@ public final class ANNIPlugin extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new GrapplingHook(), this);
         getServer().getPluginManager().registerEvents(new DefenseArtifact(), this);
         getServer().getPluginManager().registerEvents(new FlyingBook(), this);
+        getServer().getPluginManager().registerEvents(new NexusCompass(), this);
 
         currentGame = new ANNIArena(this, "current");
         spectatorTask = new SpectatorTask();
@@ -166,6 +164,8 @@ public final class ANNIPlugin extends JavaPlugin {
     public void onDisable() {
         if (!currentGame.isCancelled()) currentGame.cancel();
         unregisterRecipe();
+
+        instance = null;
     }
 
     @SuppressWarnings("unchecked")

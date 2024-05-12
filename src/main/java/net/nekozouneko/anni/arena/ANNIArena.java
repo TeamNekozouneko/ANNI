@@ -1068,12 +1068,13 @@ public class ANNIArena extends BukkitRunnable {
     }
 
     private void initPlayer(Player player) {
-        player.setHealth(player.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue());
-        player.setFoodLevel(20);
         player.getInventory().clear();
         player.getEnderChest().clear();
+        player.setHealth(player.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue());
+        player.setFoodLevel(20);
         player.setLevel(0);
         player.setExp(0);
+        player.setCompassTarget(player.getWorld().getSpawnLocation());
     }
 
     private ANNITeam assignTeam() {
