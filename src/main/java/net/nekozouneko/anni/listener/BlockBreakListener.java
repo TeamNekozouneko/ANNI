@@ -132,7 +132,7 @@ public class BlockBreakListener implements Listener {
                 () -> new Random().nextInt(7) + 6
         ));
         BLOCKS.put(Material.DIAMOND_ORE, rareInfo);
-        BLOCKS.put(Material.EMERALD_ORE, rareInfo);
+        BLOCKS.put(Material.EMERALD_ORE, new ANNIBlockInfo(30, true, Material.COBBLESTONE, () -> new Random().nextInt(15) + 10));
         BLOCKS.put(Material.NETHER_GOLD_ORE, commonInfo);
 
         // 1.17
@@ -240,7 +240,9 @@ public class BlockBreakListener implements Listener {
                         return;
                     }
 
-                    CmnUtil.giveOrDrop(e.getPlayer(), e.getBlock().getDrops(mainHand, e.getPlayer()));
+                    if (e.getBlock().getType() != Material.EMERALD_ORE) {
+                        CmnUtil.giveOrDrop(e.getPlayer(), e.getBlock().getDrops(mainHand, e.getPlayer()));
+                    }
 
                     e.setExpToDrop(0);
                     e.setDropItems(false);
