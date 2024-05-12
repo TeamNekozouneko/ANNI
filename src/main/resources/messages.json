@@ -1,5 +1,5 @@
 {
-  "version": "15",
+  "version": "16",
 
   "scoreboard.title": "&c&lANNI&9&lHI&a&lLA&e&lTION",
   "scoreboard.dateformat": "yyyy/MM/dd HH:mm",
@@ -504,6 +504,9 @@
   "item.flying_book.lore.2": "",
   "item.flying_book.lore.3": "&9効果：",
   "item.flying_book.lore.4": "&9* 自身を10秒間浮遊させる。",
+
+  "item.nexus_compass.name": "&7クリックして有効化",
+  "item.nexus_compass.name.target": "{0}&rのネクサス &7[クリック]",
 
   "actionbar.nexus_alert": "&c{0} によってネクサスが破壊されています！",
   "actionbar.spectator_mode": "&7観戦モード",

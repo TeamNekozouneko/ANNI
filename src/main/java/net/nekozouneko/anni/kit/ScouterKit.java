@@ -2,6 +2,7 @@ package net.nekozouneko.anni.kit;
 
 import net.nekozouneko.anni.ANNIPlugin;
 import net.nekozouneko.anni.item.GrapplingHook;
+import net.nekozouneko.anni.item.NexusCompass;
 import net.nekozouneko.commons.spigot.inventory.ItemStackBuilder;
 import net.nekozouneko.commons.spigot.inventory.special.LeatherArmorBuilder;
 import org.bukkit.Material;
@@ -23,8 +24,11 @@ public class ScouterKit extends AbstractKit {
         inv[1] = ItemStackBuilder.of(Material.STONE_PICKAXE).build();
         inv[2] = ItemStackBuilder.of(Material.STONE_AXE).build();
         inv[3] = ItemStackBuilder.of(Material.STONE_SHOVEL).build();
-        inv[7] = ItemStackBuilder.of(Material.BREAD).amount(16).build();
-        inv[8] = GrapplingHook.builder()
+        inv[6] = ItemStackBuilder.of(Material.BREAD).amount(16).build();
+        inv[7] = GrapplingHook.builder()
+                .persistentData(new NamespacedKey(ANNIPlugin.getInstance(), "no-remove"), PersistentDataType.INTEGER, 1)
+                .build();
+        inv[8] = NexusCompass.builder()
                 .persistentData(new NamespacedKey(ANNIPlugin.getInstance(), "no-remove"), PersistentDataType.INTEGER, 1)
                 .build();
 

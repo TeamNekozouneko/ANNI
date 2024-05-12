@@ -66,6 +66,7 @@ public class PlayerDeathListener implements Listener {
         }
 
         DefenseArtifact.cancelTask(e.getEntity().getUniqueId());
+        e.getEntity().setCompassTarget(e.getEntity().getWorld().getSpawnLocation());
 
         // {kit-item: 1} じゃないアイテムをドロップさせる。
         new LinkedHashSet<>(e.getDrops()).stream()

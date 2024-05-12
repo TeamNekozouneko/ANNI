@@ -1,6 +1,7 @@
 package net.nekozouneko.anni.kit;
 
 import net.nekozouneko.anni.ANNIPlugin;
+import net.nekozouneko.anni.item.NexusCompass;
 import net.nekozouneko.anni.item.StunGrenade;
 import net.nekozouneko.commons.spigot.inventory.ItemStackBuilder;
 import net.nekozouneko.commons.spigot.inventory.special.LeatherArmorBuilder;
@@ -27,9 +28,12 @@ public class MochiMochiKit extends AbstractKit {
         inv[1] = ItemStackBuilder.of(Material.STONE_PICKAXE).build();
         inv[2] = ItemStackBuilder.of(Material.STONE_AXE).build();
         inv[3] = ItemStackBuilder.of(Material.STONE_SHOVEL).build();
-        inv[7] = ItemStackBuilder.of(Material.BREAD).amount(16).build();
-        inv[8] = StunGrenade.builder()
+        inv[6] = ItemStackBuilder.of(Material.BREAD).amount(16).build();
+        inv[7] = StunGrenade.builder()
                 .amount(5)
+                .persistentData(new NamespacedKey(ANNIPlugin.getInstance(), "no-remove"), PersistentDataType.INTEGER, 1)
+                .build();
+        inv[8] = NexusCompass.builder()
                 .persistentData(new NamespacedKey(ANNIPlugin.getInstance(), "no-remove"), PersistentDataType.INTEGER, 1)
                 .build();
 
