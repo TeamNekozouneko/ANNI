@@ -105,4 +105,8 @@ public final class CmnUtil {
         return true;
     }
 
+    public static boolean hasPersistentContainer(ItemStack item) {
+        return item != null && !item.getType().isAir();
+    }
+
 }
