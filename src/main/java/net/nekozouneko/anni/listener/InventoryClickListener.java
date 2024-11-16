@@ -37,86 +37,8 @@ public class InventoryClickListener implements Listener {
     private final NamespacedKey noRemove = new NamespacedKey(ANNIPlugin.getInstance(), "no-remove");
     private final NamespacedKey kitItem = new NamespacedKey(ANNIPlugin.getInstance(), "kit-item");
 
-    /*@EventHandler
-    public void onClick(InventoryClickEvent e) {
-        ANNIPlugin plugin = ANNIPlugin.getInstance();
-
-        if (SpectatorManager.isSpectating((Player) e.getWhoClicked()) && e.getWhoClicked().getGameMode() != GameMode.CREATIVE) {
-            if (e.getInventory().getType() != InventoryType.PLAYER) {
-                e.setCancelled(true);
-                return;
-            }
-        }
-
-        if (plugin.getCurrentGame().getState().isInArena()) {
-            /*if (dropTypes.contains(e.getClick())) {
-                if (e.getWhoClicked().getGameMode() == GameMode.CREATIVE) return;
-                if (CmnUtil.hasPersistentContainer(e.getCurrentItem()) && isTrue(
-                        e.getCurrentItem().getItemMeta().getPersistentDataContainer(), noRemove
-                )) {
-                    e.setCancelled(true);
-
-                }
-                return;
-            }/
-
-            if (e.getCurrentItem() != null) {
-                Bukkit.broadcastMessage("Current: " + e.getCurrentItem());
-            }
-            if (e.getCursor() != null) {
-                Bukkit.broadcastMessage("Cursor: " + e.getCursor());
-            }
-
-            if (whitelistTypes.contains(e.getInventory().getType())) {
-                if (e.getWhoClicked().getGameMode() == GameMode.CREATIVE) return;
-                if (CmnUtil.hasPersistentContainer(e.getCurrentItem()) && isTrue(
-                        e.getCurrentItem().getItemMeta().getPersistentDataContainer(), kitItem
-                ))
-                    e.setCancelled(true);
-                return;
-            }
-
-            if (e.getClick() == ClickType.NUMBER_KEY) {
-                ItemStack item = e.getWhoClicked().getInventory().getItem(e.getHotbarButton());
-
-                if (item != null && !item.getType().isAir()) {
-                    PersistentDataContainer pdc = item.getItemMeta().getPersistentDataContainer();
-                    if (isTrue(pdc, noRemove) || isTrue(pdc, kitItem)) {
-                        e.setCancelled(true);
-                    }
-                }
-
-                return;
-            }
-            else if (CmnUtil.hasPersistentContainer(e.getCurrentItem())) return;
-
-            PersistentDataContainer pdc = e.getCurrentItem().getItemMeta().getPersistentDataContainer();
-
-            if (isTrue(pdc, noRemove) || isTrue(pdc, kitItem)) {
-                if (e.getWhoClicked().getGameMode() != GameMode.CREATIVE && e.getInventory() != null) {
-                    if (e.getClick() == ClickType.DROP || e.getClick() == ClickType.CONTROL_DROP) {
-                        /*
-                        e.setCurrentItem(null);
-                        ((Player) e.getWhoClicked()).playSound(e.getWhoClicked().getLocation(), Sound.ENTITY_ITEM_BREAK, 1, 1);
-                        return;
-                         /
-                    }
-                    else if (
-                            !(e.getInventory().getType() == InventoryType.CRAFTING ||
-                                    e.getInventory().getType() == InventoryType.PLAYER ||
-                                    e.getInventory().getType() == InventoryType.CREATIVE
-                            )
-                                    && pdc.getOrDefault(kitItem, PersistentDataType.INTEGER, 0) == 1
-                    ) {
-                        e.setCancelled(true);
-                    }
-                }
-            }
-        }
-    }*/
-
     @EventHandler
-    public void onClick2(InventoryClickEvent e) {
+    public void onClick(InventoryClickEvent e) {
         ANNIPlugin plugin = ANNIPlugin.getInstance();
 
         if (SpectatorManager.isSpectating((Player) e.getWhoClicked()) && e.getWhoClicked().getGameMode() != GameMode.CREATIVE) {
@@ -129,6 +51,7 @@ public class InventoryClickListener implements Listener {
         if (plugin.getCurrentGame().getState().isInArena()) {
             // getCurrentItem等だけで入手できない用
             if (swapTypes.contains(e.getClick())) {
+                if (whitelistTypes.contains(e.getInventory().getType())) return;
                 ItemStack pos1;
                 ItemStack item = e.getCurrentItem();
 
