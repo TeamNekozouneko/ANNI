@@ -3,15 +3,15 @@ package net.nekozouneko.anni.item;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.nekozouneko.anni.ANNIPlugin;
-import net.nekozouneko.anni.arena.team.ANNITeam;
 import net.nekozouneko.anni.message.MessageManager;
 import net.nekozouneko.anni.task.CooldownManager;
-import net.nekozouneko.anni.util.CmnUtil;
 import net.nekozouneko.commons.spigot.inventory.ItemStackBuilder;
-import org.bukkit.*;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
+import org.bukkit.Sound;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.FishHook;
-import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.ProjectileHitEvent;
@@ -23,7 +23,8 @@ import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.List;
 
 public class GrapplingHook implements Listener {
 
@@ -87,13 +88,8 @@ public class GrapplingHook implements Listener {
         if (c.getOrDefault(new NamespacedKey(ANNIPlugin.getInstance(), "grappling-hook"), PersistentDataType.INTEGER, 0) != 1)
             return;
 
-        if (event.getHitEntity() != null && event.getHitEntity() instanceof Player) {
-            ANNITeam shooterTeam = ANNIPlugin.getInstance().getCurrentGame().getTeam(CmnUtil.getJoinedTeam((Player) event.getEntity().getShooter()));
-            ANNITeam at = ANNIPlugin.getInstance().getCurrentGame().getTeam(CmnUtil.getJoinedTeam(((Player) event.getHitEntity())));
-
-            if (at != null && at == shooterTeam) {
-                event.setCancelled(true);
-            }
+        if (event.getHitEntity() != null) {
+            event.setCancelled(true);
         }
     }
 
