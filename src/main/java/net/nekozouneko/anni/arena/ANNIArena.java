@@ -772,8 +772,16 @@ public class ANNIArena extends BukkitRunnable {
             }
 
             players.forEach((p) -> {
+                ItemStack mainHand = p.getInventory().getItemInMainHand();
+                ItemStack offHand = p.getInventory().getItemInOffHand();
+                boolean hasBow = (mainHand != null && mainHand.getType() == Material.BOW) ||
+                        (offHand != null && offHand.getType() == Material.BOW);
+
                 if (getKit(p).equals(ANNIKit.ASSAULT.getKit())) {
                     p.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 40, 0, false, false, true));
+                }
+                else if (getKit(p).equals(ANNIKit.BOW.getKit()) || hasBow) {
+                    p.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 40, 0, false, false, true));
                 }
             });
         }
@@ -857,7 +865,7 @@ public class ANNIArena extends BukkitRunnable {
                                     df.format(Calendar.getInstance().getTime()),
                                     news,
                                     players.size() + " / " + (ANNIConfig.getTeamMaxPlayers() * getEnabledTeams().size()),
-                                    nowRes.size() > 0 ? nowRes.get(0).getKey().getName() + " - " + nowRes.get(0).getValue() : "",
+                                    !nowRes.isEmpty() ? nowRes.get(0).getKey().getName() + " - " + nowRes.get(0).getValue() : "",
                                     nowRes.size() > 1 ? nowRes.get(1).getKey().getName() + " - " + nowRes.get(1).getValue() : "",
                                     nowRes.size() > 2 ? nowRes.get(2).getKey().getName() + " - " + nowRes.get(2).getValue() : ""
                             ));
