@@ -17,6 +17,11 @@ public class BoardManager implements Listener {
         public ANNIFastBoard(Player player) {
             super(player);
         }
+
+        @Override
+        public boolean hasLinesMaxLength() {
+            return super.hasLinesMaxLength();
+        }
     }
 
     private final ANNIPlugin plugin;
