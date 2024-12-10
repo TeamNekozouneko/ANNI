@@ -1,5 +1,5 @@
 {
-  "version": "14",
+  "version": "16",
 
   "scoreboard.title": "&c&lANNI&9&lHI&a&lLA&e&lTION",
   "scoreboard.dateformat": "yyyy/MM/dd HH:mm",
@@ -467,6 +467,10 @@
   "kit.vampire.about.0": "&7敵に直接攻撃して、",
   "kit.vampire.about.1": "&7体力を吸い取ろう！",
 
+  "kit.musasabi.name": "&bむささびキット",
+  "kit.musasabi.about.0": "&7空高く飛んで、",
+  "kit.musasabi.about.1": "&7敵に奇襲をしよう！",
+
   "item.stun_grenade.name": "&cもちっと&bスタングレネード",
   "item.stun_grenade.lore.0": "&7ある高齢の職人が作ったもちっとスタンさせるグレネード。",
   "item.stun_grenade.lore.1": "",
@@ -493,6 +497,16 @@
   "item.defense_artifact_lore.4": "&9効果：",
   "item.defense_artifact.lore.5": "&9* 近くの敵の視界が一瞬真っ暗",
   "item.defense_artifact.lore.6": "&9* 近くの敵の攻撃力が10秒間低下",
+
+  "item.flying_book.name": "浮遊の書",
+  "item.flying_book.lore.0": "&7使用することで空高くにいくことができると言われている。",
+  "item.flying_book.lore.1": "&9クールタイム： 60秒",
+  "item.flying_book.lore.2": "",
+  "item.flying_book.lore.3": "&9効果：",
+  "item.flying_book.lore.4": "&9* 自身を10秒間浮遊させる。",
+
+  "item.nexus_compass.name": "&7クリックして有効化",
+  "item.nexus_compass.name.target": "{0}&rのネクサス &7[クリック]",
 
   "actionbar.nexus_alert": "&c{0} によってネクサスが破壊されています！",
   "actionbar.spectator_mode": "&7観戦モード",

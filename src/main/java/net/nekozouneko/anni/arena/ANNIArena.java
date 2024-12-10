@@ -23,7 +23,7 @@ import net.nekozouneko.anni.arena.team.ANNITeam;
 import net.nekozouneko.anni.board.BoardManager;
 import net.nekozouneko.anni.kit.ANNIKit;
 import net.nekozouneko.anni.kit.AbstractKit;
-import net.nekozouneko.anni.kit.items.DefenseArtifact;
+import net.nekozouneko.anni.item.DefenseArtifact;
 import net.nekozouneko.anni.listener.PlayerDamageListener;
 import net.nekozouneko.anni.map.ANNIMap;
 import net.nekozouneko.anni.message.MessageManager;
@@ -602,6 +602,7 @@ public class ANNIArena extends BukkitRunnable {
             log.info("Initializing players...");
             SpectatorManager.clear();
             savedData.clear();
+            plugin.getCooldownManager().clear();
             players.forEach(player -> {
                 player.spigot().respawn();
                 initPlayer(player);
@@ -690,7 +691,10 @@ public class ANNIArena extends BukkitRunnable {
                     if (VoteManager.isNowVoting(id)) {
                         List<Map.Entry<ANNIMap, Integer>> l = getMapRanking(VoteManager.endVote(id));
                         if (l.isEmpty() || Collections3.allValueEquals(l, l.get(0))) {
-                            map = plugin.getMapManager().getMaps().get(rand.nextInt(plugin.getMapManager().getMaps().size()));
+                            List<ANNIMap> filtered = plugin.getMapManager().getMaps().stream()
+                                    .filter(ANNIMap::canUseOnArena)
+                                    .collect(Collectors.toList());
+                            map = filtered.get(rand.nextInt(filtered.size()));
                         }
                         else map = l.get(0).getKey();
                     }
@@ -768,8 +772,16 @@ public class ANNIArena extends BukkitRunnable {
             }
 
             players.forEach((p) -> {
+                ItemStack mainHand = p.getInventory().getItemInMainHand();
+                ItemStack offHand = p.getInventory().getItemInOffHand();
+                boolean hasBow = (mainHand != null && mainHand.getType() == Material.BOW) ||
+                        (offHand != null && offHand.getType() == Material.BOW);
+
                 if (getKit(p).equals(ANNIKit.ASSAULT.getKit())) {
                     p.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 40, 0, false, false, true));
+                }
+                else if (getKit(p).equals(ANNIKit.BOW.getKit()) || hasBow) {
+                    p.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 40, 0, false, false, true));
                 }
             });
         }
@@ -853,7 +865,7 @@ public class ANNIArena extends BukkitRunnable {
                                     df.format(Calendar.getInstance().getTime()),
                                     news,
                                     players.size() + " / " + (ANNIConfig.getTeamMaxPlayers() * getEnabledTeams().size()),
-                                    nowRes.size() > 0 ? nowRes.get(0).getKey().getName() + " - " + nowRes.get(0).getValue() : "",
+                                    !nowRes.isEmpty() ? nowRes.get(0).getKey().getName() + " - " + nowRes.get(0).getValue() : "",
                                     nowRes.size() > 1 ? nowRes.get(1).getKey().getName() + " - " + nowRes.get(1).getValue() : "",
                                     nowRes.size() > 2 ? nowRes.get(2).getKey().getName() + " - " + nowRes.get(2).getValue() : ""
                             ));
@@ -1060,17 +1072,17 @@ public class ANNIArena extends BukkitRunnable {
 
         LinkedList<Map.Entry<ANNIMap, Integer>> ll = new LinkedList<>(rank.entrySet());
         ll.sort(Map.Entry.comparingByValue(Comparator.reverseOrder()));
-
         return ll;
     }
 
     private void initPlayer(Player player) {
-        player.setHealth(player.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue());
-        player.setFoodLevel(20);
         player.getInventory().clear();
         player.getEnderChest().clear();
+        player.setHealth(player.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue());
+        player.setFoodLevel(20);
         player.setLevel(0);
         player.setExp(0);
+        player.setCompassTarget(player.getWorld().getSpawnLocation());
     }
 
     private ANNITeam assignTeam() {

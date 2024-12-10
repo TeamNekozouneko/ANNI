@@ -1,8 +1,7 @@
 package net.nekozouneko.anni.listener;
 
 import net.nekozouneko.anni.ANNIPlugin;
-import net.nekozouneko.anni.kit.items.AirJump;
-import net.nekozouneko.anni.kit.items.DefenseArtifact;
+import net.nekozouneko.anni.item.DefenseArtifact;
 import net.nekozouneko.anni.message.MessageManager;
 import net.nekozouneko.anni.task.CooldownManager;
 import net.nekozouneko.anni.util.CmnUtil;
@@ -67,6 +66,7 @@ public class PlayerDeathListener implements Listener {
         }
 
         DefenseArtifact.cancelTask(e.getEntity().getUniqueId());
+        e.getEntity().setCompassTarget(e.getEntity().getWorld().getSpawnLocation());
 
         // {kit-item: 1} じゃないアイテムをドロップさせる。
         new LinkedHashSet<>(e.getDrops()).stream()

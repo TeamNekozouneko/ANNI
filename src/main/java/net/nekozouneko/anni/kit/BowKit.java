@@ -1,11 +1,14 @@
 package net.nekozouneko.anni.kit;
 
 import net.nekozouneko.anni.ANNIPlugin;
+import net.nekozouneko.anni.item.NexusCompass;
 import net.nekozouneko.commons.spigot.inventory.ItemStackBuilder;
 import net.nekozouneko.commons.spigot.inventory.special.LeatherArmorBuilder;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.persistence.PersistentDataType;
 
 public class BowKit extends AbstractKit {
 
@@ -28,7 +31,10 @@ public class BowKit extends AbstractKit {
         inv[4] = ItemStackBuilder.of(Material.BOW)
                 .enchant(Enchantment.DURABILITY, 3, false)
                 .build();
-        inv[8] = ItemStackBuilder.of(Material.BREAD).amount(16).build();
+        inv[7] = ItemStackBuilder.of(Material.BREAD).amount(16).build();
+        inv[8] = NexusCompass.builder()
+                .persistentData(new NamespacedKey(ANNIPlugin.getInstance(), "no-remove"), PersistentDataType.INTEGER, 1)
+                .build();
         inv[9] = ItemStackBuilder.of(Material.ARROW)
                 .amount(32)
                 .build();

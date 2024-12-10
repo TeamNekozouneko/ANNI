@@ -62,6 +62,10 @@ public class VoteManager {
         return ImmutableMultimap.copyOf(vote.get(id));
     }
 
+    public static void clearVote(String id) {
+        vote.get(id).clear();
+    }
+
     public static boolean isNowVoting(String id) {
         return vote.containsKey(id);
     }

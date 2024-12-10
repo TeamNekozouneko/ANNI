@@ -6,11 +6,8 @@ import net.nekozouneko.anni.arena.ANNIArena;
 import net.nekozouneko.anni.arena.spectator.SpectatorTask;
 import net.nekozouneko.anni.board.BoardManager;
 import net.nekozouneko.anni.command.*;
+import net.nekozouneko.anni.item.*;
 import net.nekozouneko.anni.kit.custom.CustomKitManager;
-import net.nekozouneko.anni.kit.items.AirJump;
-import net.nekozouneko.anni.kit.items.DefenseArtifact;
-import net.nekozouneko.anni.kit.items.GrapplingHook;
-import net.nekozouneko.anni.kit.items.StunGrenade;
 import net.nekozouneko.anni.listener.*;
 import net.nekozouneko.anni.listener.votifier.VotifierListener;
 import net.nekozouneko.anni.map.MapManager;
@@ -37,12 +34,9 @@ import java.util.Map;
 
 public final class ANNIPlugin extends JavaPlugin {
 
-    public static final String LATEST_MESSAGE_VERSION = "14";
-    private static ANNIPlugin plugin;
-
-    public static ANNIPlugin getInstance() {
-        return plugin;
-    }
+    public static final String LATEST_MESSAGE_VERSION = "16";
+    @Getter
+    private static ANNIPlugin instance;
 
     @Getter
     private MessageManager messageManager;
@@ -93,7 +87,7 @@ public final class ANNIPlugin extends JavaPlugin {
 
     @Override
     public void onEnable() {
-        plugin = this;
+        instance = this;
 
         saveDefaultConfig();
         ANNIConfig.setConfig(getConfig());
@@ -130,6 +124,8 @@ public final class ANNIPlugin extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new PlayerQuitListener(), this);
         getServer().getPluginManager().registerEvents(new PlayerRespawnListener(), this);
         getServer().getPluginManager().registerEvents(new ProjectileLaunchListener(), this);
+        getServer().getPluginManager().registerEvents(new BlockPistonListener(), this);
+        getServer().getPluginManager().registerEvents(new InventoryClickListener(), this);
 
         if (ANNIConfig.isVotifierVoteEnabled()) {
             try {
@@ -144,6 +140,8 @@ public final class ANNIPlugin extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new AirJump(), this);
         getServer().getPluginManager().registerEvents(new GrapplingHook(), this);
         getServer().getPluginManager().registerEvents(new DefenseArtifact(), this);
+        getServer().getPluginManager().registerEvents(new FlyingBook(), this);
+        getServer().getPluginManager().registerEvents(new NexusCompass(), this);
 
         currentGame = new ANNIArena(this, "current");
         spectatorTask = new SpectatorTask();
@@ -167,6 +165,8 @@ public final class ANNIPlugin extends JavaPlugin {
     public void onDisable() {
         if (!currentGame.isCancelled()) currentGame.cancel();
         unregisterRecipe();
+
+        instance = null;
     }
 
     @SuppressWarnings("unchecked")

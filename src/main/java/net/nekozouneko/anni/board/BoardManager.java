@@ -7,14 +7,12 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerQuitEvent;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
 
 public class BoardManager implements Listener {
 
-    public class ANNIFastBoard extends FastBoard {
+    public static class ANNIFastBoard extends FastBoard {
 
         public ANNIFastBoard(Player player) {
             super(player);
@@ -22,27 +20,8 @@ public class BoardManager implements Listener {
 
         @Override
         public boolean hasLinesMaxLength() {
-            try {
-                Class<?> via = Class.forName("com.viaversion.viaversion.api.Via");
-                Method getApi = via.getMethod("getAPI"); // com.viaversion.viaversion.api.Via#getAPI()
-                Object viaApi = getApi.invoke(null);
-
-                // com.viaversion.viaversion.api.Via#getAPI()#getPlayerVersion(Player)
-                Method getpv = viaApi.getClass().getMethod("getPlayerVersion", Player.class);
-
-                // com.viaversion.viaversion.api.protocol.version.ProtocolVersion.V1_13#getVersion()
-                Class<?> prov = Class.forName("com.viaversion.viaversion.api.protocol.version.ProtocolVersion");
-                Field v1_13Field = prov.getField("v1_13");
-                Object v1_13inst = v1_13Field.get(null);
-                Method getVer = v1_13inst.getClass().getMethod("getVersion");
-
-                return (int) getpv.invoke(viaApi, getPlayer()) < (int) getVer.invoke(v1_13inst);
-            }
-            catch (Exception ignored) {}
-
             return super.hasLinesMaxLength();
         }
-
     }
 
     private final ANNIPlugin plugin;

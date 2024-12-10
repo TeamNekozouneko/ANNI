@@ -26,6 +26,7 @@ public enum ANNIKit {
     SCOUTER(new ScouterKit()),
     WORKER(new WorkerKit()),
     VAMPIRE(new VampireKit());
+    //MUSASABI(new MusasabiKit());
 
     private static final Map<String, ANNIKit> ID_MAP = new HashMap<>();
 
@@ -40,6 +41,7 @@ public enum ANNIKit {
         ID_MAP.put(SCOUTER.getKit().getId(), SCOUTER);
         ID_MAP.put(WORKER.getKit().getId(), WORKER);
         ID_MAP.put(VAMPIRE.getKit().getId(), VAMPIRE);
+        //ID_MAP.put(MUSASABI.getKit().getId(), MUSASABI);
     }
 
     private final AbstractKit kit;

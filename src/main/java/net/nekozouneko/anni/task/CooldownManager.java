@@ -16,13 +16,13 @@ import java.util.*;
 
 public class CooldownManager extends BukkitRunnable {
 
-    @AllArgsConstructor
+    @AllArgsConstructor @Getter
     public enum Type {
         AIR_JUMP("item.airjump.name"),
         DEFENSE_ARTIFACT("item.defense_artifact.name"),
-        GRAPPLING_HOOK("item.grappling_hook.name");
+        GRAPPLING_HOOK("item.grappling_hook.name"),
+        FLYING_BOOK("item.flying_book.name");
 
-        @Getter
         private final String key;
     }
 
@@ -73,6 +73,10 @@ public class CooldownManager extends BukkitRunnable {
 
             map.remove(player);
         }
+    }
+
+    public void clear() {
+        cooldown.clear();
     }
 
     @Override

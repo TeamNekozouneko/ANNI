@@ -1,4 +1,4 @@
-package net.nekozouneko.anni.kit.items;
+package net.nekozouneko.anni.item;
 
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldguard.WorldGuard;

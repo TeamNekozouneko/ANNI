@@ -101,6 +101,10 @@ public class BlockBreakListener implements Listener {
         return QUEUED_ON_DAMAGE;
     }
 
+    public static Set<Material> getRegenerativeBlocks() {
+        return Collections.unmodifiableSet(BLOCKS.keySet());
+    }
+
     static {
         BLOCKS.put(Material.MELON, new ANNIBlockInfo(5, false, null, () -> 0));
         BLOCKS.put(Material.GRAVEL, new ANNIBlockInfo(5, false, Material.COBBLESTONE, () -> 0));
@@ -128,7 +132,7 @@ public class BlockBreakListener implements Listener {
                 () -> new Random().nextInt(7) + 6
         ));
         BLOCKS.put(Material.DIAMOND_ORE, rareInfo);
-        BLOCKS.put(Material.EMERALD_ORE, rareInfo);
+        BLOCKS.put(Material.EMERALD_ORE, new ANNIBlockInfo(30, true, Material.COBBLESTONE, () -> new Random().nextInt(15) + 10));
         BLOCKS.put(Material.NETHER_GOLD_ORE, commonInfo);
 
         // 1.17
@@ -144,7 +148,7 @@ public class BlockBreakListener implements Listener {
                     () -> new Random().nextInt(7) + 6
             ));
             BLOCKS.put(Material.DEEPSLATE_DIAMOND_ORE, rareInfo);
-            BLOCKS.put(Material.DEEPSLATE_EMERALD_ORE, rareInfo);
+            BLOCKS.put(Material.DEEPSLATE_EMERALD_ORE, new ANNIBlockInfo(30, true, Material.COBBLESTONE, () -> new Random().nextInt(15) + 10));
         }
         // 1.19
         if (Enums.getIfPresent(Material.class, "MANGROVE_LOG").isPresent()) {
@@ -236,7 +240,9 @@ public class BlockBreakListener implements Listener {
                         return;
                     }
 
-                    CmnUtil.giveOrDrop(e.getPlayer(), e.getBlock().getDrops(mainHand, e.getPlayer()));
+                    if (e.getBlock().getType() != Material.EMERALD_ORE) {
+                        CmnUtil.giveOrDrop(e.getPlayer(), e.getBlock().getDrops(mainHand, e.getPlayer()));
+                    }
 
                     e.setExpToDrop(0);
                     e.setDropItems(false);

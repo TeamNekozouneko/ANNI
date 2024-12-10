@@ -1,6 +1,7 @@
 package net.nekozouneko.anni.listener;
 
 import net.nekozouneko.anni.ANNIPlugin;
+import net.nekozouneko.anni.arena.ANNIArena;
 import net.nekozouneko.anni.arena.ArenaState;
 import net.nekozouneko.anni.arena.spectator.SpectatorManager;
 import net.nekozouneko.anni.kit.ANNIKit;
@@ -9,6 +10,7 @@ import net.nekozouneko.anni.task.CooldownManager;
 import org.bukkit.*;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Firework;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -62,8 +64,15 @@ public class PlayerDamageListener implements Listener {
                 return;
             }
 
-            if (ANNIPlugin.getInstance().getCurrentGame().getState().getId() >= 0) {
-                switch (ANNIKit.get(ANNIPlugin.getInstance().getCurrentGame().getKit(p))) {
+            ANNIArena arena = ANNIPlugin.getInstance().getCurrentGame();
+
+            if (arena.getState() == ArenaState.GAME_OVER && arena.getPlayers().contains(p)) {
+                e.setCancelled(true);
+                return;
+            }
+
+            if (arena.getState().getId() >= 0) {
+                switch (ANNIKit.get(arena.getKit(p))) {
                     case ACROBAT: {
                         if (e.getCause() == EntityDamageEvent.DamageCause.FALL) {
                             e.setCancelled(true);
@@ -97,6 +106,10 @@ public class PlayerDamageListener implements Listener {
 
             if (isWinnerRocket) e.setCancelled(true);
             return;
+        }
+
+        if (e.getDamager() instanceof Arrow) {
+            e.setDamage(e.getDamage() * 0.75);
         }
 
         if (e.getDamager() instanceof Player) {

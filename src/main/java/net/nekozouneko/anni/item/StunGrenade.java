@@ -1,4 +1,4 @@
-package net.nekozouneko.anni.kit.items;
+package net.nekozouneko.anni.item;
 
 import net.nekozouneko.anni.ANNIPlugin;
 import net.nekozouneko.anni.message.MessageManager;
@@ -17,6 +17,7 @@ import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.persistence.PersistentDataContainer;
+import org.bukkit.persistence.PersistentDataHolder;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -70,6 +71,15 @@ public class StunGrenade implements Listener {
             }
         }
     }
+
+    /*@EventHandler
+    public void onLaunch2(PlayerInteractEvent e) {
+        if (!(e.getAction() == Action.RIGHT_CLICK_AIR || e.getAction() == Action.RIGHT_CLICK_BLOCK)) return;
+        if (e.getItem() == null || e.getItem().getType().isAir()) return;
+        if (!isStunGrenade(e.getItem().getItemMeta())) return;
+
+        e.setCancelled(true);
+    }*/
 
     @EventHandler
     public void onHit(ProjectileHitEvent e) {
@@ -130,6 +140,15 @@ public class StunGrenade implements Listener {
                 }
             }
         }
+    }
+
+    public static boolean isStunGrenade(PersistentDataHolder holder) {
+        if (holder == null) return false;
+
+        NamespacedKey key = new NamespacedKey(ANNIPlugin.getInstance(), "special-item");
+
+        return holder.getPersistentDataContainer()
+                .getOrDefault(key, PersistentDataType.STRING, "").equals("stun-grenade");
     }
 
 

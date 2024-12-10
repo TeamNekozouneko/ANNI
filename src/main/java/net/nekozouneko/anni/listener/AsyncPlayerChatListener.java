@@ -44,8 +44,10 @@ public class AsyncPlayerChatListener implements Listener {
         ANNITeam at = plugin.getCurrentGame().getTeamByPlayer(e.getPlayer());
 
         if (SpectatorManager.isSpectating(e.getPlayer())) {
-            if (e.getMessage().startsWith("!") && e.getPlayer().hasPermission("anni.mod.global_chat_on_spectator"))
+            if (e.getMessage().startsWith("!") && e.getPlayer().hasPermission("anni.mod.global_chat_on_spectator")) {
                 globalChat(e);
+                return;
+            }
 
             spectatorChat(e);
             return;
