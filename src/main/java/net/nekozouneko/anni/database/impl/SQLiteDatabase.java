@@ -21,10 +21,10 @@ public class SQLiteDatabase implements ANNIDatabase {
         new File(ANNIConfig.getLocalDBPath()).getParentFile().mkdirs();
 
         connect();
-        createTable("level", "player TEXT NOT NULL, level integer, exp integer");
-        createTable("settings", "player TEXT NOT NULL, kit TEXT");
-        createTable("available_kits", "player TEXT NOT NULL, kits TEXT NOT NULL DEFAULT '[]'");
-        createTable("statistic", "player TEXT NOT NULL, kills integer, deaths integer, nexus integer, wins integer, loses integer");
+        createTable("level", "player TEXT NOT NULL PRIMARY KEY, level integer, exp integer");
+        createTable("settings", "player TEXT NOT NULL PRIMARY KEY, kit TEXT");
+        createTable("available_kits", "player TEXT NOT NULL PRIMARY KEY, kits TEXT NOT NULL DEFAULT '[]'");
+        createTable("statistic", "player TEXT NOT NULL PRIMARY KEY, kills integer, deaths integer, nexus integer, wins integer, loses integer");
     }
 
     private void connect() {
@@ -420,12 +420,28 @@ public class SQLiteDatabase implements ANNIDatabase {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public List<String> getAvailableKits(UUID player) {
-        return null;
+        try (PreparedStatement ps = source.prepareStatement(
+                "SELECT kits FROM available_kits WHERE player = ?"
+        )) {
+            ps.setString(1, player.toString());
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                return FileUtil.createGson().fromJson(rs.getString(1), List.class);
+            }
+        }
+        catch (SQLException sqlex) {
+            sqlex.printStackTrace();
+        }
+        return Collections.singletonList("default");
     }
 
     @Override
     public void addAvailableKits(UUID player, ANNIKit kit) {
+        List<String> list = getAvailableKits(player);
+        list.add(kit.getKit().getId());
+
 
     }
 
