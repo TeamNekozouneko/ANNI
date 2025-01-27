@@ -44,7 +44,7 @@ public class PlayerRespawnListener implements Listener {
 
             // リスキル対策で 耐性255 と スピード 1 をリスポーン時付与
             Bukkit.getScheduler().runTask(plugin, () -> {
-                        e.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 200, 255, false, false, true));
+                        e.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.RESISTANCE, 200, 255, false, false, true));
                         e.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 200, 1, false, false, true));
                     }
             );

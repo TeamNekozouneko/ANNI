@@ -26,8 +26,8 @@ public class MinerKit extends AbstractKit {
 
         inv[0] = ItemStackBuilder.of(Material.WOODEN_SWORD).build();
         inv[1] = ItemStackBuilder.of(Material.IRON_PICKAXE)
-                .enchant(Enchantment.DURABILITY, 1, false)
-                .enchant(Enchantment.LOOT_BONUS_BLOCKS, 1, false)
+                .enchant(Enchantment.UNBREAKING, 1, false)
+                .enchant(Enchantment.FORTUNE, 1, false)
                 .build();
         inv[2] = ItemStackBuilder.of(Material.STONE_AXE).build();
         inv[3] = ItemStackBuilder.of(Material.STONE_SHOVEL).build();

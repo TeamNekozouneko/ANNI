@@ -54,7 +54,7 @@ public class AirJump implements Listener {
                             Particle.CLOUD, e.getPlayer().getLocation(), 50, .5, .5, .5, .1
                     );
                     e.getPlayer().getWorld().spawnParticle(
-                            Particle.SMOKE_NORMAL, e.getPlayer().getLocation(), 50, .5, .5, .5, .1
+                            Particle.SMOKE, e.getPlayer().getLocation(), 50, .5, .5, .5, .1
                     );
                     e.getPlayer().setVelocity(e.getPlayer().getLocation().getDirection().setY(1));
                 }

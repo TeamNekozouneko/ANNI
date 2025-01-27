@@ -97,11 +97,11 @@ public class DefenseArtifact implements Listener {
                     .forEach(victim -> {
                         if (for_first_check == time) {
                             victim.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 20, 0, false, true, true));
-                            victim.addPotionEffect(new PotionEffect(PotionEffectType.SLOW_DIGGING, 40, 1, false, true, true));
+                            victim.addPotionEffect(new PotionEffect(PotionEffectType.MINING_FATIGUE, 40, 1, false, true, true));
                             ANNIPlugin.getInstance().getCooldownManager().set(victim.getUniqueId(), CooldownManager.Type.GRAPPLING_HOOK, 5000);
                         }
 
-                        victim.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 40, 1, false, true, true));
+                        victim.addPotionEffect(new PotionEffect(PotionEffectType.SLOWNESS, 40, 1, false, true, true));
                     });
 
             time--;
@@ -121,7 +121,7 @@ public class DefenseArtifact implements Listener {
                 .name(ANNIPlugin.getInstance().getMessageManager().build("item.defense_artifact.name"))
                 .lore(ANNIPlugin.getInstance().getMessageManager().buildList("item.defense_artifact.lore"))
                 .persistentData(new NamespacedKey(ANNIPlugin.getInstance(), "special-item"), PersistentDataType.STRING, "defense-artifact")
-                .enchant(Enchantment.DURABILITY, 1, false)
+                .enchant(Enchantment.UNBREAKING, 1, false)
                 .itemFlags(ItemFlag.HIDE_ENCHANTS);
     }
 

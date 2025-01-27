@@ -29,7 +29,7 @@ public class BowKit extends AbstractKit {
         inv[2] = ItemStackBuilder.of(Material.STONE_AXE).build();
         inv[3] = ItemStackBuilder.of(Material.STONE_SHOVEL).build();
         inv[4] = ItemStackBuilder.of(Material.BOW)
-                .enchant(Enchantment.DURABILITY, 3, false)
+                .enchant(Enchantment.UNBREAKING, 3, false)
                 .build();
         inv[7] = ItemStackBuilder.of(Material.BREAD).amount(16).build();
         inv[8] = NexusCompass.builder()

@@ -23,7 +23,7 @@ public class Nexus {
 
         World w = loc.getWorld();
 
-        w.spawnParticle(Particle.EXPLOSION_HUGE, loc, 10, 1, 1, 1);
+        w.spawnParticle(Particle.EXPLOSION_EMITTER, loc, 10, 1, 1, 1);
         w.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, 1.5f, 0);
     }
 
@@ -38,11 +38,11 @@ public class Nexus {
     }
 
     public Location asBukkitLocation(World world) {
-        return new Location(world, location.getX(), location.getY(), location.getZ());
+        return new Location(world, location.x(), location.y(), location.z());
     }
 
     public BlockVector3 getLocation() {
-        return BlockVector3.at(location.getX(), location.getY(), location.getZ());
+        return BlockVector3.at(location.x(), location.y(), location.z());
     }
 
 }

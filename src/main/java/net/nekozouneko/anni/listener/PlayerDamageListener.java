@@ -123,7 +123,7 @@ public class PlayerDamageListener implements Listener {
             // 斧で攻撃した場合
             if (AXES.contains(main.getType())) {
                 // 4ダメージより上なら4ダメージを減らして0.4 * ダメージ増加 (ない場合0)のレベル減らしてそうではないならそのまま通す
-                e.setDamage(Math.max(e.getDamage() > 2 ? e.getDamage() - 4 - (0.5 * main.getEnchantmentLevel(Enchantment.DAMAGE_ALL)) : e.getDamage(), 0));
+                e.setDamage(Math.max(e.getDamage() > 2 ? e.getDamage() - 4 - (0.5 * main.getEnchantmentLevel(Enchantment.SHARPNESS)) : e.getDamage(), 0));
             }
 
             if (ANNIKit.get(ANNIPlugin.getInstance().getCurrentGame().getKit(damager)) == ANNIKit.VAMPIRE) {
@@ -134,13 +134,13 @@ public class PlayerDamageListener implements Listener {
                     particlePos.setY(particlePos.getY() + 1);
 
                     e.getEntity().getWorld().spawnParticle(
-                            Particle.BLOCK_DUST, particlePos,
+                            Particle.BLOCK, particlePos,
                             100, .1, .25, .1, 1,
                             Material.REDSTONE_BLOCK.createBlockData()
                     );
                     damager.setHealth(Math.min(
                             damager.getHealth() + Math.min((e.getDamage() * ((double) (new Random().nextInt(25) + 10) / 100)), 3),
-                            damager.getAttribute(Attribute.GENERIC_MAX_HEALTH) != null ? damager.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue() : 20D
+                            damager.getAttribute(Attribute.MAX_HEALTH) != null ? damager.getAttribute(Attribute.MAX_HEALTH).getValue() : 20D
                     ));
                 }
             }

@@ -38,7 +38,7 @@ public class StunGrenade implements Listener {
                         PersistentDataType.STRING, "stun-grenade"
                 )
                 .itemFlags(ItemFlag.HIDE_ENCHANTS)
-                .enchant(Enchantment.DURABILITY, 1, false);
+                .enchant(Enchantment.UNBREAKING, 1, false);
     }
 
     @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
@@ -61,7 +61,7 @@ public class StunGrenade implements Listener {
                             else {
 
                                 e.getEntity().getWorld().spawnParticle(
-                                        Particle.BLOCK_DUST, e.getEntity().getLocation(),
+                                        Particle.BLOCK, e.getEntity().getLocation(),
                                         5, 0, 0, 0, Material.PLAYER_HEAD.createBlockData()
                                 );
                             }
@@ -131,7 +131,7 @@ public class StunGrenade implements Listener {
                         }
                     }
 
-                    hit.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 200, 2));
+                    hit.addPotionEffect(new PotionEffect(PotionEffectType.SLOWNESS, 200, 2));
                     hit.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 20, 0));
 
                     CooldownManager cm = ANNIPlugin.getInstance().getCooldownManager();

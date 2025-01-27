@@ -36,7 +36,7 @@ public class MusasabiKit extends AbstractKit {
 
         inv[39] = LeatherArmorBuilder.of(Material.LEATHER_HELMET).build();
         inv[38] = LeatherArmorBuilder.of(Material.ELYTRA)
-                .enchant(Enchantment.DURABILITY, 1, false)
+                .enchant(Enchantment.UNBREAKING, 1, false)
                 .unbreakable(true)
                 .itemFlags(ItemFlag.HIDE_UNBREAKABLE, ItemFlag.HIDE_ENCHANTS)
                 .persistentData(new NamespacedKey(ANNIPlugin.getInstance(), "no-remove"), PersistentDataType.INTEGER, 1)

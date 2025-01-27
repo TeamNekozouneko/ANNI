@@ -26,7 +26,7 @@ public class FlyingBook implements Listener {
         return ItemStackBuilder.of(Material.BOOK)
                 .name(ANNIPlugin.getInstance().getMessageManager().build("item.flying_book.name"))
                 .lore(ANNIPlugin.getInstance().getMessageManager().buildList("item.flying_book.lore"))
-                .enchant(Enchantment.DURABILITY, 1, false)
+                .enchant(Enchantment.UNBREAKING, 1, false)
                 .itemFlags(ItemFlag.HIDE_ENCHANTS)
                 .persistentData(new NamespacedKey(ANNIPlugin.getInstance(), "special-item"), PersistentDataType.STRING, "flying-book");
     }

@@ -29,7 +29,7 @@ import java.util.List;
 public class GrapplingHook implements Listener {
 
     public static final List<EntityType> CANT_PULL_ENTITIES = Arrays.asList(
-            EntityType.WITHER, EntityType.ENDER_DRAGON, EntityType.ENDER_CRYSTAL,
+            EntityType.WITHER, EntityType.ENDER_DRAGON, EntityType.END_CRYSTAL,
             EntityType.AREA_EFFECT_CLOUD, EntityType.WARDEN, EntityType.IRON_GOLEM
     );
 
