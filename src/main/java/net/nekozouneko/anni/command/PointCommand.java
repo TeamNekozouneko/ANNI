@@ -26,7 +26,7 @@ public class PointCommand implements CommandExecutor, TabCompleter {
                 sender.sendMessage(mm.build("command.err.player_only"));
             }
             else {
-                sender.sendMessage(mm.build("command.point.self_point", VaultUtil.getEco().getBalance((Player)sender), mm.build("gui.shop.ext")));
+                sender.sendMessage(mm.build("command.point.self_point", ANNIPlugin.getInstance().getPointManager().getPoint((Player)sender), mm.build("gui.shop.ext")));
             }
         }
         else {
