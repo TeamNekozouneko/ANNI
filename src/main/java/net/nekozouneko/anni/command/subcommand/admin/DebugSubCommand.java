@@ -1,5 +1,6 @@
 package net.nekozouneko.anni.command.subcommand.admin;
 
+import net.kyori.adventure.text.Component;
 import net.nekozouneko.anni.ANNIPlugin;
 import net.nekozouneko.anni.arena.ANNIArena;
 import net.nekozouneko.anni.arena.ArenaState;
@@ -13,7 +14,7 @@ import net.nekozouneko.anni.kit.ANNIKit;
 import net.nekozouneko.anni.kit.custom.CustomKit;
 import net.nekozouneko.anni.listener.BlockBreakListener;
 import net.nekozouneko.anni.util.CmdUtil;
-import net.nekozouneko.anni.vote.VoteManager;
+import net.nekozouneko.anni.util.CmnUtil;
 import net.nekozouneko.commons.spigot.command.TabCompletes;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
@@ -98,8 +99,15 @@ public class DebugSubCommand extends ASubCommand {
                 ((Player) sender).getInventory().addItem(GrapplingHook.builder().build());
                 break;
             }
-            case "vote": {
-                VoteManager.vote(ANNIPlugin.getInstance().getCurrentGame().getId(), Bukkit.getOfflinePlayer(UUID.randomUUID()), args.get(1));
+            case "locale-check": {
+                Locale locale = ((Player) sender).locale();
+
+                Locale converted = CmnUtil.localeCodeToLocale(args.get(1));
+
+                sender.sendMessage(Component.text(locale.toString()));
+                sender.sendMessage(Component.text(converted.toString()));
+                sender.sendMessage(Component.text(converted.equals(locale)));
+                sender.sendMessage(Component.text(converted == locale));
                 break;
             }
             default: return false;
@@ -132,12 +140,6 @@ public class DebugSubCommand extends ASubCommand {
                                 .map(CustomKit::getId).collect(Collectors.toList()));
 
                         return TabCompletes.sorted(args.get(1), ids);
-                    }
-                    case "vote": {
-                        String id = ANNIPlugin.getInstance().getCurrentGame().getId();
-                        if (VoteManager.isNowVoting(id)) {
-                            return TabCompletes.sorted(args.get(1), VoteManager.getChoices(id).stream().map(Object::toString).collect(Collectors.toList()));
-                        }
                     }
                 }
             }
