@@ -1,5 +1,5 @@
 {
-  "version": "16",
+  "version": "17",
 
   "scoreboard.title": "&c&lANNI&9&lHI&a&lLA&e&lTION",
   "scoreboard.dateformat": "yyyy/MM/dd HH:mm",
@@ -207,6 +207,12 @@
   "command.point.self_point": "&a現在のあなたのポイントは{0}&a{1}&aです。",
   "command.point.other_point": "&a現在の{0}&aのポイントは{1}&a{2}&aです。",
 
+  "command.player.0": "&7----------------------------------------",
+  "command.player.1": "{0}",
+  "command.player.2": "| Lv.{1} [{2}/{3}]",
+  "command.player.3": "| AP: {4}",
+  "command.info.4": "&7----------------------------------------",
+
   "xyz": "{0} / {1} / {2}",
   "xyz.format": "%.1f",
   "xyz.blockformat": "%d",
@@ -229,6 +235,7 @@
   "notify.deposit_points": "&a+{0} {1}",
   "notify.moved": "&6あなたは {0}&6 に移動されました。",
   "notify.moved_leave": "&6あなたは退出させられました。",
+  "notify.level_up": "&eLv.{0}にレベルアップしました！",
 
   "notify.voted.0": "&7----------------------------------------",
   "notify.voted.1": "&a{1} で {0} さんが投票しました！ありがとうございます。",
