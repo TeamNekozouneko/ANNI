@@ -121,7 +121,7 @@ public class CustomKitEditor extends AbstractGui {
 
         try (BufferedWriter writer = new BufferedWriter(
                 new OutputStreamWriter(new FileOutputStream(
-                        new File(plugin.getKitsDir(), kit.getId() + ".json")
+                        new File(plugin.getDefaultKitsDir(), kit.getId() + ".json")
                 ))
         )) {
             FileUtil.createGson().toJson(kit, CustomKit.class, writer);

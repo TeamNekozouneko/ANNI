@@ -123,7 +123,7 @@ public class KitSubCommand extends ASubCommand {
     private void saveAndReload(CustomKit ck) {
         try (BufferedWriter writer = new BufferedWriter(
                 new OutputStreamWriter(
-                        new FileOutputStream(new File(plugin.getKitsDir(), ck.getId() + ".json")),
+                        new FileOutputStream(new File(plugin.getDefaultKitsDir(), ck.getId() + ".json")),
                         StandardCharsets.UTF_8
                 )
         )) {

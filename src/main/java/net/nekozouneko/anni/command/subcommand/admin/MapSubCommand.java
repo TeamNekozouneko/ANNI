@@ -93,7 +93,7 @@ public class MapSubCommand extends ASubCommand {
                                 Float.parseFloat(args.get(5)),
                                 Float.parseFloat(args.get(6))
                         ));
-                        FileUtil.writeGson(new File(plugin.getMapsDir(), map.getId() + ".json"), map, ANNIMap.class);
+                        FileUtil.writeGson(new File(plugin.getDefaultMapsDir(), map.getId() + ".json"), map, ANNIMap.class);
                         plugin.getMapManager().reload();
                     }
                     else if (args.size() == 5) {
@@ -102,13 +102,13 @@ public class MapSubCommand extends ASubCommand {
                                 Double.parseDouble(args.get(3)),
                                 Double.parseDouble(args.get(4))
                         ));
-                        FileUtil.writeGson(new File(plugin.getMapsDir(), map.getId() + ".json"), map, ANNIMap.class);
+                        FileUtil.writeGson(new File(plugin.getDefaultMapsDir(), map.getId() + ".json"), map, ANNIMap.class);
                         plugin.getMapManager().reload();
                     }
                     else {
                         if (sender instanceof Player) {
                             map.setDefaultSpawn(((Player) sender).getLocation());
-                            FileUtil.writeGson(new File(plugin.getMapsDir(), map.getId() + ".json"), map, ANNIMap.class);
+                            FileUtil.writeGson(new File(plugin.getDefaultMapsDir(), map.getId() + ".json"), map, ANNIMap.class);
                             plugin.getMapManager().reload();
                         }
                         else sender.sendMessage(mem.build("command.err.player_only"));
@@ -116,7 +116,7 @@ public class MapSubCommand extends ASubCommand {
                     break;
                 }
                 case "delete": {
-                    if (new File(plugin.getMapsDir(), map.getId() + ".json").delete()) {
+                    if (new File(plugin.getDefaultMapsDir(), map.getId() + ".json").delete()) {
                         plugin.getMapManager().reload();
                     }
                     else sender.sendMessage(mem.build("command.err.ioe"));
@@ -139,7 +139,7 @@ public class MapSubCommand extends ASubCommand {
                     map.setSpawn(
                             ANNITeam.valueOf(args.get(2)),
                             SpawnLocation.fromLocation(((Player) sender).getLocation()));
-                    FileUtil.writeGson(new File(plugin.getMapsDir(), map.getId() + ".json"), map, ANNIMap.class);
+                    FileUtil.writeGson(new File(plugin.getDefaultMapsDir(), map.getId() + ".json"), map, ANNIMap.class);
                     plugin.getMapManager().reload();
                     break;
                 }
@@ -153,7 +153,7 @@ public class MapSubCommand extends ASubCommand {
                     BlockBreakListener.getQueuedOnDamageMap()
                             .put(((Player) sender).getUniqueId(), block -> {
                                         map.setNexus(ANNITeam.valueOf(args.get(2)), block.getLocation());
-                                        FileUtil.writeGson(new File(plugin.getMapsDir(), map.getId() + ".json"), map, ANNIMap.class);
+                                        FileUtil.writeGson(new File(plugin.getDefaultMapsDir(), map.getId() + ".json"), map, ANNIMap.class);
                                         plugin.getMapManager().reload();
                                     }
                             );
@@ -181,7 +181,7 @@ public class MapSubCommand extends ASubCommand {
                     }
 
                     map.setTeamRegion(at, region);
-                    FileUtil.writeGson(new File(plugin.getMapsDir(), map.getId() + ".json"), map, ANNIMap.class);
+                    FileUtil.writeGson(new File(plugin.getDefaultMapsDir(), map.getId() + ".json"), map, ANNIMap.class);
                     plugin.getMapManager().reload();
                     break;
                 }

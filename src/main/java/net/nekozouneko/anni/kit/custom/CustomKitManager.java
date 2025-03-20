@@ -15,7 +15,7 @@ public class CustomKitManager {
 
     public CustomKitManager(ANNIPlugin plugin) {
         this.plugin = plugin;
-        loadDir(plugin.getKitsDir());
+        loadDir(plugin.getDefaultKitsDir());
     }
 
     public void load(File f) {
@@ -57,7 +57,7 @@ public class CustomKitManager {
 
     public void reload() {
         kits.clear();
-        loadDir(plugin.getKitsDir());
+        loadDir(plugin.getDefaultKitsDir());
     }
 
     public CustomKit getKit(String id) {

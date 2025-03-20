@@ -35,7 +35,7 @@ public class CreateKitSubCommand extends ASubCommand {
 
         try (BufferedWriter writer = new BufferedWriter(
                 new OutputStreamWriter(new FileOutputStream(
-                        new File(ANNIPlugin.getInstance().getKitsDir(), id + ".json")
+                        new File(ANNIPlugin.getInstance().getDefaultKitsDir(), id + ".json")
                 ), StandardCharsets.UTF_8)
         )) {
             FileUtil.createGson().toJson(ck, CustomKit.class, writer);
