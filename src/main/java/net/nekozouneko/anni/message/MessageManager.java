@@ -90,9 +90,9 @@ public class MessageManager {
         String format = build("xyz.blockformat");
         return build(
                 "xyz",
-                String.format(format, loc.getBlockX()),
-                String.format(format, loc.getBlockY()),
-                String.format(format, loc.getBlockZ())
+                String.format(format, loc.x()),
+                String.format(format, loc.y()),
+                String.format(format, loc.z())
         );
     }
 

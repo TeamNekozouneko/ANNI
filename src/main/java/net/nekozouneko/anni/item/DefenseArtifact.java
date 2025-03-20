@@ -97,7 +97,7 @@ public class DefenseArtifact implements Listener {
                     .forEach(victim -> {
                         if (for_first_check == time) {
                             victim.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 20, 0, false, true, true));
-                            victim.addPotionEffect(new PotionEffect(PotionEffectType.MINING_FATIGUE, 40, 1, false, true, true));
+                            victim.addPotionEffect(new PotionEffect(PotionEffectType.MINING_FATIGUE, 60, 254, false, true, true));
                             ANNIPlugin.getInstance().getCooldownManager().set(victim.getUniqueId(), CooldownManager.Type.GRAPPLING_HOOK, 5000);
                         }
 
