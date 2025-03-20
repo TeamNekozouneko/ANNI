@@ -30,7 +30,7 @@ public class MochiMochiKit extends AbstractKit {
         inv[3] = ItemStackBuilder.of(Material.STONE_SHOVEL).build();
         inv[6] = ItemStackBuilder.of(Material.BREAD).amount(16).build();
         inv[7] = StunGrenade.builder()
-                .amount(5)
+                .amount(6)
                 .persistentData(new NamespacedKey(ANNIPlugin.getInstance(), "no-remove"), PersistentDataType.INTEGER, 1)
                 .build();
         inv[8] = NexusCompass.builder()
