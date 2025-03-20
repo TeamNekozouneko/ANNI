@@ -1,11 +1,15 @@
 package net.nekozouneko.anni.util;
 
 import com.google.common.base.Preconditions;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scoreboard.Team;
 
 import java.util.Collection;
+import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -107,6 +111,28 @@ public final class CmnUtil {
 
     public static boolean hasPersistentContainer(ItemStack item) {
         return item != null && !item.getType().isAir();
+    }
+
+    public static Locale localeCodeToLocale(String code) {
+        String[] codes = code.split("_");
+        return codes.length == 3 ? Locale.of(codes[0], codes[1], codes[2]) :
+                (codes.length == 2 ? Locale.of(codes[0], codes[1]) : Locale.of(codes[0]));
+    }
+
+    public static Component progressBar(double progress, int bars) {
+        int greenBars = (int) (progress / (1D / bars));
+
+        StringBuilder green = new StringBuilder();
+        StringBuilder gray = new StringBuilder();
+        for (int i = 1; i <= bars; i++) {
+            if (greenBars >= i) green.append("|");
+            else gray.append("|");
+        }
+
+        return Component.text()
+                .append(Component.text(green.toString(), NamedTextColor.GREEN).decorate(TextDecoration.BOLD))
+                .append(Component.text(gray.toString(), NamedTextColor.DARK_GRAY).decorate(TextDecoration.BOLD))
+                .asComponent();
     }
 
 }
