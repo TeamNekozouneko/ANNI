@@ -4,7 +4,6 @@ import net.nekozouneko.anni.ANNIPlugin;
 import net.nekozouneko.anni.arena.ANNIArena;
 import net.nekozouneko.anni.arena.spectator.SpectatorManager;
 import net.nekozouneko.anni.gui.AbstractGui;
-import net.nekozouneko.anni.vote.VoteManager;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerQuitEvent;
@@ -20,7 +19,7 @@ public class PlayerQuitListener implements Listener {
         SpectatorManager.remove(e.getPlayer());
 
         if (arena.getPlayers().isEmpty()) {
-            VoteManager.clearVote(arena.getId());
+            arena.getVoteManager().clear();
         }
     }
 
