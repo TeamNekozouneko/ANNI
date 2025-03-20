@@ -4,7 +4,6 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.EnumHashBiMap;
 import com.google.common.collect.HashBiMap;
-import com.google.common.collect.Multimap;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.protection.flags.Flags;
@@ -14,19 +13,21 @@ import com.sk89q.worldguard.protection.regions.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
-import net.md_5.bungee.api.ChatMessageType;
-import net.md_5.bungee.api.chat.TextComponent;
+import net.kyori.adventure.text.format.NamedTextColor;
 import net.nekozouneko.anni.ANNIConfig;
 import net.nekozouneko.anni.ANNIPlugin;
+import net.nekozouneko.anni.arena.manager.BossbarManager;
+import net.nekozouneko.anni.arena.manager.ScoreboardManager;
 import net.nekozouneko.anni.arena.spectator.SpectatorManager;
 import net.nekozouneko.anni.arena.team.ANNITeam;
-import net.nekozouneko.anni.board.BoardManager;
+import net.nekozouneko.anni.item.DefenseArtifact;
 import net.nekozouneko.anni.kit.ANNIKit;
 import net.nekozouneko.anni.kit.AbstractKit;
-import net.nekozouneko.anni.item.DefenseArtifact;
 import net.nekozouneko.anni.listener.PlayerDamageListener;
 import net.nekozouneko.anni.map.ANNIMap;
 import net.nekozouneko.anni.message.MessageManager;
+import net.nekozouneko.anni.message.TranslationManager;
+import net.nekozouneko.anni.task.RechargeManager;
 import net.nekozouneko.anni.util.CmnUtil;
 import net.nekozouneko.anni.util.FileUtil;
 import net.nekozouneko.anni.util.VaultUtil;
@@ -53,7 +54,6 @@ import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.Team;
 
 import java.io.IOException;
-import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.Map.Entry;
 import java.util.logging.Logger;
@@ -75,6 +75,14 @@ public class ANNIArena extends BukkitRunnable {
 
     private final ANNIPlugin plugin;
     private final MessageManager mm;
+    private final TranslationManager tm;
+    @Getter
+    private final BossbarManager bossbarManager;
+    @Getter
+    private VoteManager voteManager;
+    private final ScoreboardManager scoreboardManager = new ScoreboardManager(this);
+    @Getter
+    private RechargeManager rechargeManager = null;
     @Getter
     private final String id;
 
@@ -86,6 +94,7 @@ public class ANNIArena extends BukkitRunnable {
     @Getter @Setter
     private ArenaState state = ArenaState.WAITING;
 
+    @Getter @Setter
     private ANNIMap map = null;
     private World copy = null;
 
@@ -102,12 +111,18 @@ public class ANNIArena extends BukkitRunnable {
     private final KeyedBossBar bb;
 
     public ANNIArena(ANNIPlugin plugin, String id) {
-        Preconditions.checkArgument(plugin != null, "Argument 'plugin' cannot be null.");
+        Objects.requireNonNull(plugin);
         Preconditions.checkArgument(id.length() < 9, "Id length limit is 8! (" + id.length() + ")");
 
         this.plugin = plugin;
         this.mm = plugin.getMessageManager();
+        this.tm = plugin.getTranslationManager();
         this.id = id;
+        this.voteManager = new VoteManager(plugin.getMapManager().getMaps().stream()
+                .filter(ANNIMap::canUseOnArena)
+                .map(ANNIMap::getId)
+                .collect(Collectors.toSet())
+        );
 
         this.bb = Bukkit.createBossBar(
                 new NamespacedKey(plugin, id),
@@ -115,6 +130,7 @@ public class ANNIArena extends BukkitRunnable {
                 BarColor.BLUE,
                 BarStyle.SOLID
         );
+        this.bossbarManager = new BossbarManager(this, bb);
 
         createTeams();
 
@@ -210,40 +226,37 @@ public class ANNIArena extends BukkitRunnable {
         Team g = sb.registerNewTeam(id + "-green");
         Team y = sb.registerNewTeam(id + "-yellow");
 
-        r.setDisplayName(mm.build("team.red.display"));
-        r.setPrefix(mm.build("team.red.prefix"));
-        r.setColor(org.bukkit.ChatColor.RED);
-        r.setAllowFriendlyFire(false);
-        r.setCanSeeFriendlyInvisibles(true);
-
-        b.setDisplayName(mm.build("team.blue.display"));
-        b.setPrefix(mm.build("team.blue.prefix"));
-        b.setColor(org.bukkit.ChatColor.BLUE);
-        b.setAllowFriendlyFire(false);
-        b.setCanSeeFriendlyInvisibles(true);
-
-        g.setDisplayName(mm.build("team.green.display"));
-        g.setPrefix(mm.build("team.green.prefix"));
-        g.setColor(org.bukkit.ChatColor.GREEN);
-        g.setAllowFriendlyFire(false);
-        g.setCanSeeFriendlyInvisibles(true);
-
-        y.setDisplayName(mm.build("team.yellow.display"));
-        y.setPrefix(mm.build("team.yellow.prefix"));
-        y.setColor(org.bukkit.ChatColor.YELLOW);
-        y.setAllowFriendlyFire(false);
-        y.setCanSeeFriendlyInvisibles(true);
-
         teams.put(ANNITeam.RED, r);
         teams.put(ANNITeam.BLUE, b);
         teams.put(ANNITeam.GREEN, g);
         teams.put(ANNITeam.YELLOW, y);
-        teams.keySet().forEach((t) -> enabledTeams.put(t, true));
+
+        r.displayName(plugin.getTranslationManager().component("team.red.name"));
+        r.prefix(plugin.getTranslationManager().component("team.red.prefix"));
+        r.color(NamedTextColor.RED);
+
+        b.displayName(plugin.getTranslationManager().component("team.blue.name"));
+        b.prefix(plugin.getTranslationManager().component("team.blue.prefix"));
+        b.color(NamedTextColor.BLUE);
+
+        g.displayName(plugin.getTranslationManager().component("team.green.name"));
+        g.prefix(plugin.getTranslationManager().component("team.green.prefix"));
+        g.color(NamedTextColor.GREEN);
+
+        y.displayName(plugin.getTranslationManager().component("team.yellow.name"));
+        y.prefix(plugin.getTranslationManager().component("team.yellow.prefix"));
+        y.color(NamedTextColor.YELLOW);
+
+        teams.forEach((t, st) -> {
+            st.setAllowFriendlyFire(false);
+            st.setCanSeeFriendlyInvisibles(true);
+            enabledTeams.put(t, true);
+        });
     }
 
     private void deleteTeams() {
         teams.values().forEach(Team::unregister);
-        teams.values().clear();
+        teams.clear();
     }
 
     public void enableTeam(ANNITeam team) {
@@ -345,21 +358,9 @@ public class ANNIArena extends BukkitRunnable {
             nexus.put(team, health <= 0 ? null : health);
 
             if (player != null) {
-                double leftHealth = CmnUtil.bossBarProgress(ANNIConfig.getDefaultHealth(), health);
-                if (leftHealth <= 0.2) bb.setColor(BarColor.RED);
-                else if (leftHealth <= 0.5) bb.setColor(BarColor.YELLOW);
-                else bb.setColor(BarColor.GREEN);
-
-                bb.setProgress(leftHealth);
-
-                bb.setTitle(ANNIPlugin.getInstance().getMessageManager().build(
-                        "bossbar.damaged_nexus",
-                        player.getName(), team.getTeamName()
-                ));
+                bossbarManager.damageNexus(team, player, health);
                 getTeamPlayers(team).forEach(p1 -> {
-                    p1.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(
-                            mm.build("actionbar.nexus_alert", player.getName())
-                    ));
+                    p1.sendActionBar(tm.component("actionbar.nexus_alert", player.name()));
                     p1.playSound(p1.getLocation(), Sound.BLOCK_NOTE_BLOCK_HARP, 1, 2);
                 });
 
@@ -367,7 +368,7 @@ public class ANNIArena extends BukkitRunnable {
                     if (getTeamByPlayer(player) == null) return;
 
                     getTeamPlayers(getTeamByPlayer(player)).forEach(teammate -> {
-                        eco.depositPlayer(teammate, 3);
+                        ANNIPlugin.getInstance().getPointManager().givePoint(teammate, 3);
                         teammate.sendMessage(
                                 mm.build("notify.deposit_points", "3", mm.build("gui.shop.full_ext"))
                         );
@@ -433,14 +434,6 @@ public class ANNIArena extends BukkitRunnable {
         else throw new IllegalStateException("Nexus is now active");
     }
 
-    public ANNIMap getMap() {
-        return map;
-    }
-
-    public void setMap(ANNIMap map) {
-        this.map = map;
-    }
-
     public World getCopyWorld() {
         return copy;
     }
@@ -454,11 +447,10 @@ public class ANNIArena extends BukkitRunnable {
         log.info("Starting game... (ID: " + id + ")");
         try {
             if (map == null) {
-                if (VoteManager.isNowVoting(id) && !VoteManager.getResult(id).isEmpty()) {
-                    map = getMapRanking(VoteManager.endVote(id)).stream()
-                            .filter(ent -> ent.getKey().canUseOnArena())
-                            .map(Map.Entry::getKey)
-                            .findFirst().orElse(null);
+                if (voteManager != null && !voteManager.isEmpty()) {
+                    map = plugin.getMapManager().getMap(voteManager.getResult());
+                    if (map != null && !map.canUseOnArena()) map = null;
+                    voteManager = null;
                 }
 
                 if (map == null) {
@@ -497,8 +489,8 @@ public class ANNIArena extends BukkitRunnable {
                         log.info(s + " is polygon region.");
                         newpr = new ProtectedPolygonalRegion(s,
                                 pr.getPoints(),
-                                pr.getMinimumPoint().getY(),
-                                pr.getMaximumPoint().getY()
+                                pr.getMinimumPoint().y(),
+                                pr.getMaximumPoint().y()
                         );
                     }
                     else {
@@ -582,6 +574,9 @@ public class ANNIArena extends BukkitRunnable {
                 )) broadcast(s, at);
             });
 
+            rechargeManager = new RechargeManager();
+            rechargeManager.runTaskTimer(plugin, 0, 10);
+
             setState(ArenaState.PHASE_ONE);
             setTimer(ArenaState.PHASE_ONE.nextPhaseIn());
             log.info("Started game.");
@@ -608,6 +603,7 @@ public class ANNIArena extends BukkitRunnable {
                 initPlayer(player);
                 Players.clearPotionEffects(player);
                 player.teleport(plugin.getLobby());
+                player.setFlying(player.getGameMode() == GameMode.CREATIVE || player.getGameMode() == GameMode.SPECTATOR);
             });
             log.info("Removing player from team...");
             teams.values().forEach(team -> {
@@ -616,6 +612,8 @@ public class ANNIArena extends BukkitRunnable {
             });
             log.info("Cancelling tasks...");
             DefenseArtifact.cancelAllTasks();
+            if (rechargeManager != null && !rechargeManager.isCancelled()) rechargeManager.cancel();
+            rechargeManager = null;
             log.info("Initializing nexus...");
             nexus.clear();
             log.info("Initializing map...");
@@ -647,7 +645,7 @@ public class ANNIArena extends BukkitRunnable {
 
                 fireworkTimer = 0;
             }
-            if (VoteManager.isNowVoting(id)) VoteManager.endVote(id);
+            voteManager = null;
         }
         catch (IOException e) { e.printStackTrace(); }
 
@@ -688,40 +686,38 @@ public class ANNIArena extends BukkitRunnable {
 
             if (map == null) {
                 if (state == ArenaState.STARTING && getTimer() <= 10) {
-                    if (VoteManager.isNowVoting(id)) {
-                        List<Map.Entry<ANNIMap, Integer>> l = getMapRanking(VoteManager.endVote(id));
-                        if (l.isEmpty() || Collections3.allValueEquals(l, l.get(0))) {
-                            List<ANNIMap> filtered = plugin.getMapManager().getMaps().stream()
+                    if (voteManager != null) {
+                        if (voteManager.isEmpty()) {
+                            List<ANNIMap> maps = plugin.getMapManager().getMaps().stream()
                                     .filter(ANNIMap::canUseOnArena)
                                     .collect(Collectors.toList());
-                            map = filtered.get(rand.nextInt(filtered.size()));
+                            map = maps.get(rand.nextInt(maps.size()));
                         }
-                        else map = l.get(0).getKey();
+                        else map = plugin.getMapManager().getMap(voteManager.getResult());
                     }
                 }
                 else {
-                    Set<Object> choices = plugin.getMapManager().getMaps().stream()
+                    Set<String> choices = plugin.getMapManager().getMaps().stream()
                             .filter(ANNIMap::canUseOnArena)
-                            .map(m -> (Object) m.getId())
+                            .map(ANNIMap::getId)
                             .collect(Collectors.toSet());
 
-                    if (VoteManager.isNowVoting(id)) {
-                        VoteManager.updateChoices(
-                                id, choices
-                        );
-                    } else VoteManager.startVote(id, choices);
+                    if (voteManager != null) {
+                        voteManager.updateChoices(choices);
+                    }
+                    else voteManager = new VoteManager(choices);
                 }
             }
-            else if (VoteManager.isNowVoting(id)) VoteManager.endVote(id);
+            else voteManager = null;
         }
 
-        updateBossBar();
-        updateScoreboard();
+        bossbarManager.update();
+        scoreboardManager.update();
         updatePhase();
 
         if (state == ArenaState.GAME_OVER) launchFireworkRocket();
 
-        if (state.getId() >= 0) {
+        if (state.isInArena()) {
             if (state.getId() > 0) {
                 // プレイヤー数が0のチームを退場させる
                 getTeams().keySet().forEach(at -> {
@@ -743,13 +739,13 @@ public class ANNIArena extends BukkitRunnable {
                 // ネクサスを失っていないチーム数を調べる
                 List<ANNITeam> living = getTeams().keySet().stream()
                         .filter(team -> !isNexusLost(team))
-                        .collect(Collectors.toList());
+                        .toList();
 
                 // もし1以下なら
                 if (living.size() <= 1) {
                     // もし1なら
                     if (living.size() == 1) {
-                        ANNITeam won = living.get(0);
+                        ANNITeam won = living.getFirst();
 
                         for (String s : mm.buildBigChar(
                                 'e', Character.toString(won.getCCChar()),
@@ -758,10 +754,10 @@ public class ANNIArena extends BukkitRunnable {
                                 ))
                         )
                             broadcast(s);
-                        VaultUtil.ifAvail((eco) -> getTeamPlayers(won).forEach(p -> {
-                            eco.depositPlayer(p, 3000);
+                        getTeamPlayers(won).forEach(p -> {
+                            ANNIPlugin.getInstance().getPointManager().givePoint(p, 3000);
                             p.sendMessage(mm.build("notify.deposit_points", "3000", mm.build("gui.shop.full_ext")));
-                        }));
+                        });
                     } else { // ではない (0 ~ (Integer.MIN_VALUE)) なら
                         broadcast(mm.build("notify.draw"));
                     }
@@ -781,7 +777,7 @@ public class ANNIArena extends BukkitRunnable {
                     p.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 40, 0, false, false, true));
                 }
                 else if (getKit(p).equals(ANNIKit.BOW.getKit()) || hasBow) {
-                    p.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 40, 0, false, false, true));
+                    p.addPotionEffect(new PotionEffect(PotionEffectType.SLOWNESS, 40, 0, false, false, true));
                 }
             });
         }
@@ -796,147 +792,6 @@ public class ANNIArena extends BukkitRunnable {
         bb.setVisible(false);
         bb.removeAll();
         Bukkit.removeBossBar(bb.getKey());
-    }
-
-    private void updateBossBar() {
-        players.forEach(bb::addPlayer);
-
-        bb.setColor(BarColor.BLUE);
-        switch (state) {
-            case PHASE_ONE:
-            case PHASE_TWO:
-            case PHASE_THREE:
-            case PHASE_FOUR:
-            case GAME_OVER: {
-                bb.setVisible(true);
-                bb.setTitle(
-                        mm.build("bossbar.timer",
-                                mm.build(state.getName()),
-                                CmnUtil.secminTimer(timer)
-                        )
-                );
-                bb.setProgress(state.nextPhaseIn() > 0 ? CmnUtil.bossBarProgress(state.nextPhaseIn(), timer) : 1);
-                break;
-            }
-            case PHASE_FIVE: {
-                bb.setVisible(true);
-                bb.setTitle(mm.build(state.getName()));
-                bb.setProgress(1);
-                break;
-            }
-            default: {
-                bb.setVisible(false);
-                break;
-            }
-        }
-    }
-
-    private void updateScoreboard() {
-        BoardManager bm = plugin.getBoardManager();
-
-        for (Player pl : players) {
-            try {
-                BoardManager.ANNIFastBoard fb = bm.get(pl);
-                SimpleDateFormat df = new SimpleDateFormat(mm.build("scoreboard.dateformat"));
-
-                switch (state) {
-                    case WAITING:
-                    case STARTING: {
-                        fb.updateTitle(mm.build("scoreboard.title"));
-                        String news = state == ArenaState.STARTING ?
-                                mm.build("scoreboard.waiting.2.starting", CmnUtil.secminTimer(getTimer())) :
-                                mm.build("scoreboard.waiting.2.more_player", (
-                                        enabledTeams.entrySet().stream()
-                                                .filter(Map.Entry::getValue)
-                                                .count() * ANNIConfig.getTeamMinPlayers()
-                                                - players.size())
-                                );
-
-                        if (map != null) {
-                            fb.updateLines(mm.buildList("scoreboard.waiting",
-                                    df.format(Calendar.getInstance().getTime()),
-                                    news,
-                                    players.size() + " / 120",
-                                    map.getName()
-                            ));
-                        } else {
-                            List<Map.Entry<ANNIMap, Integer>> nowRes = getMapRanking(VoteManager.getResult(id));
-                            fb.updateLines(mm.buildList("scoreboard.waiting_voting",
-                                    df.format(Calendar.getInstance().getTime()),
-                                    news,
-                                    players.size() + " / " + (ANNIConfig.getTeamMaxPlayers() * getEnabledTeams().size()),
-                                    !nowRes.isEmpty() ? nowRes.get(0).getKey().getName() + " - " + nowRes.get(0).getValue() : "",
-                                    nowRes.size() > 1 ? nowRes.get(1).getKey().getName() + " - " + nowRes.get(1).getValue() : "",
-                                    nowRes.size() > 2 ? nowRes.get(2).getKey().getName() + " - " + nowRes.get(2).getValue() : ""
-                            ));
-                        }
-                        break;
-                    }
-                    case PHASE_ONE:
-                    case PHASE_TWO:
-                    case PHASE_THREE:
-                    case PHASE_FOUR:
-                    case PHASE_FIVE:
-                    case GAME_OVER: {
-                        if (fb.hasLinesMaxLength()) {
-                            if (map.getName() != null)
-                                fb.updateTitle(mm.build("scoreboard.playing.short.title", map.getName()));
-                            else fb.updateTitle(mm.build("scoreboard.title"));
-                            fb.updateLines(
-                                    mm.buildList(
-                                            "scoreboard.playing.short",
-                                            shortNexusHealth(ANNITeam.RED),
-                                            shortNexusHealth(ANNITeam.BLUE),
-                                            shortNexusHealth(ANNITeam.GREEN),
-                                            shortNexusHealth(ANNITeam.YELLOW)
-                                    )
-                            );
-                        }
-                        else {
-                            fb.updateTitle(mm.build("scoreboard.title"));
-                            fb.updateLines(mm.buildList("scoreboard.playing",
-                                    df.format(Calendar.getInstance().getTime()),
-                                    sbNexusState(ANNITeam.RED),
-                                    sbNexusState(ANNITeam.BLUE),
-                                    sbNexusState(ANNITeam.GREEN),
-                                    sbNexusState(ANNITeam.YELLOW),
-                                    sbNexusHealth(ANNITeam.RED),
-                                    sbNexusHealth(ANNITeam.BLUE),
-                                    sbNexusHealth(ANNITeam.GREEN),
-                                    sbNexusHealth(ANNITeam.YELLOW),
-                                    map != null ? map.getName() : "-----"
-                            ));
-                        }
-                        break;
-                    }
-                    default: {
-                        fb.updateLines(mm.buildList("scoreboard.stopping",
-                                df.format(Calendar.getInstance().getTime())
-                        ));
-                        break;
-                    }
-                }
-            }
-            catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
-    private String sbNexusHealth(ANNITeam team) {
-        Integer nh = getNexusHealth(team);
-        if (nh == null) nh = 0;
-        return isEnabledTeam(team) ? // teamが無効化されていないなら
-                String.format(mm.build("nexus.health.format"), nh) // フォーマット適応済みの体力
-                : mm.build("nexus.health.none"); // 体力なしのメッセージ
-    }
-
-    private String sbNexusState(ANNITeam team) {
-        return isNexusLost(team) ? mm.build("nexus.status.lost") : mm.build("nexus.status.active");
-    }
-
-    private int shortNexusHealth(ANNITeam team) {
-        return getNexusHealth(team) != null ? getNexusHealth(team) : 0;
     }
 
     private void updatePhase() {
@@ -1032,7 +887,7 @@ public class ANNIArena extends BukkitRunnable {
                 .forEach(winner -> {
                         if (winner.getWorld() != copy) return;
 
-                        Firework fw = (Firework) copy.spawnEntity(winner.getLocation(), EntityType.FIREWORK);
+                        Firework fw = (Firework) copy.spawnEntity(winner.getLocation(), EntityType.FIREWORK_ROCKET);
 
                         fw.getPersistentDataContainer().set(
                                 new NamespacedKey(plugin, "winner-rocket"),
@@ -1060,25 +915,10 @@ public class ANNIArena extends BukkitRunnable {
                 });
     }
 
-    private List<Map.Entry<ANNIMap, Integer>> getMapRanking(Multimap<Object, OfflinePlayer> multimap) {
-        Map<ANNIMap, Integer> rank = new HashMap<>();
-        multimap.keySet().forEach((obj) -> {
-            if (!(obj instanceof String)) return;
-            ANNIMap ma = plugin.getMapManager().getMap((String) obj);
-            if (ma != null)
-                rank.put(ma, multimap.get(obj).size());
-        });
-
-
-        LinkedList<Map.Entry<ANNIMap, Integer>> ll = new LinkedList<>(rank.entrySet());
-        ll.sort(Map.Entry.comparingByValue(Comparator.reverseOrder()));
-        return ll;
-    }
-
     private void initPlayer(Player player) {
         player.getInventory().clear();
         player.getEnderChest().clear();
-        player.setHealth(player.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue());
+        player.setHealth(player.getAttribute(Attribute.MAX_HEALTH).getValue());
         player.setFoodLevel(20);
         player.setLevel(0);
         player.setExp(0);
