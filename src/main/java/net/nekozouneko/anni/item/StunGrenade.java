@@ -1,22 +1,22 @@
 package net.nekozouneko.anni.item;
 
+import com.destroystokyo.paper.event.player.PlayerLaunchProjectileEvent;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import net.nekozouneko.anni.ANNIPlugin;
 import net.nekozouneko.anni.message.MessageManager;
 import net.nekozouneko.anni.task.CooldownManager;
+import net.nekozouneko.anni.task.RechargeManager;
 import net.nekozouneko.anni.util.CmnUtil;
 import net.nekozouneko.commons.spigot.inventory.ItemStackBuilder;
 import org.bukkit.*;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.ProjectileHitEvent;
-import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
-import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataHolder;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.potion.PotionEffect;
@@ -41,57 +41,56 @@ public class StunGrenade implements Listener {
                 .enchant(Enchantment.UNBREAKING, 1, false);
     }
 
-    @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
-    public void onLaunch(ProjectileLaunchEvent e) {
-        if (e.getEntity().getShooter() != null && e.getEntity().getShooter() instanceof Player) {
-            Player s = ((Player) e.getEntity().getShooter());
-            if (s.getInventory().getItemInMainHand() == null || s.getInventory().getItemInMainHand().getType().isAir()) return;
-            PersistentDataContainer pdc = s.getInventory().getItemInMainHand()
-                    .getItemMeta().getPersistentDataContainer();
-            NamespacedKey siKey = new NamespacedKey(ANNIPlugin.getInstance(), "special-item");
+    public static boolean isStunGrenade(PersistentDataHolder holder) {
+        if (holder == null) return false;
 
-            if (pdc.has(siKey, PersistentDataType.STRING)) {
-                if (pdc.get(siKey, PersistentDataType.STRING).equals("stun-grenade")) {
-                    e.getEntity().getPersistentDataContainer()
-                            .set(siKey, PersistentDataType.STRING, "stun-grenade");
-                    new BukkitRunnable() {
-                        @Override
-                        public void run() {
-                            if (e.getEntity().isDead()) cancel();
-                            else {
+        NamespacedKey key = new NamespacedKey(ANNIPlugin.getInstance(), "special-item");
 
-                                e.getEntity().getWorld().spawnParticle(
-                                        Particle.BLOCK, e.getEntity().getLocation(),
-                                        5, 0, 0, 0, Material.PLAYER_HEAD.createBlockData()
-                                );
-                            }
-                        }
-                    }.runTaskTimer(ANNIPlugin.getInstance(), 0, 1);
-                }
-            }
-        }
+        return holder.getPersistentDataContainer()
+                .getOrDefault(key, PersistentDataType.STRING, "").equals("stun-grenade");
     }
 
-    /*@EventHandler
-    public void onLaunch2(PlayerInteractEvent e) {
-        if (!(e.getAction() == Action.RIGHT_CLICK_AIR || e.getAction() == Action.RIGHT_CLICK_BLOCK)) return;
-        if (e.getItem() == null || e.getItem().getType().isAir()) return;
-        if (!isStunGrenade(e.getItem().getItemMeta())) return;
+    @EventHandler(ignoreCancelled = true)
+    public void onLaunch(PlayerLaunchProjectileEvent e) {
+        if (!isStunGrenade(e.getItemStack().getItemMeta())) return;
 
-        e.setCancelled(true);
-    }*/
+        if (e.getItemStack().getAmount() == 1) {
+            e.setCancelled(true);
+
+            ANNIPlugin plugin = ANNIPlugin.getInstance();
+            if (plugin.getCurrentGame().getRechargeManager() != null) {
+                e.getPlayer().sendActionBar(LegacyComponentSerializer.legacyAmpersand().deserialize(
+                        plugin.getMessageManager().build("actionbar.cooldown_recharge",
+                                plugin.getCurrentGame().getRechargeManager().getTimeLeftFormatted(e.getPlayer(), RechargeManager.Type.STUN_GRENADE)
+                        )
+                ));
+            }
+            return;
+        }
+
+        NamespacedKey siKey = new NamespacedKey(ANNIPlugin.getInstance(), "special-item");
+        e.getProjectile().getPersistentDataContainer()
+                .set(siKey, PersistentDataType.STRING, "stun-grenade");
+
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                if (e.getProjectile().isDead()) cancel();
+                else {
+
+                    e.getProjectile().getWorld().spawnParticle(
+                            Particle.BLOCK, e.getProjectile().getLocation(),
+                            5, 0, 0, 0, Material.PLAYER_HEAD.createBlockData()
+                    );
+                }
+            }
+        }.runTaskTimer(ANNIPlugin.getInstance(), 0, 1);
+    }
 
     @EventHandler
     public void onHit(ProjectileHitEvent e) {
-        if (e.getEntity().getPersistentDataContainer().has(
-                new NamespacedKey(ANNIPlugin.getInstance(), "special-item"), PersistentDataType.STRING
-        ) && e.getEntity().getPersistentDataContainer().get(
-                new NamespacedKey(ANNIPlugin.getInstance(), "special-item"), PersistentDataType.STRING)
-                .equals("stun-grenade")
-        ) {
-            if (e.getHitEntity() != null && e.getHitEntity() instanceof Player) {
-                Player hit = ((Player) e.getHitEntity());
-
+        if (isStunGrenade(e.getEntity())) {
+            if (e.getHitEntity() != null && e.getHitEntity() instanceof Player hit) {
                 if (!(e.getEntity().getShooter() instanceof Player) || CmnUtil.canDamage((Player) e.getEntity().getShooter(), hit)) {
                     hit.damage(1, e.getEntity());
 
@@ -141,15 +140,4 @@ public class StunGrenade implements Listener {
             }
         }
     }
-
-    public static boolean isStunGrenade(PersistentDataHolder holder) {
-        if (holder == null) return false;
-
-        NamespacedKey key = new NamespacedKey(ANNIPlugin.getInstance(), "special-item");
-
-        return holder.getPersistentDataContainer()
-                .getOrDefault(key, PersistentDataType.STRING, "").equals("stun-grenade");
-    }
-
-
 }
