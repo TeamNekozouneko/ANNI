@@ -2,7 +2,7 @@ name: ANNI
 version: '${project.version}'
 
 main: net.nekozouneko.anni.ANNIPlugin
-api-version: 1.16
+api-version: 1.21
 
 authors: [Taitaitatata]
 description: '${project.description}'
@@ -10,6 +10,8 @@ website: '${project.url}'
 
 softdepend: [Votifier]
 depend: [Vault, WorldEdit, WorldGuard]
+
+libraries: ["org.xerial:sqlite-jdbc:3.48.0.0"]
 
 commands:
   anni-admin:
@@ -44,16 +46,18 @@ commands:
     description: "Suicide command"
     permission: anni.command.suicide
     usage: "/<command>"
-  point:
-    description: "Point command"
-    permission: anni.command.point
-    usage: "/<command> [target]"
   charge:
     description: "Charge command"
     permission: anni.command.charge
     usage: "/<command>"
+  player:
+    description: "Player command"
+    permission: anni.command.player
+    usage: "/<command> [target]"
 
 permissions:
   anni.mod.global_chat_on_spectator:
     default: op
-    description: "If you have this permission, can use global chat on spectator"
+
+  anni.command.player.other:
+    default: op
