@@ -1,73 +1,66 @@
 package net.nekozouneko.anni.vote;
 
-import com.google.common.base.Preconditions;
-import com.google.common.collect.HashMultimap;
-import com.google.common.collect.ImmutableMultimap;
-import com.google.common.collect.Multimap;
 import org.bukkit.OfflinePlayer;
+import org.bukkit.entity.Player;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public class VoteManager {
 
-    private static final Map<String, Multimap<Object, OfflinePlayer>> vote = new HashMap<>();
-    private static final Map<String, Set<Object>> choices = new HashMap<>();
-
-    private VoteManager() { throw new ExceptionInInitializerError(); }
-
-    public static void startVote(String id, Set<Object> choices) {
-        Preconditions.checkArgument(id != null, "ID is null.");
-        Preconditions.checkArgument(!isNowVoting(id), "Duplicate");
-
-        vote.put(id, HashMultimap.create());
-        VoteManager.choices.put(id, choices);
+    public VoteManager(Set<String> choices) {
+        this.choices.addAll(choices);
     }
 
-    public static void vote(String id, OfflinePlayer player, Object obj) {
-        Preconditions.checkArgument(id != null && player != null);
-        if (choices.get(id) != null) {
-            if (!choices.get(id).contains(obj))
-                throw new IllegalArgumentException(obj + " is not contain choices");
-        }
+    private final Map<OfflinePlayer, String> votes = new HashMap<>();
+    private final Set<String> choices = new HashSet<>();
 
-        new HashSet<>(vote.get(id).keySet()).forEach(obj1 -> vote.get(id).remove(obj1, player));
-        vote.get(id).put(obj, player);
+    public void vote(Player player, String choice) {
+        if (!choices.contains(choice)) return;
+
+        votes.put(player, choice);
     }
 
-    public static void updateChoices(String id, Set<Object> choices) {
-        Preconditions.checkArgument(id != null);
-
-        VoteManager.choices.put(id, choices);
+    public void clear() {
+        votes.clear();
     }
 
-    public static boolean hasChoices(String id) {
-        return isNowVoting(id) && choices.get(id) != null && !choices.get(id).isEmpty();
+    public void updateChoices(Set<String> choices) {
+        this.choices.clear();
+        this.choices.addAll(choices);
+
+        new HashMap<>(votes).forEach((player, vote) -> {
+            if (!this.choices.contains(vote)) this.votes.remove(player);
+        });
     }
 
-    public static Set<Object> getChoices(String id) {
-        return choices.get(id);
+    public Set<String> getChoices() {
+        return Collections.unmodifiableSet(choices);
     }
 
-    public static Multimap<Object, OfflinePlayer> endVote(String id) {
-        choices.remove(id);
-        return vote.remove(id);
+    public String getResult() {
+        return getSortedResults().get(0).getKey();
     }
 
-    public static Multimap<Object, OfflinePlayer> getResult(String id) {
-        Preconditions.checkArgument(vote.containsKey(id));
+    public Map<String, Integer> getResults() {
+        Map<String, Integer> map = new HashMap<>();
 
-        return ImmutableMultimap.copyOf(vote.get(id));
+        votes.values().forEach(choice -> {
+            map.put(choice, map.getOrDefault(choice, 0) + 1);
+        });
+
+        return map;
     }
 
-    public static void clearVote(String id) {
-        vote.get(id).clear();
+    @SuppressWarnings("unchecked")
+    public List<Map.Entry<String, Integer>> getSortedResults() {
+        List<Map.Entry<String, Integer>> list = new ArrayList<>(getResults().entrySet());
+        list.sort(Comparator.comparingInt(entry -> ((Map.Entry<String, Integer>) entry).getValue()).reversed());
+
+        return list;
     }
 
-    public static boolean isNowVoting(String id) {
-        return vote.containsKey(id);
+    public boolean isEmpty() {
+        return votes.isEmpty();
     }
 
 }

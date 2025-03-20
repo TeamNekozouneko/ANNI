@@ -4,7 +4,6 @@ import net.nekozouneko.anni.ANNIPlugin;
 import net.nekozouneko.anni.message.MessageManager;
 import net.nekozouneko.anni.util.CmdUtil;
 import net.nekozouneko.anni.vote.VoteManager;
-import org.bukkit.OfflinePlayer;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -13,7 +12,6 @@ import org.bukkit.entity.Player;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class VoteCommand implements CommandExecutor, TabCompleter {
 
@@ -32,16 +30,16 @@ public class VoteCommand implements CommandExecutor, TabCompleter {
             return true;
         }
 
-        if (VoteManager.isNowVoting(plugin.getCurrentGame().getId())) {
-            if (VoteManager.hasChoices(plugin.getCurrentGame().getId())) {
-                if (!VoteManager.getChoices(plugin.getCurrentGame().getId()).contains(args[0])) {
-                    sender.sendMessage(mm.build("command.err.invalid_vote", args[0]));
-                    return true;
-                }
+        VoteManager voteManager = plugin.getCurrentGame().getVoteManager();
 
-                VoteManager.vote(plugin.getCurrentGame().getId(), (OfflinePlayer) sender, args[0]);
-                sender.sendMessage(mm.build("command.vote.voted", args[0]));
+        if (voteManager != null) {
+            if (!voteManager.getChoices().contains(args[0])) {
+                sender.sendMessage(mm.build("command.err.invalid_vote", args[0]));
+                return true;
             }
+
+            voteManager.vote((Player) sender, args[0]);
+            sender.sendMessage(mm.build("command.vote.voted", args[0]));
         }
         else {
             sender.sendMessage(mm.build("command.err.cant_vote_now"));
@@ -53,13 +51,12 @@ public class VoteCommand implements CommandExecutor, TabCompleter {
     
     @Override
     public List<String> onTabComplete(CommandSender sender, Command cmd, String label, String[] args) {
-        if (args.length == 1 && VoteManager.hasChoices(plugin.getCurrentGame().getId())) {
+        VoteManager voteManager = plugin.getCurrentGame().getVoteManager();
+
+        if (args.length == 1 && voteManager != null) {
             return CmdUtil.simpleTabComplete(
                     args[0],
-                    VoteManager.getChoices(plugin.getCurrentGame().getId()).stream()
-                            .filter(obj -> obj instanceof String)
-                            .map(obj -> (String) obj)
-                            .collect(Collectors.toSet())
+                    voteManager.getChoices()
             );
         }
         return Collections.emptyList();
