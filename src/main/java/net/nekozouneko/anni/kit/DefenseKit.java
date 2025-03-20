@@ -7,6 +7,7 @@ import net.nekozouneko.commons.spigot.inventory.ItemStackBuilder;
 import net.nekozouneko.commons.spigot.inventory.special.LeatherArmorBuilder;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.persistence.PersistentDataType;
 
@@ -24,7 +25,9 @@ public class DefenseKit extends AbstractKit {
     public ItemStack[] getKitContents() {
         ItemStack[] inv = new ItemStack[41];
 
-        inv[0] = ItemStackBuilder.of(Material.WOODEN_SWORD).build();
+        inv[0] = ItemStackBuilder.of(Material.WOODEN_SWORD)
+                .enchant(Enchantment.KNOCKBACK, 2, false)
+                .build();
         inv[1] = ItemStackBuilder.of(Material.STONE_PICKAXE).build();
         inv[2] = ItemStackBuilder.of(Material.STONE_AXE).build();
         inv[3] = ItemStackBuilder.of(Material.STONE_SHOVEL).build();
