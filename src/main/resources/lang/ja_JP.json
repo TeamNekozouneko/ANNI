@@ -1,0 +1,34 @@
+{
+    "meta.lang.id": "ja_JP",
+    "meta.lang.name": "日本語",
+
+    "actionbar.nexus_alert": "<red><0>によってネクサスが破壊されています!",
+    "actionbar.spectator": "<gray>観戦者モード",
+
+    "command.player.result.0": "<yellow>■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■",
+    "command.player.result.1": "<yellow>> <aqua><b><0></b>",
+    "command.player.result.2": "<dark_gray>・<white>Lv. <b><1></b> <gray><2> / <3> [<4><gray>]",
+    "command.player.result.3": "<dark_gray>・<white>AP: <b><5></b>",
+    "command.player.result.4": "",
+    "command.player.result.5": "<yellow>> <aqua><b>統計</b>",
+    "command.player.result.6": "<dark_gray>・<white>キル: <dark_gray>-",
+    "command.player.result.7": "<dark_gray>・<white>デス: <dark_gray>-",
+    "command.player.result.8": "<dark_gray>・<white>K/D: <dark_gray>-",
+    "command.player.result.9": "<yellow>■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■",
+
+    "notify.level_up.0": "<yellow>■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■",
+    "notify.level_up.1": "<aqua><bold>レベルアップ!",
+    "notify.level_up.2": "",
+    "notify.level_up.3": "<gray>Lv.<0> -> <white>Lv.<1>",
+    "notify.level_up.4": "<white><2> <dark_gray>/ <white><3> <gray>[<4><gray>]",
+    "notify.level_up.5": "<yellow>■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■",
+
+    "team.red.name": "赤チーム",
+    "team.red.prefix": "[R]",
+    "team.blue.name": "青チーム",
+    "team.blue.prefix": "[B]",
+    "team.green.name": "緑チーム",
+    "team.green.prefix": "[G]",
+    "team.yellow.name": "黄チーム",
+    "team.yellow.prefix": "[Y]"
+}

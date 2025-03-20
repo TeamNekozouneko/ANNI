@@ -1,0 +1,13 @@
+{
+    "meta.lang.id": "en_US",
+    "meta.lang.name": "English (US)",
+
+    "actionbar.spectator": "<gray>Spectator mode",
+
+    "notify.level_up.0": "<yellow>■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■",
+    "notify.level_up.1": "<gold><bold>LEVEL UP!",
+    "notify.level_up.2": "",
+    "notify.level_up.3": "<gray>Lv.<0> -> <white>Lv.<1>",
+    "notify.level_up.4": "<white><2> <dark_gray>/ <white><3> <gray>[<4><gray>]",
+    "notify.level_up.5": "<yellow>■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■"
+}
