@@ -69,6 +69,32 @@ public class TranslationManager {
         return component.asComponent();
     }
 
+    public List<Component> componentList(String key, Object... args) {
+        return componentList(defaultLocale, key, args);
+    }
+
+    public List<Component> componentList(Player player, String key, Object... args) {
+        return componentList(player.locale(), key, args);
+    }
+
+    public List<Component> componentList(Locale locale, String key, Object... args) {
+        int i = 0;
+        List<Component> result = new ArrayList<>();
+
+        if (!isMessageExists(locale, key + "." + i)) throw new IllegalArgumentException(String.format("The message [%s] is not defined", key + "." + i));
+        Component comp = component(locale, key + "." + i, args);
+        while (comp != null) {
+            if (i != 0) result.add(Component.newline());
+            result.add(comp);
+
+            i++;
+            if (!isMessageExists(locale, key + "." + i)) break;
+            comp = component(locale, key + "." + i, args);
+        }
+
+        return result;
+    }
+
     public String string(String key, Object... args) {
         return string(defaultLocale, key, args);
     }

@@ -16,12 +16,30 @@
     "command.player.result.8": "<dark_gray>・<white>K/D: <dark_gray>-",
     "command.player.result.9": "<yellow>■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■",
 
+    "format.scoreboard_date": "yyyy/MM/dd HH:mm",
+
     "notify.level_up.0": "<yellow>■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■",
     "notify.level_up.1": "<aqua><bold>レベルアップ!",
     "notify.level_up.2": "",
     "notify.level_up.3": "<gray>Lv.<0> -> <white>Lv.<1>",
     "notify.level_up.4": "<white><2> <dark_gray>/ <white><3> <gray>[<4><gray>]",
     "notify.level_up.5": "<yellow>■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■",
+
+    "scoreboard.title": "<b><red>ANNI<blue>HI<green>LA<yellow>TION</b>",
+    "scoreboard.entry": "<dark_gray>・<white><0><dark_gray>: <white><1>",
+    "scoreboard.voting": "投票中",
+
+    "scoreboard.not_enough.0": "<0>",
+    "scoreboard.not_enough.1": "",
+    "scoreboard.not_enough.2": "ゲームを開始するには、",
+    "scoreboard.not_enough.3": "あと<1>人必要です...",
+    "scoreboard.not_enough.4": "",
+    "scoreboard.not_enough.5": "<aqua>> <yellow><b>マップ</b>: <2>",
+    "scoreboard.not_enough.6": "<3>",
+    "scoreboard.not_enough.7": "<4>",
+    "scoreboard.not_enough.8": "<5>",
+    "scoreboard.not_enough.9": "",
+    "scoreboard.not_enough.10": "<blue><u>nekozouneko.net</u>",
 
     "team.red.name": "赤チーム",
     "team.red.prefix": "[R]",
