@@ -121,6 +121,7 @@ public final class ANNIPlugin extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new PlayerDeathListener(), this);
         getServer().getPluginManager().registerEvents(new PlayerDenyActionListener(), this);
         getServer().getPluginManager().registerEvents(new PlayerJoinListener(), this);
+        getServer().getPluginManager().registerEvents(new PlayerPortalListener(), this);
         getServer().getPluginManager().registerEvents(new PlayerQuitListener(), this);
         getServer().getPluginManager().registerEvents(new PlayerRespawnListener(), this);
         getServer().getPluginManager().registerEvents(new ProjectileLaunchListener(), this);
