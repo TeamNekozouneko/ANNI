@@ -9,7 +9,7 @@ description: '${project.description}'
 website: '${project.url}'
 
 softdepend: [Votifier]
-depend: [Vault, WorldEdit, WorldGuard]
+depend: [Vault, ViaVersion, WorldEdit, WorldGuard]
 
 commands:
   anni-admin:
