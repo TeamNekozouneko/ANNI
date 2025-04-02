@@ -1,5 +1,7 @@
 package net.nekozouneko.anni.board;
 
+import com.viaversion.viaversion.api.Via;
+import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
 import fr.mrmicky.fastboard.FastBoard;
 import net.nekozouneko.anni.ANNIPlugin;
 import org.bukkit.entity.Player;
@@ -20,7 +22,7 @@ public class BoardManager implements Listener {
 
         @Override
         public boolean hasLinesMaxLength() {
-            return super.hasLinesMaxLength();
+            return Via.getAPI().getPlayerVersion(getPlayer()) < ProtocolVersion.v1_13.getVersion();
         }
     }
 
