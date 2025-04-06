@@ -1,8 +1,6 @@
 package net.nekozouneko.anni.board;
 
-import com.viaversion.viaversion.api.Via;
-import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
-import fr.mrmicky.fastboard.FastBoard;
+import fr.mrmicky.fastboard.adventure.FastBoard;
 import net.nekozouneko.anni.ANNIPlugin;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -14,35 +12,19 @@ import java.util.Map;
 
 public class BoardManager implements Listener {
 
-    public static class ANNIFastBoard extends FastBoard {
-
-        public ANNIFastBoard(Player player) {
-            super(player);
-        }
-
-        @Override
-        public boolean hasLinesMaxLength() {
-            return Via.getAPI().getPlayerVersion(getPlayer()) < ProtocolVersion.v1_13.getVersion();
-        }
-    }
-
-    private final ANNIPlugin plugin;
-
-    private final Map<Player, ANNIFastBoard> boards = new HashMap<>();
+    private final Map<Player, FastBoard> boards = new HashMap<>();
 
     public BoardManager(ANNIPlugin plugin) {
-        this.plugin = plugin;
-
         plugin.getServer().getPluginManager().registerEvents(this, plugin);
     }
 
-    public ANNIFastBoard create(Player player) {
+    public FastBoard create(Player player) {
         delete(player);
-        return boards.put(player, new ANNIFastBoard(player));
+        return boards.put(player, new FastBoard(player));
     }
 
-    public ANNIFastBoard get(Player player) {
-        return boards.getOrDefault(player, new ANNIFastBoard(player));
+    public FastBoard get(Player player) {
+        return boards.getOrDefault(player, new FastBoard(player));
     }
 
     public void delete(Player player) {
