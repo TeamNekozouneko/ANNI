@@ -84,7 +84,6 @@ public class TranslationManager {
         if (!isMessageExists(locale, key + "." + i)) throw new IllegalArgumentException(String.format("The message [%s] is not defined", key + "." + i));
         Component comp = component(locale, key + "." + i, args);
         while (comp != null) {
-            if (i != 0) result.add(Component.newline());
             result.add(comp);
 
             i++;
