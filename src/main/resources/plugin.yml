@@ -11,7 +11,7 @@ website: '${project.url}'
 softdepend: [Votifier]
 depend: [Vault, ViaVersion, WorldEdit, WorldGuard]
 
-libraries: ["org.xerial:sqlite-jdbc:3.48.0.0"]
+libraries: ["org.xerial:sqlite-jdbc:3.49.1.0"]
 
 commands:
   anni-admin:
