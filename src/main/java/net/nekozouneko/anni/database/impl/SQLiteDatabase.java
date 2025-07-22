@@ -16,6 +16,7 @@ public class SQLiteDatabase implements Database {
                 .execute();
     }
 
+    @Override
     public void close() {
         try {
             if (!connection.isClosed())

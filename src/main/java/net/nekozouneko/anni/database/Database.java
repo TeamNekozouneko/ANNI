@@ -4,6 +4,8 @@ import java.util.UUID;
 
 public interface Database {
 
+    void close();
+
     void reset(UUID id, boolean force);
 
     void setLevel(UUID id, int level);
