@@ -19,6 +19,50 @@
     "format.scoreboard_datetime": "yyyy/MM/dd HH:mm",
     "format.nexus_health": "%,d",
 
+    "kit.assault.name": "アサルト",
+    "kit.assault.about.0": "<gray>敵にどんどん突撃し、",
+    "kit.assault.about.1": "<gray>相手を疲弊させよう！",
+
+    "kit.bow.name": "弓キット",
+    "kit.bow.description.0": "<gray>遠くから相手を撃ち、",
+    "kit.bow.description.1": "<gray>拠点から相手を離そう！",
+
+    "kit.default.name": "標準キット",
+
+    "kit.defense.name": "防衛キット",
+    "kit.defense.description.0": "<gray>重装備で抵抗しながら、",
+    "kit.defense.description.1": "<gray>防衛の心で、相手のネクサス破壊から妨害しよう！",
+
+    "kit.mochimochi.name": "もちもち",
+    "kit.mochimochi.description.0": "<gray>もちっとスタングレネードを当てて、",
+    "kit.mochimochi.description.1": "<gray>敵の撤退を妨害しよう！",
+
+    "kit.miner.name": "採掘師",
+    "kit.miner.description.0": "<gray>通常より多くの鉱物を持ち帰って、",
+    "kit.miner.description.1": "<gray>味方を支援しよう！",
+
+    "kit.acrobat.name": "アクロバット",
+    "kit.acrobat.description.0": "<gray>落下耐性と空中ジャンプで考えられない移動をして、",
+    "kit.acrobat.description.1": "<gray>相手との距離を離そう！",
+
+    "kit.scouter.name": "偵察員",
+    "kit.scouter.description.0": "<gray>グラップリングフックで素早く移動し、",
+    "kit.scouter.description.1": "<gray>敵のアイテムを盗み出そう！",
+
+    "kit.chaser.name": "追撃屋",
+
+    "kit.worker.name": "ワーカーキット",
+    "kit.worker.description.0": "<gray>敵のネクサスにダメージを与えて、",
+    "kit.worker.description.1": "<gray>一定の確率で自分のネクサスを回復しよう！",
+
+    "kit.vampire.name": "吸血鬼キット",
+    "kit.vampire.description.0": "<gray>敵に直接攻撃して、",
+    "kit.vampire.description.1": "<gray>体力を吸い取ろう！",
+
+    "kit.musasabi.name": "&bむささびキット",
+    "kit.musasabi.description.0": "<gray>空高く飛んで、",
+    "kit.musasabi.description.1": "<gray>敵に奇襲をしよう！",
+
     "notify.level_up.0": "<yellow>■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■",
     "notify.level_up.1": "<aqua><bold>レベルアップ!",
     "notify.level_up.2": "",
@@ -72,6 +116,7 @@
     "scoreboard.playing.9": "<blue><u>nekozouneko.net</u>",
 
     "scoreboard.playing.short.title": "<b>マップ</b>: <0>",
+    "scoreboard.playing.short.team_entry": "<0><dark_gray>: <reset><1>",
 
     "scoreboard.stopped.0": "<dark_gray><0>",
     "scoreboard.stopped.1": "",
@@ -87,12 +132,12 @@
     "scoreboard.nexus.state.lost": "<red>×",
     "scoreboard.nexus.health.none": "<dark_gray>-",
 
-    "team.red.name": "赤チーム",
+    "team.red.name": "<red>赤チーム",
     "team.red.prefix": "[R]",
-    "team.blue.name": "青チーム",
+    "team.blue.name": "<blue>青チーム",
     "team.blue.prefix": "[B]",
-    "team.green.name": "緑チーム",
+    "team.green.name": "<green>緑チーム",
     "team.green.prefix": "[G]",
-    "team.yellow.name": "黄チーム",
+    "team.yellow.name": "<yellow>黄チーム",
     "team.yellow.prefix": "[Y]"
 }

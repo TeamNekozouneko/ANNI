@@ -57,6 +57,7 @@
     "scoreboard.playing.9": "<blue><u>nekozouneko.net</u>",
 
     "scoreboard.playing.short.title": "<b>Map</b>: <0>",
+    "scoreboard.playing.short.team_entry": "<0><dark_gray>: <reset><1>",
 
     "scoreboard.stopped.0": "<dark_gray><0>",
     "scoreboard.stopped.1": "",
@@ -68,12 +69,12 @@
     "scoreboard.stopped.7": "",
     "scoreboard.stopped.8": "<blue><u>nekozouneko.net</u>",
 
-    "team.red.name": "Red team",
+    "team.red.name": "<red>Red team",
     "team.red.prefix": "[R]",
-    "team.blue.name": "Blue team",
+    "team.blue.name": "<blue>Blue team",
     "team.blue.prefix": "[B]",
-    "team.green.name": "Green team",
+    "team.green.name": "<green>Green team",
     "team.green.prefix": "[G]",
-    "team.yellow.name": "Yellow team",
+    "team.yellow.name": "<yellow>Yellow team",
     "team.yellow.prefix": "[Y]"
 }
