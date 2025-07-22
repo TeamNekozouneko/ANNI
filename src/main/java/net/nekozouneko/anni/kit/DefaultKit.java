@@ -9,15 +9,10 @@ import org.bukkit.NamespacedKey;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.persistence.PersistentDataType;
 
-import java.util.Collections;
-
-public class DefaultKit extends AbstractKit {
+public class DefaultKit extends InternalKit {
 
     DefaultKit() {
-        super(
-                "default", "DFT", "kit.default.name",
-                Material.DIRT.name(), Collections.emptyList()
-        );
+        super("default", "kit.default.name", "kit.default.description", "DFT", Material.CHEST);
     }
 
     @Override

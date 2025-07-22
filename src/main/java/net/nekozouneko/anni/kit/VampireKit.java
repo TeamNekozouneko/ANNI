@@ -9,10 +9,10 @@ import org.bukkit.NamespacedKey;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.persistence.PersistentDataType;
 
-public class VampireKit extends AbstractKit {
+public class VampireKit extends InternalKit {
 
     VampireKit() {
-        super("vampire", "VMP", "kit.vampire.name", Material.REDSTONE.name(), ANNIPlugin.getInstance().getMessageManager().buildList("kit.vampire.about"));
+        super("vampire", "kit.vampire.name", "kit.vampire.description", "VMP", Material.REDSTONE);
     }
 
     @Override

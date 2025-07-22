@@ -10,14 +10,10 @@ import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.persistence.PersistentDataType;
 
-public class MinerKit extends AbstractKit {
+public class MinerKit extends InternalKit {
 
     public MinerKit() {
-        super(
-                "miner", "MNR", "kit.miner.name",
-                Material.IRON_PICKAXE.name(),
-                ANNIPlugin.getInstance().getMessageManager().buildList("kit.miner.about")
-        );
+        super("miner", "kit.miner.name", "kit.miner.description", "MNR", Material.IRON_PICKAXE);
     }
 
     @Override

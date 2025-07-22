@@ -9,10 +9,10 @@ import org.bukkit.NamespacedKey;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.persistence.PersistentDataType;
 
-public class WorkerKit extends AbstractKit {
+public class WorkerKit extends InternalKit {
 
     WorkerKit() {
-        super("worker", "WRK", "kit.worker.name", Material.CHIPPED_ANVIL.name(), ANNIPlugin.getInstance().getMessageManager().buildList("kit.worker.about"));
+        super("worker", "kit.worker.name", "kit.worker.description", "WRK", Material.CHIPPED_ANVIL);
     }
 
     @Override

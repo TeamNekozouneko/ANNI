@@ -9,14 +9,10 @@ import org.bukkit.NamespacedKey;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.persistence.PersistentDataType;
 
-public final class AssaultKit extends AbstractKit {
+public final class AssaultKit extends InternalKit {
 
     AssaultKit() {
-        super(
-                "assault", "AST", "kit.assault.name",
-                Material.IRON_SWORD.name(),
-                ANNIPlugin.getInstance().getMessageManager().buildList("kit.assault.about")
-        );
+        super("assault", "kit.assault.name", "kit.assault.description", "AST", Material.IRON_SWORD);
     }
 
     @Override

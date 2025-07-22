@@ -10,14 +10,10 @@ import org.bukkit.NamespacedKey;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.persistence.PersistentDataType;
 
-public class MochiMochiKit extends AbstractKit {
+public class MochiMochiKit extends InternalKit {
 
     MochiMochiKit() {
-        super(
-                "mochimochi", "MOC", "kit.mochimochi.name",
-                Material.HONEY_BLOCK.name(),
-                ANNIPlugin.getInstance().getMessageManager().buildList("kit.mochimochi.about")
-        );
+        super("mochimochi", "kit.mochimochi.name", "kit.mochimochi.description", "MOC", Material.HONEY_BLOCK);
     }
 
     @Override

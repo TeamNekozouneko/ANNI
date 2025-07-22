@@ -5,7 +5,7 @@ import net.nekozouneko.anni.ANNIConfig;
 import net.nekozouneko.anni.ANNIPlugin;
 import net.nekozouneko.anni.gui.AbstractGui;
 import net.nekozouneko.anni.kit.ANNIKit;
-import net.nekozouneko.anni.kit.AbstractKit;
+import net.nekozouneko.anni.kit.Kit;
 import net.nekozouneko.anni.message.MessageManager;
 import net.nekozouneko.commons.spigot.inventory.ItemStackBuilder;
 import org.bukkit.Bukkit;
@@ -15,6 +15,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 
@@ -32,7 +33,7 @@ public class KitSelector extends AbstractGui {
     public KitSelector(ANNIPlugin plugin, Player player, int page) {
         super(plugin, player);
 
-        List<List<AbstractKit>> part = getPartedKits();
+        List<List<Kit>> part = getPartedKits();
 
         this.page = Math.max(page <= part.size() ? page : 1, 1);
     }
@@ -87,17 +88,20 @@ public class KitSelector extends AbstractGui {
 
         NamespacedKey kin = new NamespacedKey(plugin, "kit");
 
-        List<List<AbstractKit>> part = getPartedKits();
+        List<List<Kit>> part = getPartedKits();
 
         if (!part.isEmpty()) {
-            List<AbstractKit> p = part.get(page - 1);
+            List<Kit> p = part.get(page - 1);
             for (int i = 0;i < p.size() && i < 27; i++) {
-                inventory.setItem(i, ItemStackBuilder.of(p.get(i).getIcon())
-                        .name("§f" + p.get(i).getName())
-                        .lore(p.get(i).getLore())
-                        .persistentData(kin, PersistentDataType.STRING, p.get(i).getId())
-                        .build()
-                );
+                Kit kit = p.get(i);
+                ItemStack kitButton = new ItemStack(p.get(i).getIcon());
+
+                kitButton.editMeta(meta -> {
+                    meta.customName(kit.getName(player));
+                    meta.lore(kit.getLore(player));
+                    meta.getPersistentDataContainer().set(kin, PersistentDataType.STRING, kit.getId());
+                });
+                inventory.setItem(i, kitButton);
             }
         }
     }
@@ -120,7 +124,7 @@ public class KitSelector extends AbstractGui {
             player.closeInventory();
         }
         else if (pdc.has(kin, PersistentDataType.STRING)) {
-            AbstractKit kit = ANNIKit.getAbsKitOrCustomById(
+            Kit kit = ANNIKit.getAbsKitOrCustomById(
                     pdc.getOrDefault(kin, PersistentDataType.STRING, "default")
             );
 
@@ -149,8 +153,8 @@ public class KitSelector extends AbstractGui {
         return getPartedKits().size();
     }
 
-    private List<List<AbstractKit>> getPartedKits() {
-        List<AbstractKit> kits = new ArrayList<>();
+    private List<List<Kit>> getPartedKits() {
+        List<Kit> kits = new ArrayList<>();
         if (ANNIConfig.isEnabledCustomKits()) {
             if (!ANNIConfig.isCustomKitOnly()) {
                 kits.addAll(Arrays.stream(ANNIKit.values())

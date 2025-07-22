@@ -11,14 +11,10 @@ import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.persistence.PersistentDataType;
 
-public class DefenseKit extends AbstractKit {
+public class DefenseKit extends InternalKit {
 
     DefenseKit() {
-        super(
-                "defense", "DEF", "kit.defense.name",
-                Material.SHIELD.name(),
-                ANNIPlugin.getInstance().getMessageManager().buildList("kit.defense.about")
-        );
+        super("defense", "kit.defense.name", "kit.defense.description", "DFS", Material.SHIELD);
     }
 
     @Override

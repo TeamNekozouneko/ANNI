@@ -10,14 +10,10 @@ import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.persistence.PersistentDataType;
 
-public class BowKit extends AbstractKit {
+public class BowKit extends InternalKit {
 
     BowKit() {
-        super(
-                "bow", "BOW", "kit.bow.name",
-                Material.BOW.name(),
-                ANNIPlugin.getInstance().getMessageManager().buildList("kit.bow.about")
-        );
+        super("bow", "kit.bow.name", "kit.bow.description", "BOW", Material.BOW);
     }
 
     @Override

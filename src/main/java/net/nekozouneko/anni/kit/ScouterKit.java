@@ -10,10 +10,10 @@ import org.bukkit.NamespacedKey;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.persistence.PersistentDataType;
 
-public class ScouterKit extends AbstractKit {
+public class ScouterKit extends InternalKit {
 
     ScouterKit() {
-        super("scouter", "SCT", "kit.scouter.name", Material.SPYGLASS.name(), ANNIPlugin.getInstance().getMessageManager().buildList("kit.scouter.about"));
+        super("scouter", "kit.scouter.name", "kit.scouter.description", "SCT", Material.SPYGLASS);
     }
 
     @Override

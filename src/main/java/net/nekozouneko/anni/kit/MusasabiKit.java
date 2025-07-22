@@ -11,14 +11,10 @@ import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.persistence.PersistentDataType;
 
-public class MusasabiKit extends AbstractKit {
+public class MusasabiKit extends InternalKit {
 
-    public MusasabiKit() {
-        super(
-                "musasabi", "MSB", "kit.musasabi.name",
-                Material.ELYTRA.name(),
-                ANNIPlugin.getInstance().getMessageManager().buildList("kit.musasabi.about")
-        );
+    MusasabiKit() {
+        super("musasabi", "kit.musasabi.name", "kit.musasabi.description", "MSB", Material.ELYTRA);
     }
 
     @Override

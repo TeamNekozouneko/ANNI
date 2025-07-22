@@ -9,12 +9,10 @@ import org.bukkit.NamespacedKey;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.persistence.PersistentDataType;
 
-import java.util.Collections;
-
-public class ChaserKit extends AbstractKit {
+public class ChaserKit extends InternalKit {
 
     ChaserKit() {
-        super("chaser", "CHS", "kit.chaser.name", Material.TRIDENT.name(), Collections.emptyList());
+        super("chaser", "kit.chaser.name", "kit.chaser.description", "CHS", Material.TRIDENT);
     }
 
     @Override

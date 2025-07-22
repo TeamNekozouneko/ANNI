@@ -44,13 +44,13 @@ public enum ANNIKit {
         //ID_MAP.put(MUSASABI.getKit().getId(), MUSASABI);
     }
 
-    private final AbstractKit kit;
+    private final Kit kit;
 
-    private ANNIKit(AbstractKit kit) {
+    private ANNIKit(Kit kit) {
         this.kit = kit;
     }
 
-    public AbstractKit getKit() {
+    public Kit getKit() {
         return kit;
     }
 
@@ -58,24 +58,24 @@ public enum ANNIKit {
         return ID_MAP.getOrDefault(id, DEFAULT);
     }
 
-    public static AbstractKit getAbsKitOrCustomById(String id) {
+    public static Kit getAbsKitOrCustomById(String id) {
         return ANNIPlugin.getInstance().getCustomKitManager().getKit(id) != null ? ANNIPlugin.getInstance().getCustomKitManager().getKit(id) : getKitById(id).getKit();
     }
 
-    public static boolean isDefaultKit(AbstractKit kit) {
+    public static boolean isDefaultKit(Kit kit) {
         return Arrays.stream(values())
                 .map(ANNIKit::getKit)
                 .anyMatch(kit::equals);
     }
 
-    public static ANNIKit get(AbstractKit kit) {
+    public static ANNIKit get(Kit kit) {
         for (ANNIKit k : values()) {
             if (k.getKit().equals(kit)) return k;
         }
         return DEFAULT;
     }
 
-    public static ItemStack[] teamColor(AbstractKit kit, ANNITeam team) {
+    public static ItemStack[] teamColor(Kit kit, ANNITeam team) {
         ItemStack[] arr = Arrays.copyOf(kit.getKitContents(), kit.getKitContents().length);
         for (ItemStack is : arr) {
             if (is == null) continue;
