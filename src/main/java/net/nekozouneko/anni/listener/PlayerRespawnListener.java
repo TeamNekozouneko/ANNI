@@ -42,10 +42,10 @@ public class PlayerRespawnListener implements Listener {
                 return;
             }
 
-            // リスキル対策で 耐性255 と スピード 1 をリスポーン時付与
+            // リスキル対策で 耐性256 と スピード 1 をリスポーン時付与
             Bukkit.getScheduler().runTask(plugin, () -> {
                         e.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.RESISTANCE, 200, 255, false, false, true));
-                        e.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 200, 1, false, false, true));
+                        e.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 200, 0, false, false, true));
                     }
             );
 
@@ -55,6 +55,8 @@ public class PlayerRespawnListener implements Listener {
                         ANNIKit.teamColor(current.getKit(e.getPlayer()), current.getTeamByPlayer(e.getPlayer()))
                         : current.getKit(e.getPlayer()).getKitContents()
             );
+
+            current.getKit(e.getPlayer()).onRespawn(e.getPlayer());
         }
         else {
             SpectatorManager.remove(e.getPlayer());
