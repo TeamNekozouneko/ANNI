@@ -11,7 +11,6 @@ import net.nekozouneko.anni.arena.ANNIArena;
 import net.nekozouneko.anni.arena.team.ANNITeam;
 import net.nekozouneko.anni.board.BoardManager;
 import net.nekozouneko.anni.map.ANNIMap;
-import net.nekozouneko.anni.message.MessageManager;
 import net.nekozouneko.anni.message.TranslationManager;
 import net.nekozouneko.anni.vote.VoteManager;
 import org.bukkit.Bukkit;
@@ -29,98 +28,6 @@ public class ScoreboardManager {
     public ScoreboardManager(ANNIArena arena) {
         this.arena = arena;
     }
-
-    /*public void update() {
-        BoardManager bm = ANNIPlugin.getInstance().getBoardManager();
-        MessageManager mm = ANNIPlugin.getInstance().getMessageManager();
-
-        for (Player pl : Bukkit.getOnlinePlayers()) {
-            try {
-                BoardManager.ANNIFastBoard fb = bm.get(pl);
-                SimpleDateFormat df = new SimpleDateFormat(mm.build("scoreboard.dateformat"));
-
-                switch (arena.getState()) {
-                    case WAITING:
-                    case STARTING: {
-                        fb.updateTitle(mm.build("scoreboard.title"));
-                        String news = arena.getState() == ArenaState.STARTING ?
-                                mm.build("scoreboard.waiting.2.starting", CmnUtil.secminTimer(arena.getTimer())) :
-                                mm.build("scoreboard.waiting.2.more_player", (
-                                        arena.getEnabledTeams().entrySet().stream()
-                                                .filter(Map.Entry::getValue)
-                                                .count() * ANNIConfig.getTeamMinPlayers() - Bukkit.getOnlinePlayers().size())
-                                );
-
-                        if (arena.getMap() != null) {
-                            fb.updateLines(mm.buildList("scoreboard.waiting",
-                                    df.format(Calendar.getInstance().getTime()),
-                                    news,
-                                    Bukkit.getOnlinePlayers().size() + " / 120",
-                                    arena.getMap().getName()
-                            ));
-                        } else {
-                            List<Map.Entry<String, Integer>> nowRes = arena.getVoteManager().getSortedResults();
-                            fb.updateLines(mm.buildList("scoreboard.waiting_voting",
-                                    df.format(Calendar.getInstance().getTime()),
-                                    news,
-                                    Bukkit.getOnlinePlayers().size() + " / " + (ANNIConfig.getTeamMaxPlayers() * arena.getEnabledTeams().size()),
-                                    !nowRes.isEmpty() ? nowRes.get(0).getKey() + " - " + nowRes.get(0).getValue() : "",
-                                    nowRes.size() > 1 ? nowRes.get(1).getKey() + " - " + nowRes.get(1).getValue() : "",
-                                    nowRes.size() > 2 ? nowRes.get(2).getKey() + " - " + nowRes.get(2).getValue() : ""
-                            ));
-                        }
-                        break;
-                    }
-                    case PHASE_ONE:
-                    case PHASE_TWO:
-                    case PHASE_THREE:
-                    case PHASE_FOUR:
-                    case PHASE_FIVE:
-                    case GAME_OVER: {
-                        if (fb.hasLinesMaxLength()) {
-                            if (arena.getMap().getName() != null)
-                                fb.updateTitle(mm.build("scoreboard.playing.short.title", arena.getMap().getName()));
-                            else fb.updateTitle(mm.build("scoreboard.title"));
-                            fb.updateLines(
-                                    mm.buildList(
-                                            "scoreboard.playing.short",
-                                            shortNexusHealth(ANNITeam.RED),
-                                            shortNexusHealth(ANNITeam.BLUE),
-                                            shortNexusHealth(ANNITeam.GREEN),
-                                            shortNexusHealth(ANNITeam.YELLOW)
-                                    )
-                            );
-                        }
-                        else {
-                            fb.updateTitle(mm.build("scoreboard.title"));
-                            fb.updateLines(mm.buildList("scoreboard.playing",
-                                    df.format(Calendar.getInstance().getTime()),
-                                    sbNexusState(ANNITeam.RED),
-                                    sbNexusState(ANNITeam.BLUE),
-                                    sbNexusState(ANNITeam.GREEN),
-                                    sbNexusState(ANNITeam.YELLOW),
-                                    sbNexusHealth(ANNITeam.RED),
-                                    sbNexusHealth(ANNITeam.BLUE),
-                                    sbNexusHealth(ANNITeam.GREEN),
-                                    sbNexusHealth(ANNITeam.YELLOW),
-                                    arena.getMap() != null ? arena.getMap().getName() : "-----"
-                            ));
-                        }
-                        break;
-                    }
-                    default: {
-                        fb.updateLines(mm.buildList("scoreboard.stopping",
-                                df.format(Calendar.getInstance().getTime())
-                        ));
-                        break;
-                    }
-                }
-            }
-            catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-    }*/
 
     public void update() {
         BoardManager bm = ANNIPlugin.getInstance().getBoardManager();
@@ -174,10 +81,12 @@ public class ScoreboardManager {
                                 fb.updateTitle(tm.component(player, "scoreboard.playing.short.title", arena.getMap().getName()));
                             else fb.updateTitle(tm.component(player, "scoreboard.title"));
 
-                            for (ANNITeam team : ANNITeam.values()) {
-                                Integer health = arena.getNexusHealth(team);
-                                fb.updateScore(health != null ? health : 0, tm.component(player, team.getNameKey()));
-                            }
+                            fb.updateLines(
+                                    tm.component(player, "scoreboard.playing.short.team_entry", tm.component(player, ANNITeam.RED.getNameKey()), nexusHealth(player, ANNITeam.RED)),
+                                    tm.component(player, "scoreboard.playing.short.team_entry", tm.component(player, ANNITeam.BLUE.getNameKey()), nexusHealth(player, ANNITeam.BLUE)),
+                                    tm.component(player, "scoreboard.playing.short.team_entry", tm.component(player, ANNITeam.GREEN.getNameKey()), nexusHealth(player, ANNITeam.GREEN)),
+                                    tm.component(player, "scoreboard.playing.short.team_entry", tm.component(player, ANNITeam.YELLOW.getNameKey()), nexusHealth(player, ANNITeam.YELLOW))
+                            );
                         }
                         else {
                             fb.updateTitle(tm.component(player, "scoreboard.title"));
@@ -202,25 +111,6 @@ public class ScoreboardManager {
                 e.printStackTrace();
             }
         }
-    }
-
-    private String sbNexusHealth(ANNITeam team) {
-        MessageManager mm = ANNIPlugin.getInstance().getMessageManager();
-        Integer nh = arena.getNexusHealth(team);
-
-        if (nh == null) nh = 0;
-        return arena.isEnabledTeam(team) ? // teamが無効化されていないなら
-                String.format(mm.build("nexus.health.format"), nh) // フォーマット適応済みの体力
-                : mm.build("nexus.health.none"); // 体力なしのメッセージ
-    }
-
-    private String sbNexusState(ANNITeam team) {
-        MessageManager mm = ANNIPlugin.getInstance().getMessageManager();
-        return arena.isNexusLost(team) ? mm.build("nexus.status.lost") : mm.build("nexus.status.active");
-    }
-
-    private int shortNexusHealth(ANNITeam team) {
-        return arena.getNexusHealth(team) != null ? arena.getNexusHealth(team) : 0;
     }
 
     private Component nexusState(Player player, ANNITeam team) {
