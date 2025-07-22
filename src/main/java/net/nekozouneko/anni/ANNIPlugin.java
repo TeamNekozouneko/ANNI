@@ -198,6 +198,8 @@ public final class ANNIPlugin extends JavaPlugin {
         if (!currentGame.isCancelled()) currentGame.cancel();
         unregisterRecipe();
 
+        if (database != null) database.close();
+
         instance = null;
     }
 
