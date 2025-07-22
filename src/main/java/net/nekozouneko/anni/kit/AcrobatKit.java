@@ -10,10 +10,10 @@ import org.bukkit.NamespacedKey;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.persistence.PersistentDataType;
 
-public class AcrobatKit extends AbstractKit {
+public class AcrobatKit extends InternalKit {
 
     AcrobatKit() {
-        super("acrobat", "ARC", "kit.acrobat.name", Material.FEATHER.name(), ANNIPlugin.getInstance().getMessageManager().buildList("kit.acrobat.about"));
+        super("acrobat", "kit.acrobat.name", "kit.acrobat.description", "ARC", Material.FEATHER);
     }
 
     @Override
