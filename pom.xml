@@ -181,7 +181,7 @@
                     <artifactId>spigot-api</artifactId>
                 </exclusion>
                 <exclusion>
-                    <groupId>com.google.guava100.97.53.126</groupId>
+                    <groupId>com.google.guava</groupId>
                     <artifactId>guava</artifactId>
                 </exclusion>
             </exclusions>
