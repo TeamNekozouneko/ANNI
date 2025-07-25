@@ -6,10 +6,13 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.scoreboard.Team;
 
 import java.util.Collection;
 import java.util.Locale;
+import java.util.function.Consumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -133,6 +136,12 @@ public final class CmnUtil {
                 .append(Component.text(green.toString(), NamedTextColor.GREEN).decorate(TextDecoration.BOLD))
                 .append(Component.text(gray.toString(), NamedTextColor.DARK_GRAY).decorate(TextDecoration.BOLD))
                 .asComponent();
+    }
+
+    public static void editPDC(ItemStack item, Consumer<PersistentDataContainer> editor) {
+        ItemMeta meta = item.getItemMeta();
+        editor.accept(meta.getPersistentDataContainer());
+        item.setItemMeta(meta);
     }
 
 }

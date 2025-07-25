@@ -2,6 +2,7 @@ package net.nekozouneko.anni.kit;
 
 import net.nekozouneko.anni.ANNIPlugin;
 import net.nekozouneko.anni.item.NexusCompass;
+import net.nekozouneko.anni.util.CmnUtil;
 import net.nekozouneko.commons.spigot.inventory.ItemStackBuilder;
 import net.nekozouneko.commons.spigot.inventory.special.LeatherArmorBuilder;
 import org.bukkit.Material;
@@ -10,6 +11,8 @@ import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.persistence.PersistentDataType;
 
+import java.util.Locale;
+
 public class MinerKit extends InternalKit {
 
     public MinerKit() {
@@ -17,7 +20,7 @@ public class MinerKit extends InternalKit {
     }
 
     @Override
-    public ItemStack[] getKitContents() {
+    public ItemStack[] getKitContents(Locale locale) {
         ItemStack[] inv = new ItemStack[41];
 
         inv[0] = ItemStackBuilder.of(Material.WOODEN_SWORD).build();
@@ -29,9 +32,8 @@ public class MinerKit extends InternalKit {
         inv[3] = ItemStackBuilder.of(Material.STONE_SHOVEL).build();
 
         inv[7] = ItemStackBuilder.of(Material.BREAD).amount(16).build();
-        inv[8] = NexusCompass.builder()
-                .persistentData(new NamespacedKey(ANNIPlugin.getInstance(), "no-remove"), PersistentDataType.INTEGER, 1)
-                .build();
+        inv[8] = NexusCompass.get(locale);
+        CmnUtil.editPDC(inv[8], c -> c.set(new NamespacedKey(ANNIPlugin.getInstance(), "no-remove"), PersistentDataType.INTEGER, 1));
 
         inv[39] = LeatherArmorBuilder.of(Material.LEATHER_HELMET).build();
         inv[38] = LeatherArmorBuilder.of(Material.LEATHER_CHESTPLATE).build();

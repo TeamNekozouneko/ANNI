@@ -9,15 +9,13 @@ import net.nekozouneko.anni.ANNIPlugin;
 import net.nekozouneko.anni.arena.ANNIArena;
 import net.nekozouneko.anni.arena.spectator.SpectatorManager;
 import net.nekozouneko.anni.task.CooldownManager;
-import net.nekozouneko.commons.spigot.inventory.ItemStackBuilder;
 import org.bukkit.*;
-import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.inventory.ItemFlag;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.potion.PotionEffect;
@@ -116,13 +114,18 @@ public class DefenseArtifact implements Listener {
         }
     }
 
-    public static ItemStackBuilder builder() {
-        return ItemStackBuilder.of(Material.HEART_OF_THE_SEA)
-                .name(ANNIPlugin.getInstance().getMessageManager().build("item.defense_artifact.name"))
-                .lore(ANNIPlugin.getInstance().getMessageManager().buildList("item.defense_artifact.lore"))
-                .persistentData(new NamespacedKey(ANNIPlugin.getInstance(), "special-item"), PersistentDataType.STRING, "defense-artifact")
-                .enchant(Enchantment.UNBREAKING, 1, false)
-                .itemFlags(ItemFlag.HIDE_ENCHANTS);
+    public static ItemStack get(Locale locale) {
+        var tm = ANNIPlugin.getInstance().getTranslationManager();
+
+        ItemStack item = ItemStack.of(Material.HEART_OF_THE_SEA);
+        item.editMeta(meta -> {
+            meta.displayName(tm.component(locale, "item.defense_artifact.name"));
+            meta.lore(tm.componentList(locale, "item.defense_artifact.lore"));
+            meta.getPersistentDataContainer().set(new NamespacedKey(ANNIPlugin.getInstance(), "special-item"), PersistentDataType.STRING, "defense-artifact");
+            meta.setEnchantmentGlintOverride(true);
+        });
+
+        return item;
     }
 
     public static void cancelTask(UUID player) {

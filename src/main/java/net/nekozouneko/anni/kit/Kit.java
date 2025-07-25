@@ -37,7 +37,7 @@ public interface Kit {
 
     Material getIcon();
 
-    ItemStack[] getKitContents();
+    ItemStack[] getKitContents(Locale locale);
 
     default void onDeath(Player player) {}
 

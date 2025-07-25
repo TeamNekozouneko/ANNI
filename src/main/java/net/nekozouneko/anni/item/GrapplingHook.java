@@ -3,9 +3,8 @@ package net.nekozouneko.anni.item;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.nekozouneko.anni.ANNIPlugin;
-import net.nekozouneko.anni.message.MessageManager;
+import net.nekozouneko.anni.message.TranslationManager;
 import net.nekozouneko.anni.task.CooldownManager;
-import net.nekozouneko.commons.spigot.inventory.ItemStackBuilder;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -25,6 +24,7 @@ import org.bukkit.util.Vector;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 
 public class GrapplingHook implements Listener {
 
@@ -33,15 +33,19 @@ public class GrapplingHook implements Listener {
             EntityType.AREA_EFFECT_CLOUD, EntityType.WARDEN, EntityType.IRON_GOLEM
     );
 
-    public static ItemStackBuilder builder() {
-        MessageManager mm = ANNIPlugin.getInstance().getMessageManager();
+    public static ItemStack get(Locale locale) {
+        TranslationManager tm = ANNIPlugin.getInstance().getTranslationManager();
 
-        return ItemStackBuilder.of(Material.FISHING_ROD)
-                .name(mm.build("item.grappling_hook.name"))
-                .lore(mm.buildList("item.grappling_hook.lore"))
-                .persistentData(new NamespacedKey(ANNIPlugin.getInstance(), "special-item"), PersistentDataType.STRING, "grappling-hook")
-                .unbreakable(true)
-                .itemFlags(ItemFlag.HIDE_UNBREAKABLE);
+        ItemStack item = ItemStack.of(Material.FISHING_ROD);
+        item.editMeta(meta -> {
+            meta.displayName(tm.component(locale, "item.grappling_hook.name"));
+            meta.lore(tm.componentList(locale, "item.grappling_hook.lore"));
+            meta.setUnbreakable(true);
+            meta.addItemFlags(ItemFlag.HIDE_UNBREAKABLE);
+            meta.getPersistentDataContainer().set(new NamespacedKey(ANNIPlugin.getInstance(), "special-item"), PersistentDataType.STRING, "grappling-hook");
+        });
+
+        return item;
     }
 
     @EventHandler

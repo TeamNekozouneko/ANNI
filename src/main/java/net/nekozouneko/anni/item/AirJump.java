@@ -3,9 +3,8 @@ package net.nekozouneko.anni.item;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.nekozouneko.anni.ANNIPlugin;
-import net.nekozouneko.anni.message.MessageManager;
+import net.nekozouneko.anni.message.TranslationManager;
 import net.nekozouneko.anni.task.CooldownManager;
-import net.nekozouneko.commons.spigot.inventory.ItemStackBuilder;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.Particle;
@@ -15,22 +14,27 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
+
+import java.util.Locale;
 
 public class AirJump implements Listener {
 
     public static final long DEFAULT_COOLTIME = 10000;
 
-    public static ItemStackBuilder builder() {
-        MessageManager mm = ANNIPlugin.getInstance().getMessageManager();
-        return ItemStackBuilder.of(Material.FEATHER)
-                .name(mm.build("item.airjump.name"))
-                .lore(mm.buildList("item.airjump.lore"))
-                .persistentData(
-                        new NamespacedKey(ANNIPlugin.getInstance(), "special-item"),
-                        PersistentDataType.STRING, "air-jump"
-                );
+    public static ItemStack get(Locale locale) {
+        TranslationManager tm = ANNIPlugin.getInstance().getTranslationManager();
+
+        ItemStack item = ItemStack.of(Material.FEATHER);
+        item.editMeta(meta -> {
+            meta.displayName(tm.component(locale, "item.airjump.name"));
+            meta.lore(tm.componentList(locale, "item.airjump.lore"));
+            meta.getPersistentDataContainer().set(new NamespacedKey(ANNIPlugin.getInstance(), "special-item"), PersistentDataType.STRING, "air-jump");
+        });
+
+        return item;
     }
 
     @EventHandler(priority = EventPriority.LOW)

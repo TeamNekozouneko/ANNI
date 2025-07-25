@@ -4,7 +4,6 @@ import com.google.common.base.Enums;
 import net.nekozouneko.anni.ANNIPlugin;
 import net.nekozouneko.anni.arena.ANNIArena;
 import net.nekozouneko.anni.arena.team.ANNITeam;
-import net.nekozouneko.commons.spigot.inventory.ItemStackBuilder;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
@@ -20,12 +19,15 @@ import org.bukkit.scoreboard.Team;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 public class NexusCompass implements Listener {
 
-    public static ItemStackBuilder builder() {
-        return ItemStackBuilder.of(Material.COMPASS)
-                .name(ANNIPlugin.getInstance().getMessageManager().build("item.nexus_compass.name"));
+    public static ItemStack get(Locale locale) {
+        ItemStack item = ItemStack.of(Material.COMPASS);
+        item.editMeta(meta -> meta.displayName(ANNIPlugin.getInstance().getTranslationManager().component(locale, "item.nexus_compass.name")));
+
+        return item;
     }
 
     @EventHandler

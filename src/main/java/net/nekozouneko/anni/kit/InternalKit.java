@@ -47,7 +47,7 @@ public abstract class InternalKit implements Kit {
     }
 
     @Override
-    public ItemStack[] getKitContents() {
+    public ItemStack[] getKitContents(Locale locale) {
         return new ItemStack[0];
     }
 }

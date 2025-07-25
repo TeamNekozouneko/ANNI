@@ -11,6 +11,8 @@ import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.persistence.PersistentDataType;
 
+import java.util.Locale;
+
 public class MusasabiKit extends InternalKit {
 
     MusasabiKit() {
@@ -18,7 +20,7 @@ public class MusasabiKit extends InternalKit {
     }
 
     @Override
-    public ItemStack[] getKitContents() {
+    public ItemStack[] getKitContents(Locale locale) {
         ItemStack[] inv = new ItemStack[41];
 
         inv[0] = ItemStackBuilder.of(Material.WOODEN_SWORD).build();

@@ -3,18 +3,14 @@ package net.nekozouneko.anni.item;
 import com.destroystokyo.paper.event.player.PlayerLaunchProjectileEvent;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import net.nekozouneko.anni.ANNIPlugin;
-import net.nekozouneko.anni.message.MessageManager;
 import net.nekozouneko.anni.task.CooldownManager;
 import net.nekozouneko.anni.task.RechargeManager;
 import net.nekozouneko.anni.util.CmnUtil;
-import net.nekozouneko.commons.spigot.inventory.ItemStackBuilder;
 import org.bukkit.*;
-import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.ProjectileHitEvent;
-import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.persistence.PersistentDataHolder;
@@ -23,22 +19,23 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 
+import java.util.Locale;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class StunGrenade implements Listener {
 
-    public static ItemStackBuilder builder() {
-        MessageManager mm = ANNIPlugin.getInstance().getMessageManager();
+    public static ItemStack get(Locale locale) {
+        var tm = ANNIPlugin.getInstance().getTranslationManager();
 
-        return ItemStackBuilder.of(Material.SNOWBALL)
-                .name(mm.build("item.stun_grenade.name"))
-                .lore(mm.buildList("item.stun_grenade.lore"))
-                .persistentData(
-                        new NamespacedKey(ANNIPlugin.getInstance(), "special-item"),
-                        PersistentDataType.STRING, "stun-grenade"
-                )
-                .itemFlags(ItemFlag.HIDE_ENCHANTS)
-                .enchant(Enchantment.UNBREAKING, 1, false);
+        ItemStack item = ItemStack.of(Material.SNOWBALL);
+        item.editMeta(meta -> {
+            meta.displayName(tm.component(locale, "item.stun_grenade.name"));
+            meta.lore(tm.componentList(locale, "item.stun_grenade.lore"));
+            meta.getPersistentDataContainer().set(new NamespacedKey(ANNIPlugin.getInstance(), "special-item"), PersistentDataType.STRING, "stun-grenade");
+            meta.setEnchantmentGlintOverride(true);
+        });
+
+        return item;
     }
 
     public static boolean isStunGrenade(PersistentDataHolder holder) {
