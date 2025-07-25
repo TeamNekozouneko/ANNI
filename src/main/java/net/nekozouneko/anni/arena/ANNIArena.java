@@ -46,6 +46,7 @@ import org.bukkit.entity.Firework;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.FireworkMeta;
+import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -187,18 +188,33 @@ public class ANNIArena extends BukkitRunnable {
     public void leave(Player player) {
         players.remove(player);
 
-        if (state.getId() > 0 && getTeamByPlayer(player) != null && !PlayerDamageListener.isFighting(player)) {
-            savedData.put(
-                    player.getUniqueId(),
-                    new SaveData(
-                            isNexusLost(getTeamByPlayer(player)) && SpectatorManager.isSpectating(player),
-                            getTeamByPlayer(player),
-                            player.getInventory().getContents(),
-                            player.getExp(),
-                            player.getLevel(),
-                            player.getHealth()
-                    )
-            );
+        if (state.getId() > 0 && getTeamByPlayer(player) != null) {
+            if (PlayerDamageListener.isFighting(player)) {
+                Arrays.stream(player.getInventory().getContents())
+                        .filter(Objects::nonNull)
+                        .filter(is -> {
+                            PersistentDataContainer pdc = is.getItemMeta().getPersistentDataContainer();
+
+                            return pdc.getOrDefault(
+                                    new NamespacedKey(ANNIPlugin.getInstance(), "kit-item"),
+                                    PersistentDataType.INTEGER, 0
+                            ) == 0;
+                        })
+                        .forEach(item -> player.getWorld().dropItemNaturally(player.getLocation(), item));
+            }
+            else {
+                savedData.put(
+                        player.getUniqueId(),
+                        new SaveData(
+                                isNexusLost(getTeamByPlayer(player)) && SpectatorManager.isSpectating(player),
+                                getTeamByPlayer(player),
+                                player.getInventory().getContents(),
+                                player.getExp(),
+                                player.getLevel(),
+                                player.getHealth()
+                        )
+                );
+            }
             player.getInventory().clear();
         }
 
