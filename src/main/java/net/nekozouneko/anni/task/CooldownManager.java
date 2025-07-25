@@ -3,10 +3,8 @@ package net.nekozouneko.anni.task;
 import com.google.common.base.Preconditions;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import net.md_5.bungee.api.ChatMessageType;
-import net.md_5.bungee.api.chat.TextComponent;
 import net.nekozouneko.anni.ANNIPlugin;
-import net.nekozouneko.anni.message.MessageManager;
+import net.nekozouneko.anni.message.TranslationManager;
 import org.bukkit.Bukkit;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
@@ -89,11 +87,9 @@ public class CooldownManager extends BukkitRunnable {
                 Player bukkitPlayer = Bukkit.getPlayer(player);
                 if (bukkitPlayer == null) return;
 
-                MessageManager mm = ANNIPlugin.getInstance().getMessageManager();
+                TranslationManager tm = ANNIPlugin.getInstance().getTranslationManager();
 
-                bukkitPlayer.spigot().sendMessage(ChatMessageType.ACTION_BAR,
-                        new TextComponent(mm.build("actionbar.cooldown_ended", mm.build(type.getKey())))
-                );
+                bukkitPlayer.sendActionBar(tm.component(bukkitPlayer, "actionbar.cooldown.end", tm.component(bukkitPlayer, type.getKey())));
                 bukkitPlayer.playSound(bukkitPlayer.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 10, 2);
             });
         }
