@@ -50,7 +50,7 @@ public class DebugSubCommand extends ASubCommand {
                 ANNIPlugin.getInstance().getCurrentGame().setKit(Bukkit.getPlayer(args.get(1)), ANNIKit.getAbsKitOrCustomById(args.get(2)));
                 break;
             case "get-stung":
-                ((Player) sender).getInventory().addItem(StunGrenade.builder().amount(16).build());
+                ((Player) sender).getInventory().addItem(StunGrenade.get(((Player) sender).locale()).add(15));
                 break;
             case "toggle-spec": {
                 Player p;
@@ -74,7 +74,7 @@ public class DebugSubCommand extends ASubCommand {
                 break;
             }
             case "get-airjump": {
-                ((Player)sender).getInventory().addItem(AirJump.builder().build());
+                ((Player)sender).getInventory().addItem(AirJump.get(((Player) sender).locale()));
                 break;
             }
             case "teams": {
@@ -96,7 +96,7 @@ public class DebugSubCommand extends ASubCommand {
                 break;
             }
             case "get-grapple": {
-                ((Player) sender).getInventory().addItem(GrapplingHook.builder().build());
+                ((Player) sender).getInventory().addItem(GrapplingHook.get(((Player) sender).locale()));
                 break;
             }
             case "locale-check": {
