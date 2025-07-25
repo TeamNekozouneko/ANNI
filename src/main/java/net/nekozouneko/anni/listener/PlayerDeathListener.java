@@ -14,7 +14,7 @@ import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 
-import java.util.LinkedHashSet;
+import java.util.ArrayList;
 import java.util.Objects;
 
 public class PlayerDeathListener implements Listener {
@@ -67,7 +67,7 @@ public class PlayerDeathListener implements Listener {
         ANNIPlugin.getInstance().getCurrentGame().getKit(e.getEntity()).onDeath(e.getEntity());
 
         // {kit-item: 1} じゃないアイテムをドロップさせる。
-        new LinkedHashSet<>(e.getDrops()).stream()
+        new ArrayList<>(e.getDrops()).stream()
                 .filter(Objects::nonNull) // nullじゃないかつ
                 .filter(is -> { // {kit-item:1}なら
                     PersistentDataContainer pdc = is.getItemMeta().getPersistentDataContainer();
