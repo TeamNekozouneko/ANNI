@@ -2,6 +2,8 @@
     "meta.lang.id": "ja_JP",
     "meta.lang.name": "日本語",
 
+    "actionbar.cooldown.time": "<red>あと<0>秒後に使用できます。",
+    "actionbar.cooldown.end": "<green><0>のクールダウンが終わりました。",
     "actionbar.nexus_alert": "<red><0>によってネクサスが破壊されています!",
     "actionbar.spectator": "<gray>観戦者モード",
 
@@ -18,6 +20,36 @@
 
     "format.scoreboard_datetime": "yyyy/MM/dd HH:mm",
     "format.nexus_health": "%,d",
+
+    "item.arijump.name": "<aqua>空中ジャンプ",
+    "item.airjump.lore.0": "<gray>右クリックすることで大きなジャンプができる",
+    "item.airjump.lore.1": "",
+    "item.airjump.lore.2": "<blue>クールタイム: 20秒",
+
+    "item.defense_artifact.name": "<light_purple><b>防衛の心",
+    "item.defense_artifact.lore.0": "<gray>防衛をするという強い意志が込められたもの。",
+    "item.defense_artifact.lore.1": "<blue>効果時間： 20秒",
+    "item.defense_artifact.lore.2": "<blue>クールタイム： 60秒",
+    "item.defense_artifact_lore.3": "",
+    "item.defense_artifact_lore.4": "<blue>効果：",
+    "item.defense_artifact.lore.5": "<blue>* 近くの敵の視界が一瞬真っ暗",
+    "item.defense_artifact.lore.6": "<blue>* 近くの敵の攻撃力が10秒間低下",
+
+    "item.grappling_hook": "<green>グラップリングフック",
+    "item.grappling_hook.lore.0": "<gray>竿を投げ、巻き戻すと竿のあった場所にめがけて飛ぶことができる。",
+    "item.grappling_hook.lore.1": "",
+    "item.grappling_hook.lore.2": "<blue>クールダウン：5秒",
+
+    "item.stun_grenade.name": "<red>もちっと<aqua>スタングレネード",
+    "item.stun_grenade.lore.0": "<gray>ある高齢の職人が作ったもちっとスタンさせるグレネード。",
+    "item.stun_grenade.lore.1": "",
+    "item.stun_grenade.lore.2": "<blue>効果：",
+    "item.stun_grenade.lore.3": "<blue>* 盾が10秒間使用できないようにします。",
+    "item.stun_grenade.lore.4": "<blue>* 敵が10秒間遅くなります",
+    "item.stun_grenade.lore.5": "<blue>* 敵の視界が一瞬真っ黒になります。",
+
+    "item.nexus_compass.name": "<gray>クリックして有効化",
+    "item.nexus_compass.name.target": "<reset><0>のネクサス <gray>[クリック]",
 
     "kit.assault.name": "アサルト",
     "kit.assault.about.0": "<gray>敵にどんどん突撃し、",
