@@ -175,7 +175,7 @@ public class ANNIArena extends BukkitRunnable {
         else {
             Players.clearPotionEffects(player);
             initPlayer(player);
-            player.getInventory().setContents(ANNIKit.teamColor(getKit(player), team));
+            player.getInventory().setContents(ANNIKit.teamColor(getKit(player), player.locale(), team));
             player.teleport(map.getSpawnOrDefault(team).toLocation(copy));
         }
 
@@ -583,7 +583,7 @@ public class ANNIArena extends BukkitRunnable {
                             p.teleport(sl);
                             p.setGameMode(GameMode.SURVIVAL);
                             initPlayer(p);
-                            p.getInventory().setContents(ANNIKit.teamColor(getKit(p), at));
+                            p.getInventory().setContents(ANNIKit.teamColor(getKit(p), p.locale(), at));
                         });
                 for (String s : mm.buildBigChar('1', Character.toString(at.getCCChar()),
                         (Object[]) mm.buildArray("notify.big.started", at.getTeamName())

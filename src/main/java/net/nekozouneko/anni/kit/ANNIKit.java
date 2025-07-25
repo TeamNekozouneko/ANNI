@@ -12,6 +12,7 @@ import org.bukkit.persistence.PersistentDataType;
 
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 public enum ANNIKit {
@@ -26,7 +27,6 @@ public enum ANNIKit {
     SCOUTER(new ScouterKit()),
     WORKER(new WorkerKit()),
     VAMPIRE(new VampireKit());
-    //MUSASABI(new MusasabiKit());
 
     private static final Map<String, ANNIKit> ID_MAP = new HashMap<>();
 
@@ -41,7 +41,6 @@ public enum ANNIKit {
         ID_MAP.put(SCOUTER.getKit().getId(), SCOUTER);
         ID_MAP.put(WORKER.getKit().getId(), WORKER);
         ID_MAP.put(VAMPIRE.getKit().getId(), VAMPIRE);
-        //ID_MAP.put(MUSASABI.getKit().getId(), MUSASABI);
     }
 
     private final Kit kit;
@@ -75,8 +74,8 @@ public enum ANNIKit {
         return DEFAULT;
     }
 
-    public static ItemStack[] teamColor(Kit kit, ANNITeam team) {
-        ItemStack[] arr = Arrays.copyOf(kit.getKitContents(), kit.getKitContents().length);
+    public static ItemStack[] teamColor(Kit kit, Locale locale, ANNITeam team) {
+        ItemStack[] arr = Arrays.copyOf(kit.getKitContents(locale), kit.getKitContents(locale).length);
         for (ItemStack is : arr) {
             if (is == null) continue;
 
