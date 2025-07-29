@@ -52,8 +52,8 @@ public class PlayerRespawnListener implements Listener {
             e.getPlayer().setGameMode(GameMode.SURVIVAL);
             e.getPlayer().getInventory().setContents(
                     current.getTeamByPlayer(e.getPlayer()) != null ?
-                        ANNIKit.teamColor(current.getKit(e.getPlayer()), current.getTeamByPlayer(e.getPlayer()))
-                        : current.getKit(e.getPlayer()).getKitContents()
+                        ANNIKit.teamColor(current.getKit(e.getPlayer()), e.getPlayer().locale(), current.getTeamByPlayer(e.getPlayer()))
+                        : current.getKit(e.getPlayer()).getKitContents(e.getPlayer().locale())
             );
 
             current.getKit(e.getPlayer()).onRespawn(e.getPlayer());

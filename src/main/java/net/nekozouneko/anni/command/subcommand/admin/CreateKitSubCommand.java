@@ -31,7 +31,7 @@ public class CreateKitSubCommand extends ASubCommand {
             return true;
         }
 
-        CustomKit ck = new CustomKit(id, shortName, Material.CHEST, name, Collections.emptyList(), new ItemStack[0], Collections.emptyList());
+        CustomKit ck = new CustomKit(id, name, shortName, Material.CHEST, new ItemStack[0]);
 
         try (BufferedWriter writer = new BufferedWriter(
                 new OutputStreamWriter(new FileOutputStream(

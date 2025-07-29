@@ -2,6 +2,7 @@ package net.nekozouneko.anni.kit.custom;
 
 import com.google.common.base.Enums;
 import com.google.common.base.Preconditions;
+import lombok.Setter;
 import net.kyori.adventure.text.Component;
 import net.nekozouneko.anni.kit.Kit;
 import org.bukkit.Material;
@@ -17,6 +18,7 @@ import java.util.*;
 public class CustomKit implements Kit {
 
     private final String id;
+    @Setter
     private String name, shortName;
     private String icon;
 
@@ -31,7 +33,7 @@ public class CustomKit implements Kit {
         this.inventory = inventory != null ? inventory : "";
     }
 
-    public CustomKit(String id, String shortName, Material icon, String name, ItemStack[] inventory) {
+    public CustomKit(String id, String name, String shortName, Material icon, ItemStack[] inventory) {
         this.id = id;
         this.name = name;
         this.shortName = shortName;
@@ -100,7 +102,7 @@ public class CustomKit implements Kit {
     }
 
     @Override
-    public ItemStack[] getKitContents() {
+    public ItemStack[] getKitContents(Locale locale) {
         byte[] ba = Base64.getDecoder().decode(inventory);
         try (ByteArrayInputStream bytes = new ByteArrayInputStream(ba);
              BukkitObjectInputStream in = new BukkitObjectInputStream(bytes)
