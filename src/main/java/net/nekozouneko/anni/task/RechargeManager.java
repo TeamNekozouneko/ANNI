@@ -5,7 +5,6 @@ import com.google.common.collect.Table;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import net.nekozouneko.anni.ANNIPlugin;
-import net.nekozouneko.anni.item.StunGrenade;
 import net.nekozouneko.anni.kit.ANNIKit;
 import org.bukkit.Bukkit;
 import org.bukkit.NamespacedKey;
@@ -22,16 +21,13 @@ public class RechargeManager extends BukkitRunnable {
     public enum Type {
         STUN_GRENADE(5, player ->
                 ANNIKit.MOCHI_MOCHI.getKit().equals(ANNIPlugin.getInstance().getCurrentGame().getKit(player)),
-                StunGrenade.builder()
-                        .persistentData(new NamespacedKey(ANNIPlugin.getInstance(), "no-remove"), PersistentDataType.INTEGER, 1)
-                        .persistentData(new NamespacedKey(ANNIPlugin.getInstance(), "kit-item"), PersistentDataType.INTEGER, 1)
-                        .build(),
+                "stun-grenade",
                 30000
         );
 
         private final int limit;
         private final Function<Player, Boolean> condition;
-        private final ItemStack item;
+        private final String specialKey;
         private final long cooldown;
     }
 
@@ -41,23 +37,30 @@ public class RechargeManager extends BukkitRunnable {
     public void run() {
         Bukkit.getOnlinePlayers().forEach(player -> {
             for (Type type : Type.values()) {
-                if (recharges.get(player, type) != null && (!type.getCondition().apply(player) || type.getLimit() <= countItem(player, type)-1) || !player.getInventory().containsAtLeast(type.getItem(), 1)) {
+                if (recharges.get(player, type) != null && (!type.getCondition().apply(player) || type.getLimit() <= countItem(player, type)-1) || countItem(player, type) == 0) {
                     recharges.remove(player, type);
                     continue;
                 }
-                if (!player.getInventory().containsAtLeast(type.getItem(), 1)) continue;
 
                 Long rechargeTime = recharges.get(player, type);
 
                 if (rechargeTime != null && rechargeTime <= System.currentTimeMillis()) {
                     recharges.remove(player, type);
-                    player.give(type.getItem());
+                    for (ItemStack item : player.getInventory().getContents()) {
+                        if (item == null || item.getType().isAir()) continue;
+
+                        String specialItemType = item.getPersistentDataContainer().get(new NamespacedKey(ANNIPlugin.getInstance(), "special-item"), PersistentDataType.STRING);
+
+                        if (type.getSpecialKey().equals(specialItemType)) {
+                            item.add();
+                            break;
+                        }
+                    }
                 }
 
                 if (recharges.contains(player, type)) continue;
 
-                int count = countItem(player, type);
-
+                long count = countItem(player, type);
                 if (type.getLimit() <= count-1) continue;
 
                 recharges.put(player, type, System.currentTimeMillis()+type.getCooldown());
@@ -74,12 +77,15 @@ public class RechargeManager extends BukkitRunnable {
             recharges.remove(player, type);
     }
 
-    private int countItem(Player player, Type type) {
+    private long countItem(Player player, Type type) {
         int count = 0;
-        for (ItemStack item : player.getInventory().getContents()) {
+        for (ItemStack item : player.getInventory()) {
             if (item == null || item.getType().isAir()) continue;
 
-            if (type.getItem().isSimilar(item)) count += item.getAmount();
+            String specialItemType = item.getPersistentDataContainer().get(new NamespacedKey(ANNIPlugin.getInstance(), "special-item"), PersistentDataType.STRING);
+            if (!type.getSpecialKey().equals(specialItemType)) continue;
+
+            count += item.getAmount();
         }
 
         return count;
