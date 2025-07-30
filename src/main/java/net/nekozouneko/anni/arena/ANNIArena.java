@@ -575,6 +575,7 @@ public class ANNIArena extends BukkitRunnable {
                             p.teleport(sl);
                             p.setGameMode(GameMode.SURVIVAL);
                             initPlayer(p);
+                            p.getActivePotionEffects().forEach(effect -> p.removePotionEffect(effect.getType()));
                             p.getInventory().setContents(ANNIKit.teamColor(getKit(p), at));
                         });
                 for (String s : mm.buildBigChar('1', Character.toString(at.getCCChar()),
@@ -605,7 +606,10 @@ public class ANNIArena extends BukkitRunnable {
             plugin.getCooldownManager().clear();
             players.forEach(player -> {
                 player.spigot().respawn();
+                player.setItemOnCursor(null);
+                player.closeInventory();
                 initPlayer(player);
+                Bukkit.getScheduler().runTask(plugin, () -> player.getInventory().clear());
                 Players.clearPotionEffects(player);
                 player.teleport(plugin.getLobby());
             });
