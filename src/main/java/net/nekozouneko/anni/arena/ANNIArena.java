@@ -455,10 +455,11 @@ public class ANNIArena extends BukkitRunnable {
         try {
             if (map == null) {
                 if (VoteManager.isNowVoting(id) && !VoteManager.getResult(id).isEmpty()) {
-                    map = getMapRanking(VoteManager.endVote(id)).stream()
-                            .filter(ent -> ent.getKey().canUseOnArena())
-                            .map(Map.Entry::getKey)
-                            .findFirst().orElse(null);
+                    List<Entry<ANNIMap, Integer>> result = getMapRanking(VoteManager.endVote(id));
+                    for (Entry<ANNIMap, Integer> anniMapIntegerEntry : result) {
+                        map = anniMapIntegerEntry.getKey();
+                        if (map.canUseOnArena()) break;
+                    }
                 }
 
                 if (map == null) {
