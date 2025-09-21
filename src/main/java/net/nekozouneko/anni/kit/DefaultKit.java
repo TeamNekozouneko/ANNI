@@ -1,9 +1,9 @@
 package net.nekozouneko.anni.kit;
 
 import net.nekozouneko.anni.ANNIPlugin;
+import net.nekozouneko.anni.item.EnderFurnace;
 import net.nekozouneko.anni.item.NexusCompass;
 import net.nekozouneko.anni.util.CmnUtil;
-import net.nekozouneko.commons.spigot.inventory.ItemStackBuilder;
 import net.nekozouneko.commons.spigot.inventory.special.LeatherArmorBuilder;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -22,12 +22,14 @@ public class DefaultKit extends InternalKit {
     public ItemStack[] getKitContents(Locale locale) {
         ItemStack[] inv = new ItemStack[41];
 
-        inv[0] = ItemStackBuilder.of(Material.WOODEN_SWORD).build();
-        inv[1] = ItemStackBuilder.of(Material.STONE_PICKAXE).build();
-        inv[2] = ItemStackBuilder.of(Material.STONE_AXE).build();
-        inv[3] = ItemStackBuilder.of(Material.STONE_SHOVEL).build();
+        inv[0] = ItemStack.of(Material.WOODEN_SWORD);
+        inv[1] = ItemStack.of(Material.STONE_PICKAXE);
+        inv[2] = ItemStack.of(Material.STONE_AXE);
+        inv[3] = ItemStack.of(Material.STONE_SHOVEL);
 
-        inv[7] = ItemStackBuilder.of(Material.BREAD).amount(16).build();
+        inv[6] = ItemStack.of(Material.BREAD).add(15);
+        inv[7] = EnderFurnace.get(locale);
+        CmnUtil.editPDC(inv[7], c -> c.set(new NamespacedKey(ANNIPlugin.getInstance(), "no-remove"), PersistentDataType.INTEGER, 1));
         inv[8] = NexusCompass.get(locale);
         CmnUtil.editPDC(inv[8], c -> c.set(new NamespacedKey(ANNIPlugin.getInstance(), "no-remove"), PersistentDataType.INTEGER, 1));
 
