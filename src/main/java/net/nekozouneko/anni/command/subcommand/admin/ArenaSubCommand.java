@@ -168,7 +168,7 @@ public class ArenaSubCommand extends ASubCommand {
     @Override
     public List<String> tabComplete(CommandSender sender, List<String> args) {
         if (args.size() == 1) {
-            return CmdUtil.simpleTabComplete(args.get(0), "disable-team", "enable-team", "move", "sethealth", "set-map", "start");
+            return CmdUtil.simpleTabComplete(args.get(0), "disable-team", "enable-team", "move", "sethealth", "set-map", "start", "restore");
         }
         if (args.size() == 2) {
             switch (args.get(0)) {
@@ -176,6 +176,7 @@ public class ArenaSubCommand extends ASubCommand {
                 case "enable-team":
                 case "move":
                 case "sethealth":
+                case "restore":
                     return CmdUtil.simpleTabComplete(
                             args.get(1),
                             Arrays.stream(ANNITeam.values())
