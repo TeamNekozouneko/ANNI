@@ -5,6 +5,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import lombok.Getter;
 import net.nekozouneko.anni.arena.ANNIArena;
+import net.nekozouneko.anni.arena.manager.FurnaceManager;
 import net.nekozouneko.anni.arena.spectator.SpectatorTask;
 import net.nekozouneko.anni.board.BoardManager;
 import net.nekozouneko.anni.command.*;
@@ -59,6 +60,8 @@ public final class ANNIPlugin extends JavaPlugin {
     private LevelManager levelManager;
     @Getter
     private PointManager pointManager;
+    @Getter
+    private FurnaceManager furnaceManager;
 
     @Getter
     private ANNIArena currentGame;
@@ -114,6 +117,8 @@ public final class ANNIPlugin extends JavaPlugin {
             setEnabled(false);
             return;
         }
+
+        FurnaceManager.VirtualFurnace.reloadRecipes();
 
         setupMessageManager();
         reloadTranslationManager();
@@ -174,7 +179,10 @@ public final class ANNIPlugin extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new DefenseArtifact(), this);
         getServer().getPluginManager().registerEvents(new FlyingBook(), this);
         getServer().getPluginManager().registerEvents(new NexusCompass(), this);
+        getServer().getPluginManager().registerEvents(new EnderFurnace(), this);
 
+        furnaceManager = new FurnaceManager();
+        furnaceManager.runTaskTimer(this, 0, 1);
         currentGame = new ANNIArena(this, "current");
         spectatorTask = new SpectatorTask();
         currentGame.runTaskTimer(this, 0, 20);
