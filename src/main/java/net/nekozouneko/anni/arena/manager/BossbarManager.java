@@ -1,72 +1,106 @@
 package net.nekozouneko.anni.arena.manager;
 
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import net.nekozouneko.anni.ANNIConfig;
 import net.nekozouneko.anni.ANNIPlugin;
 import net.nekozouneko.anni.arena.ANNIArena;
 import net.nekozouneko.anni.arena.team.ANNITeam;
-import net.nekozouneko.anni.message.MessageManager;
+import net.nekozouneko.anni.message.TranslationManager;
 import net.nekozouneko.anni.util.CmnUtil;
 import org.bukkit.Bukkit;
+import org.bukkit.NamespacedKey;
 import org.bukkit.boss.BarColor;
-import org.bukkit.boss.BossBar;
+import org.bukkit.boss.BarStyle;
+import org.bukkit.boss.KeyedBossBar;
 import org.bukkit.entity.Player;
+
+import java.util.*;
 
 public class BossbarManager {
 
     private final ANNIArena arena;
-    private final BossBar bossBar;
+    private final Map<Locale, KeyedBossBar> bossBars = new HashMap<>();
 
-    public BossbarManager(ANNIArena arena, BossBar bossBar) {
+    public BossbarManager(ANNIArena arena) {
         this.arena = arena;
-        this.bossBar = bossBar;
     }
     
     public void update() {
-        Bukkit.getOnlinePlayers().forEach(bossBar::addPlayer);
+        Set<Locale> locales = new HashSet<>();
 
-        MessageManager mm = ANNIPlugin.getInstance().getMessageManager();
+        Bukkit.getOnlinePlayers().forEach(player -> {
+            locales.add(player.locale());
+            var bossBar = bossBars.get(player.locale());
 
-        bossBar.setColor(BarColor.BLUE);
-        switch (arena.getState()) {
-            case PHASE_ONE:
-            case PHASE_TWO:
-            case PHASE_THREE:
-            case PHASE_FOUR:
-            case GAME_OVER: {
-                bossBar.setVisible(true);
-                bossBar.setTitle(
-                        mm.build("bossbar.timer",
-                                mm.build(arena.getState().getName()),
-                                CmnUtil.secminTimer(arena.getTimer())
-                        )
-                );
-                bossBar.setProgress(arena.getState().nextPhaseIn() > 0 ? CmnUtil.bossBarProgress(arena.getState().nextPhaseIn(), arena.getTimer()) : 1);
-                break;
-            }
-            case PHASE_FIVE: {
-                bossBar.setVisible(true);
-                bossBar.setTitle(mm.build(arena.getState().getName()));
-                bossBar.setProgress(1);
-                break;
-            }
-            default: {
-                bossBar.setVisible(false);
-                break;
-            }
+            if (bossBar == null)
+                bossBars.put(player.locale(), Bukkit.createBossBar(new NamespacedKey(ANNIPlugin.getInstance(), player.locale().toLanguageTag().toLowerCase()), "", BarColor.BLUE, BarStyle.SOLID));
+
+            bossBar.addPlayer(player);
+        });
+
+        if (!locales.containsAll(bossBars.keySet())) {
+            new HashSet<>(bossBars.keySet()).forEach(locale -> {
+                if (!locales.contains(locale)) Bukkit.removeBossBar(bossBars.remove(locale).getKey());
+            });
         }
+
+        TranslationManager translation = ANNIPlugin.getInstance().getTranslationManager();
+
+        LegacyComponentSerializer serializer = LegacyComponentSerializer.legacySection();
+
+        bossBars.forEach((locale, bossBar) -> {
+            bossBar.setColor(BarColor.BLUE);
+            switch (arena.getState()) {
+                case PHASE_ONE:
+                case PHASE_TWO:
+                case PHASE_THREE:
+                case PHASE_FOUR:
+                case GAME_OVER: {
+                    bossBar.setVisible(true);
+                    bossBar.setTitle(serializer.serialize(
+                            translation.component(locale, "bossbar.timer",
+                                    translation.component(arena.getState().getName()),
+                                    CmnUtil.secminTimer(arena.getTimer())
+                            )
+                    ));
+                    bossBar.setProgress(arena.getState().nextPhaseIn() > 0 ? CmnUtil.bossBarProgress(arena.getState().nextPhaseIn(), arena.getTimer()) : 1);
+                    break;
+                }
+                case PHASE_FIVE: {
+                    bossBar.setVisible(true);
+                    bossBar.setTitle(serializer.serialize(translation.component(arena.getState().getName())));
+                    bossBar.setProgress(1);
+                    break;
+                }
+                default: {
+                    bossBar.setVisible(false);
+                    break;
+                }
+            }
+        });
     }
 
     public void damageNexus(ANNITeam target, Player damager, int health) {
-        bossBar.setProgress((double) health / ANNIConfig.getDefaultHealth());
+        double progress = (double) health / ANNIConfig.getDefaultHealth();
 
-        if (bossBar.getProgress() <= 0.2) bossBar.setColor(BarColor.RED);
-        else if (bossBar.getProgress() <= 0.5) bossBar.setColor(BarColor.YELLOW);
-        else bossBar.setColor(BarColor.GREEN);
+        BarColor color;
+        if (progress <= 0.2) color = BarColor.RED;
+        else if (progress <= 0.5) color = BarColor.YELLOW;
+        else color = BarColor.GREEN;
 
-        MessageManager mm = ANNIPlugin.getInstance().getMessageManager();
+        TranslationManager translation = ANNIPlugin.getInstance().getTranslationManager();
+        var serializer = LegacyComponentSerializer.legacySection();
 
-        bossBar.setTitle(mm.build("bossbar.damaged_nexus",
-                damager.getName(), arena.getTeam(target).getName()
-        ));
+        bossBars.forEach((locale, bossBar) -> {
+            bossBar.setColor(color);
+            bossBar.setProgress(progress);
+            bossBar.setTitle(serializer.serialize(translation.component("bossbar.damaged_nexus",
+                    damager.name(), arena.getTeam(target).displayName()
+            )));
+        });
+    }
+
+    public void delete() {
+        bossBars.forEach((locale, bossBar) -> Bukkit.removeBossBar(bossBar.getKey()));
     }
 }
