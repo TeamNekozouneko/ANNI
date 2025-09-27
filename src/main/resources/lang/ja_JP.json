@@ -115,9 +115,9 @@
     "gui.map_editor.set_your_location_team": "<green><0>のスポーン地点をあなたの位置に設定しました。<gray>(<1>)",
     "gui.map_editor.set_team_nexus_loc": "<green><0>のネクサスの位置を設定しました。<gray>(<1>)",
 
-    "gui.map_selector.title": "マップを選択... ({0}/{1})",
-    "gui.map_selector.map_lore.0": "&7ID: {0}",
-    "gui.map_selector.map_lore.1": "&7ワールド: {1}",
+    "gui.map_selector.title": "マップを選択... (<0>/<1>)",
+    "gui.map_selector.map_lore.0": "&7ID: <0>",
+    "gui.map_selector.map_lore.1": "&7ワールド: <1>",
 
     "gui.point_charger.title": "ポイントをチャージ",
     "gui.point_charger.charged": "<green>合計 <white><0>をチャージしました。",
@@ -147,7 +147,7 @@
     "item.defense_artifact.lore.5": "<blue>* 近くの敵の視界が一瞬真っ暗",
     "item.defense_artifact.lore.6": "<blue>* 近くの敵の攻撃力が10秒間低下",
 
-    "item.ender_furnace.name": "<purple>エンダーかまど",
+    "item.ender_furnace.name": "<light_purple>エンダーかまど",
     "item.ender_furnace.lore.0": "<gray>どこでも開けるあなただけのかまどです。",
 
     "item.grappling_hook": "<green>グラップリングフック",
