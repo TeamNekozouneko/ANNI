@@ -17,6 +17,7 @@ public class PlayerQuitListener implements Listener {
         arena.leave(e.getPlayer());
         AbstractGui.unregisterAllGuiListeners(e.getPlayer());
         SpectatorManager.remove(e.getPlayer());
+        arena.getBossbarManager().leave(e.getPlayer());
 
         if (arena.getPlayers().isEmpty()) {
             arena.getVoteManager().clear();
