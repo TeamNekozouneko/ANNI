@@ -24,6 +24,10 @@ public class BossbarManager {
     public BossbarManager(ANNIArena arena) {
         this.arena = arena;
     }
+
+    public void leave(Player player) {
+        bossBars.values().forEach(bossBar -> bossBar.removePlayer(player));
+    }
     
     public void update() {
         Set<Locale> locales = new HashSet<>();
@@ -32,8 +36,10 @@ public class BossbarManager {
             locales.add(player.locale());
             var bossBar = bossBars.get(player.locale());
 
-            if (bossBar == null)
-                bossBars.put(player.locale(), Bukkit.createBossBar(new NamespacedKey(ANNIPlugin.getInstance(), player.locale().toLanguageTag().toLowerCase()), "", BarColor.BLUE, BarStyle.SOLID));
+            if (bossBar == null) {
+                bossBar = Bukkit.createBossBar(new NamespacedKey(ANNIPlugin.getInstance(), player.locale().toLanguageTag().toLowerCase()), "", BarColor.BLUE, BarStyle.SOLID);
+                bossBars.put(player.locale(), bossBar);
+            }
 
             bossBar.addPlayer(player);
         });
@@ -59,7 +65,7 @@ public class BossbarManager {
                     bossBar.setVisible(true);
                     bossBar.setTitle(serializer.serialize(
                             translation.component(locale, "bossbar.timer",
-                                    translation.component(arena.getState().getName()),
+                                    translation.component(locale, arena.getState().getName()),
                                     CmnUtil.secminTimer(arena.getTimer())
                             )
                     ));
@@ -68,7 +74,7 @@ public class BossbarManager {
                 }
                 case PHASE_FIVE: {
                     bossBar.setVisible(true);
-                    bossBar.setTitle(serializer.serialize(translation.component(arena.getState().getName())));
+                    bossBar.setTitle(serializer.serialize(translation.component(locale, arena.getState().getName())));
                     bossBar.setProgress(1);
                     break;
                 }
@@ -94,8 +100,8 @@ public class BossbarManager {
         bossBars.forEach((locale, bossBar) -> {
             bossBar.setColor(color);
             bossBar.setProgress(progress);
-            bossBar.setTitle(serializer.serialize(translation.component("bossbar.damaged_nexus",
-                    damager.name(), arena.getTeam(target).displayName()
+            bossBar.setTitle(serializer.serialize(translation.component(locale, "bossbar.damaged_nexus",
+                    damager.name(), translation.component(locale, target.getNameKey())
             )));
         });
     }
