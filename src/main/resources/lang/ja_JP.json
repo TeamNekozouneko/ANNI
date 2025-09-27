@@ -7,6 +7,71 @@
     "actionbar.nexus_alert": "<red><0>によってネクサスが破壊されています!",
     "actionbar.spectator": "<gray>観戦者モード",
 
+    "notify.big.started.0": "<white>ゲームが開始しました！",
+    "notify.big.started.1": "<gray>あなたは <0> に参加しています。",
+
+    "notify.big.mid_join.0": "<white>ゲームに途中参加しました！",
+    "notify.big.mid_join.1": "<gray>あなたは <0> に参加しています。",
+
+    "notify.big.next_phase.0": "<white><0> が開始しました！",
+    "notify.big.next_phase.1": "<gray><1>",
+
+    "notify.big.lost_nexus.0": "<white><0> のネクサスが破壊されました。",
+    "notify.big.lost_nexus.1": "<gray>by <white><1>",
+
+    "notify.big.won.0": "<white><0> が勝利しました！",
+    "notify.big.won.1": "<gray>皆さんお疲れ様です！",
+
+    "bossbar.timer": "<0> - <1>",
+    "bossbar.damaged_nexus": "<0>が<1>のネクサスにダメージを与えました！",
+
+    "command.arena.disabled_team": "<green>「<0>」というチームを無効化しました。",
+    "command.arena.enabled_team": "<green>「<0>」というチームを有効化しました。",
+    "command.arena.set_map": "<green>マップを「<0>」に設定しました。",
+    "command.arena.map_random": "<green>マップを投票による選択に設定しました。",
+    "command.arena.starting": "<green>ゲームを開始しています...",
+    "command.arena.move": "<green><0> を <1> に移動しました。",
+    "command.arena.move.leave": "<green><0> を退出させました。",
+
+    "command.error.map_not_found": "<red>「<0>」というマップは見つかりませんでした。",
+    "command.error.world_not_found": "<red>「<0>」というワールドは見つかりませんでした。",
+    "command.error.team_undefined": "<red>「<0>」というチームは存在しません。",
+    "command.error.disable_team_limited": "<red>これ以上チームを無効化することはできません。",
+    "command.error.invalid_char": "<red>使用できない文字が入っています。",
+    "command.error.io": "<red>ファイルの入出力にエラーが発生しました。コンソールを確認してください。",
+    "command.error.subcommand_not_found": "<red>「<0>」というサブコマンドは見つかりませんでした。",
+    "command.error.player_only": "<red>プレイヤーとして実行してください。",
+    "command.error.cant_vote_now": "<red>今は投票できません。",
+    "command.error.invalid_vote": "<red>「<0>」は投票できません。",
+    "command.error.game_start_failed": "<red>ゲームを開始できませんでした。",
+    "command.error.player_not_found": "「<0>」というプレイヤーは見つかりませんでした。",
+    "command.error.disabled_team": "「<0>」というチームは無効化されています。",
+    "command.error.now_fighting": "<red>現在あなたは戦闘中です。",
+    "command.error.cooldown": "<red>クールダウン中です。あと<0>秒待ってください。",
+    "command.error.non_equal_team": "<red>チームが同じではありません。",
+    "command.error.self_message": "<red>自分自身にメッセージは送信できません。",
+    "command.error.kit_exists": "<red>そのIDですでにカスタムキットが存在しています。",
+    "command.error.unknown": "なんらかの理由で不具合が発生しました。",
+    "command.error.kit_not_found": "<red>「<0>」というキットは見つかりませんでした。",
+    "command.error.material_not_defined": "<red>「<0>」というマテリアルは存在しません。",
+    "command.error.no_permissions": "<red>権限が不足しています。",
+    "command.error.region_not_found": "<red>「<0>」という保護領域が見つかりませんでした。",
+
+    "command.rule.0": "&7**** &cAnnihilationの遊び方&7 ****&r",
+    "command.rule.1": "&7・&f相手の拠点に侵入し、ネクサスを壊そう！",
+    "command.rule.2": "&7・&fあなたのチームのネクサスが破壊されたらリスポーンできない。",
+    "command.rule.3": "&7・&fフェーズ1ではネクサスを壊せないから、その間に準備をしておこう。",
+    "command.rule.4": "&7・&fフェーズ2からネクサスが壊せます。",
+    "command.rule.5": "&7・&fフェーズ3ではダイヤモンドやエメラルドといった希少な鉱石が採掘できるようになります。",
+    "command.rule.6": "&7・&fフェーズ4になるとネクサスに対してのダメージが2に増加します。守りも固めておこう。",
+    "command.rule.7": "&7・&fフェーズ5になると1秒ごとにネクサスのダメージが1になるまで減り続ける。",
+    "command.rule.8": "&7・&f/kitを打つとキットが選択できる。好きなキットを使って戦ってみよう。",
+    "command.rule.9": "&7・&f/vote <map>でゲーム開始前にマップが投票できる。気になるマップなどに投票してみよう。",
+
+    "command.usage": "<red>使用方法: <0>",
+
+    "command.vote.voted": "<green>「<0>」に投票しました。",
+
     "command.player.result.0": "<yellow>■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■",
     "command.player.result.1": "<yellow>> <aqua><b><0></b>",
     "command.player.result.2": "<dark_gray>・<white>Lv. <b><1></b> <gray><2> / <3> [<4><gray>]",
@@ -20,6 +85,53 @@
 
     "format.scoreboard_datetime": "yyyy/MM/dd HH:mm",
     "format.nexus_health": "%,d",
+    "format.block": "%d / %d / %d",
+    "format.location": "%.1f / %.1f / %.1f",
+    "format.location.yaw_pitch": "%.1f / %.1f / %.1f (%.1f / %.1f)",
+
+    "gui.next_page": "<green>次のページ",
+    "gui.prev_page": "<green>前のページ",
+    "gui.random": "<white>ランダム",
+
+    "gui.arena_dashboard.title": "アリーナダッシュボード",
+    "gui.arena_dashboard.select_map": "<white>マップを選択",
+    "gui.arena_dashboard.disabled_nexus": "<red>無効化されています。",
+    "gui.arena_dashboard.enabled_nexus": "<green>有効化されています。",
+    "gui.arena_dashboard.launch.start": "<green>今すぐ開始",
+    "gui.arena_dashboard.launch.end_now": "<red>今すぐ終了",
+    "gui.arena_dashboard.launch.restore": "<dark_red>復帰",
+
+    "gui.kit_selector.title": "キットを選択... (<0> / <1>)",
+    "gui.kit_selector.using": "<green>「<0>」を選択しました。",
+
+    "gui.map_editor.title": "マップエディター (<0>)",
+    "gui.map_editor.tp_to_world": "<white>ワールドにテレポートする",
+    "gui.map_editor.default_spawn": "<white>デフォルトスポーン地点を設定",
+    "gui.map_editor.team_spawn": "<white><0>のスポーン地点",
+    "gui.map_editor.team_nexus": "<white><0>のネクサスの位置",
+    "gui.map_editor.current_value": "<gray>設定値： <white><0>",
+    "gui.map_editor.please_click_a_block": "<green>ブロックをクリックして設定します。<gray>('cancel'とチャットに送信することでキャンセルできます。)",
+    "gui.map_editor.set_your_location": "<green>デフォルトのスポーン地点をあなたの位置に設定しました。<gray>(<0>)",
+    "gui.map_editor.set_your_location_team": "<green><0>のスポーン地点をあなたの位置に設定しました。<gray>(<1>)",
+    "gui.map_editor.set_team_nexus_loc": "<green><0>のネクサスの位置を設定しました。<gray>(<1>)",
+
+    "gui.map_selector.title": "マップを選択... ({0}/{1})",
+    "gui.map_selector.map_lore.0": "&7ID: {0}",
+    "gui.map_selector.map_lore.1": "&7ワールド: {1}",
+
+    "gui.point_charger.title": "ポイントをチャージ",
+    "gui.point_charger.charged": "<green>合計 <white><0>をチャージしました。",
+    "gui.point_charger.not_charged": "<red>無効なアイテムもしくは何もないためチャージされませんでした。",
+    "gui.point_charger.charge": "<green>ポイントをチャージ",
+
+    "gui.shop.more_points": "<red><0>不足しています。",
+    "gui.shop.purchased": "<green>購入しました！（-<0>）",
+    "gui.shop.price": "<gray>価格：<white><0>",
+
+    "gui.combat_shop.title": "戦闘ショップ",
+    "gui.potion_shop.title": "ポーションショップ",
+
+    "gui.team_selector.title": "チームを選択...",
 
     "item.arijump.name": "<aqua>空中ジャンプ",
     "item.airjump.lore.0": "<gray>右クリックすることで大きなジャンプができる",
@@ -34,6 +146,9 @@
     "item.defense_artifact_lore.4": "<blue>効果：",
     "item.defense_artifact.lore.5": "<blue>* 近くの敵の視界が一瞬真っ暗",
     "item.defense_artifact.lore.6": "<blue>* 近くの敵の攻撃力が10秒間低下",
+
+    "item.ender_furnace.name": "<purple>エンダーかまど",
+    "item.ender_furnace.lore.0": "<gray>どこでも開けるあなただけのかまどです。",
 
     "item.grappling_hook": "<green>グラップリングフック",
     "item.grappling_hook.lore.0": "<gray>竿を投げ、巻き戻すと竿のあった場所にめがけて飛ぶことができる。",
@@ -52,14 +167,15 @@
     "item.nexus_compass.name.target": "<reset><0>のネクサス <gray>[クリック]",
 
     "kit.assault.name": "アサルト",
-    "kit.assault.about.0": "<gray>敵にどんどん突撃し、",
-    "kit.assault.about.1": "<gray>相手を疲弊させよう！",
+    "kit.assault.description.0": "<gray>敵にどんどん突撃し、",
+    "kit.assault.description.1": "<gray>相手を疲弊させよう！",
 
     "kit.bow.name": "弓キット",
     "kit.bow.description.0": "<gray>遠くから相手を撃ち、",
     "kit.bow.description.1": "<gray>拠点から相手を離そう！",
 
     "kit.default.name": "標準キット",
+    "kit.default.description.0": "<gray>エンダーかまどで敵に資源を渡さないようにしながら精錬しよう！",
 
     "kit.defense.name": "防衛キット",
     "kit.defense.description.0": "<gray>重装備で抵抗しながら、",
@@ -91,9 +207,12 @@
     "kit.vampire.description.0": "<gray>敵に直接攻撃して、",
     "kit.vampire.description.1": "<gray>体力を吸い取ろう！",
 
-    "kit.musasabi.name": "&bむささびキット",
+    "kit.musasabi.name": "むささびキット",
     "kit.musasabi.description.0": "<gray>空高く飛んで、",
     "kit.musasabi.description.1": "<gray>敵に奇襲をしよう！",
+
+    "money.deposit": "<green>+<0> Annihilation Point",
+    "notify.draw": "<red>すべてのチームが敗退しているため引き分けとなります。",
 
     "notify.level_up.0": "<yellow>■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■",
     "notify.level_up.1": "<aqua><bold>レベルアップ!",
@@ -101,6 +220,20 @@
     "notify.level_up.3": "<gray>Lv.<0> -> <white>Lv.<1>",
     "notify.level_up.4": "<white><2> <dark_gray>/ <white><3> <gray>[<4><gray>]",
     "notify.level_up.5": "<yellow>■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■",
+
+    "notify.no_player_team": "<red>「<0>」にオンラインのプレイヤーがいないため自動的に敗退しました。",
+
+    "phase.one.name": "フェーズ 1",
+    "phase.one.summary.0": "",
+    "phase.two.name": "フェーズ 2",
+    "phase.two.summary.0": "",
+    "phase.three.name": "フェーズ 3",
+    "phase.three.summary.0": "",
+    "phase.four.name": "フェーズ 4",
+    "phase.four.summary.0": "",
+    "phase.five.name": "フェーズ 5",
+    "phase.five.summary.0": "",
+    "phase.restarting.name": "再起動",
 
     "scoreboard.title": "<b><red>ANNI<blue>HI<green>LA<yellow>TION</b>",
     "scoreboard.entry": "<dark_gray>・<white><0><dark_gray>: <white><1>",
