@@ -4,7 +4,6 @@ import net.nekozouneko.anni.ANNIPlugin;
 import net.nekozouneko.anni.item.EnderFurnace;
 import net.nekozouneko.anni.item.NexusCompass;
 import net.nekozouneko.anni.util.CmnUtil;
-import net.nekozouneko.commons.spigot.inventory.special.LeatherArmorBuilder;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.inventory.ItemStack;
@@ -33,10 +32,10 @@ public class DefaultKit extends InternalKit {
         inv[8] = NexusCompass.get(locale);
         CmnUtil.editPDC(inv[8], c -> c.set(new NamespacedKey(ANNIPlugin.getInstance(), "no-remove"), PersistentDataType.INTEGER, 1));
 
-        inv[39] = LeatherArmorBuilder.of(Material.LEATHER_HELMET).build();
-        inv[38] = LeatherArmorBuilder.of(Material.LEATHER_CHESTPLATE).build();
-        inv[37] = LeatherArmorBuilder.of(Material.LEATHER_LEGGINGS).build();
-        inv[36] = LeatherArmorBuilder.of(Material.LEATHER_BOOTS).build();
+        inv[39] = ItemStack.of(Material.LEATHER_HELMET);
+        inv[38] = ItemStack.of(Material.LEATHER_CHESTPLATE);
+        inv[37] = ItemStack.of(Material.LEATHER_LEGGINGS);
+        inv[36] = ItemStack.of(Material.LEATHER_BOOTS);
 
         return inv;
     }
