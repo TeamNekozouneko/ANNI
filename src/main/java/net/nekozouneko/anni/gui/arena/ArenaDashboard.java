@@ -94,19 +94,21 @@ public class ArenaDashboard extends AbstractGui {
         inventory.setItem(12, toggleGreen);
 
         var toggleYellow = ItemStack.of(arena.isEnabledTeam(ANNITeam.YELLOW) ? Material.END_STONE : Material.BEDROCK);
-        toggleGreen.editMeta(m -> m.displayName(
+        toggleYellow.editMeta(m -> m.displayName(
                         arena.isEnabledTeam(ANNITeam.YELLOW) ?
                                 tm.component(player, "gui.arena_dashboard.enabled_nexus") :
                                 tm.component(player, "gui.arena_dashboard.disabled_nexus")
                 )
         );
-        CmnUtil.editPDC(toggleYellow, c -> c.set(act, PersistentDataType.STRING, "toggle-red"));
+        CmnUtil.editPDC(toggleYellow, c -> c.set(act, PersistentDataType.STRING, "toggle-yellow"));
         inventory.setItem(13, toggleYellow);
 
         // マップ
         var map = ItemStack.of(Material.MAP);
         map.editMeta(m -> m.displayName(tm.component("gui.arena_dashboard.select_map")));
         CmnUtil.editPDC(map, c -> c.set(act, PersistentDataType.STRING, "select-map"));
+
+        inventory.setItem(15, map);
 
         Material icon;
         String displayNameKey;
@@ -133,12 +135,7 @@ public class ArenaDashboard extends AbstractGui {
         launchButton.editMeta(m -> m.displayName(tm.component(player, displayNameKey)));
         CmnUtil.editPDC(launchButton, c -> c.set(act, PersistentDataType.STRING, "launch"));
 
-        inventory.setItem(26,
-                ItemStackBuilder.of(icon)
-                        .name(displayNameKey)
-                        .persistentData(act, PersistentDataType.STRING, "launch")
-                        .build()
-        );
+        inventory.setItem(26, launchButton);
     }
 
     @EventHandler
