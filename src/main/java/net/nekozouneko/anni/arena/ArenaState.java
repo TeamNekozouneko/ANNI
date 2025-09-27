@@ -7,13 +7,13 @@ public enum ArenaState {
     WAITING(-2, null, null, null, 0, null),
     STARTING(-1, null, null, null, 60, null),
 
-    PHASE_FIVE(5, "phase.name.5", "phase.description.5", 2, 0, null),
-    PHASE_FOUR(4, "phase.name.4", "phase.description.4", 2, 600, PHASE_FIVE),
-    PHASE_THREE(3, "phase.name.3", "phase.description.3", 1, 600, PHASE_FOUR),
-    PHASE_TWO(2, "phase.name.2", "phase.description.2", 1, 600, PHASE_THREE),
-    PHASE_ONE(1, "phase.name.1", "phase.description.1", null, 600, PHASE_TWO),
+    PHASE_FIVE(5, "phase.five.name", "phase.five.summary", 2, 0, null),
+    PHASE_FOUR(4, "phase.four.name", "phase.four.summary", 2, 600, PHASE_FIVE),
+    PHASE_THREE(3, "phase.three.name", "phase.three.summary", 1, 600, PHASE_FOUR),
+    PHASE_TWO(2, "phase.two.name", "phase.two.summary", 1, 600, PHASE_THREE),
+    PHASE_ONE(1, "phase.one.name", "phase.one.summary", null, 600, PHASE_TWO),
 
-    GAME_OVER(0, "bossbar.timer.state.restarting", null, null, 30, null),
+    GAME_OVER(0, "phase.restarting.name", null, null, 30, null),
 
     STOPPED(-3, null, null, null, 0, null);
 
