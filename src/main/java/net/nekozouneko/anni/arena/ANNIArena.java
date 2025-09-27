@@ -38,9 +38,6 @@ import net.nekozouneko.commons.spigot.world.Worlds;
 import org.bukkit.*;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.block.Block;
-import org.bukkit.boss.BarColor;
-import org.bukkit.boss.BarStyle;
-import org.bukkit.boss.KeyedBossBar;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Firework;
 import org.bukkit.entity.Player;
@@ -109,8 +106,6 @@ public class ANNIArena extends BukkitRunnable {
     private final Map<UUID, String> kit = new HashMap<>();
     private final Map<UUID, SaveData> savedData = new HashMap<>();
 
-    private final KeyedBossBar bb;
-
     public ANNIArena(ANNIPlugin plugin, String id) {
         Objects.requireNonNull(plugin);
         Preconditions.checkArgument(id.length() < 9, "Id length limit is 8! (" + id.length() + ")");
@@ -125,13 +120,7 @@ public class ANNIArena extends BukkitRunnable {
                 .collect(Collectors.toSet())
         );
 
-        this.bb = Bukkit.createBossBar(
-                new NamespacedKey(plugin, id),
-                "",
-                BarColor.BLUE,
-                BarStyle.SOLID
-        );
-        this.bossbarManager = new BossbarManager(this, bb);
+        this.bossbarManager = new BossbarManager(this);
 
         createTeams();
 
@@ -221,7 +210,6 @@ public class ANNIArena extends BukkitRunnable {
         if (getTeamByPlayer(player) != null) getTeam(getTeamByPlayer(player)).removePlayer(player);
 
         player.setScoreboard(plugin.getServer().getScoreboardManager().getMainScoreboard());
-        bb.removePlayer(player);
     }
 
     public Set<Player> getPlayers() {
@@ -385,9 +373,7 @@ public class ANNIArena extends BukkitRunnable {
 
                     getTeamPlayers(getTeamByPlayer(player)).forEach(teammate -> {
                         ANNIPlugin.getInstance().getPointManager().givePoint(teammate, 3);
-                        teammate.sendMessage(
-                                mm.build("notify.deposit_points", "3", mm.build("gui.shop.full_ext"))
-                        );
+                        teammate.sendMessage(tm.component(teammate, "money.deposit", "3"));
                     });
                 });
 
@@ -613,6 +599,7 @@ public class ANNIArena extends BukkitRunnable {
             log.info("Initializing players...");
             SpectatorManager.clear();
             savedData.clear();
+            ANNIPlugin.getInstance().getFurnaceManager().clear();
             plugin.getCooldownManager().clear();
             players.forEach(player -> {
                 player.spigot().respawn();
@@ -673,12 +660,23 @@ public class ANNIArena extends BukkitRunnable {
         plugin.getLogger().info(message);
     }
 
+    public void broadcastTranslated(String key, Object... args) {
+        Bukkit.getOnlinePlayers().forEach(player -> player.sendMessage(tm.component(player, key, args)));
+        plugin.getComponentLogger().info(tm.component(key, args));
+    }
+
     public void broadcast(String message, ANNITeam team) {
         getTeamPlayers(team).forEach(p -> p.sendMessage(message));
         plugin.getLogger().info(message);
     }
 
+    public void broadcastTranslated(ANNITeam team, String key, Object... args) {
+        getTeamPlayers(team).forEach(player -> player.sendMessage(tm.component(player, key, args)));
+        plugin.getComponentLogger().info(tm.component(key, args));
+    }
+
     public void setKit(Player player, Kit ki) {
+        plugin.getFurnaceManager().remove(player);
         kit.put(player.getUniqueId(), ki.getId());
     }
 
@@ -739,7 +737,7 @@ public class ANNIArena extends BukkitRunnable {
                 getTeams().keySet().forEach(at -> {
                     if (!isNexusLost(at) && getTeamPlayers(at).isEmpty()) {
                         nexus.put(at, null);
-                        broadcast(plugin.getMessageManager().build("notify.no_player_team", at.getTeamName()));
+                        broadcastTranslated("notify.no_player_team", getTeam(at).displayName());
                     }
                 });
 
@@ -772,10 +770,10 @@ public class ANNIArena extends BukkitRunnable {
                             broadcast(s);
                         getTeamPlayers(won).forEach(p -> {
                             ANNIPlugin.getInstance().getPointManager().givePoint(p, 3000);
-                            p.sendMessage(mm.build("notify.deposit_points", "3000", mm.build("gui.shop.full_ext")));
+                            p.sendMessage(tm.component(p, "money.deposit", "3000"));
                         });
                     } else { // ではない (0 ~ (Integer.MIN_VALUE)) なら
-                        broadcast(mm.build("notify.draw"));
+                        broadcastTranslated("notify.draw");
                     }
 
                     setTimer(ArenaState.GAME_OVER.nextPhaseIn());
@@ -805,9 +803,7 @@ public class ANNIArena extends BukkitRunnable {
 
         cleanUp();
         deleteTeams();
-        bb.setVisible(false);
-        bb.removeAll();
-        Bukkit.removeBossBar(bb.getKey());
+        bossbarManager.delete();
     }
 
     private void updatePhase() {
@@ -894,11 +890,11 @@ public class ANNIArena extends BukkitRunnable {
 
         List<ANNITeam> living = getTeams().keySet().stream()
                 .filter(team -> !isNexusLost(team))
-                .collect(Collectors.toList());
+                .toList();
 
         if (living.size() != 1) return;
 
-        getTeamPlayers(living.get(0)).stream()
+        getTeamPlayers(living.getFirst()).stream()
                 .filter(p -> !SpectatorManager.isSpectating(p.getUniqueId()))
                 .forEach(winner -> {
                         if (winner.getWorld() != copy) return;
