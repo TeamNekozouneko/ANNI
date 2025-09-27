@@ -1,13 +1,13 @@
 package net.nekozouneko.anni.gui.kit;
 
 import com.google.common.collect.Lists;
+import net.kyori.adventure.text.Component;
 import net.nekozouneko.anni.ANNIConfig;
 import net.nekozouneko.anni.ANNIPlugin;
 import net.nekozouneko.anni.gui.AbstractGui;
 import net.nekozouneko.anni.kit.ANNIKit;
 import net.nekozouneko.anni.kit.Kit;
-import net.nekozouneko.anni.message.MessageManager;
-import net.nekozouneko.commons.spigot.inventory.ItemStackBuilder;
+import net.nekozouneko.anni.util.CmnUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -26,7 +26,6 @@ import java.util.stream.Collectors;
 
 public class KitSelector extends AbstractGui {
 
-    private final MessageManager mm = plugin.getMessageManager();
     private int page;
     private boolean continu = false;
 
@@ -40,51 +39,45 @@ public class KitSelector extends AbstractGui {
 
     @Override
     public void update() {
+        var translation = ANNIPlugin.getInstance().getTranslationManager();
+        
         if (inventory == null)
             inventory = Bukkit.createInventory(this, 36,
-                    mm.build(
+                    translation.component(player, 
                             "gui.kit_selector.title",
                             String.valueOf(page), String.valueOf(getMaxPage())
                     )
             );
         inventory.clear();
 
-        NamespacedKey pagek = new NamespacedKey(plugin, "page");
+        NamespacedKey pageKey = new NamespacedKey(plugin, "page");
+
+        ItemStack disabled = ItemStack.of(Material.STICK);
+        disabled.editMeta(meta -> meta.displayName(Component.space()));
 
         if (page > 1) {
-            inventory.setItem(27, ItemStackBuilder.of(Material.ARROW)
-                    .name(mm.build("gui.prev_page"))
-                    .persistentData(pagek, PersistentDataType.INTEGER, page - 1)
-                    .build()
-            );
+            ItemStack prev = ItemStack.of(Material.ARROW);
+            prev.editMeta(meta -> meta.displayName(translation.component(player, "gui.prev_page")));
+            CmnUtil.editPDC(prev, c -> c.set(pageKey, PersistentDataType.INTEGER, page - 1));
+
+            inventory.setItem(27, prev);
         }
-        else {
-            inventory.setItem(27, ItemStackBuilder.of(Material.STICK)
-                    .name(" ")
-                    .build()
-            );
-        }
+        else inventory.setItem(27, disabled);
 
         // next page
         if (getMaxPage() > page) {
-            inventory.setItem(35, ItemStackBuilder.of(Material.ARROW)
-                    .name(mm.build("gui.next_page"))
-                    .persistentData(pagek, PersistentDataType.INTEGER, page + 1)
-                    .build()
-            );
-        }
-        else {
-            inventory.setItem(35, ItemStackBuilder.of(Material.STICK)
-                    .name(" ")
-                    .build()
-            );
-        }
+            ItemStack next = ItemStack.of(Material.ARROW);
+            next.editMeta(meta -> meta.displayName(translation.component(player, "gui.next_page")));
+            CmnUtil.editPDC(next, c -> c.set(pageKey, PersistentDataType.INTEGER, page + 1));
 
-        for (int i = 28; i < 35; i++) inventory.setItem(i,
-                ItemStackBuilder.of(Material.GRAY_STAINED_GLASS_PANE)
-                        .name(" ")
-                        .build()
-        );
+            inventory.setItem(35, next);
+        }
+        else inventory.setItem(35, disabled);
+
+        ItemStack background = ItemStack.of(Material.GRAY_STAINED_GLASS_PANE);
+        background.editMeta(meta -> meta.displayName(Component.space()));
+
+        for (int i = 28; i < 35; i++) inventory.setItem(i, background);
 
         NamespacedKey kin = new NamespacedKey(plugin, "kit");
 
@@ -133,7 +126,7 @@ public class KitSelector extends AbstractGui {
             if (plugin.getCurrentGame().getState().getId() > 0) {
                 player.setHealth(0);
             }
-            else player.sendMessage(mm.build("gui.kit_selector.using", kit.getName()));
+            else player.sendMessage(ANNIPlugin.getInstance().getTranslationManager().component(player, "gui.kit_selector.using", kit.getName()));
         }
     }
 

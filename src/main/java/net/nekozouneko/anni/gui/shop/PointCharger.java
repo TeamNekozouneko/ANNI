@@ -2,10 +2,8 @@ package net.nekozouneko.anni.gui.shop;
 
 import net.nekozouneko.anni.ANNIPlugin;
 import net.nekozouneko.anni.gui.AbstractGui;
-import net.nekozouneko.anni.message.MessageManager;
 import net.nekozouneko.anni.util.CmnUtil;
 import net.nekozouneko.anni.util.VaultUtil;
-import net.nekozouneko.commons.spigot.inventory.ItemStackBuilder;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -29,15 +27,20 @@ public class PointCharger extends AbstractGui {
 
     @Override
     public void update() {
-        MessageManager mm = ANNIPlugin.getInstance().getMessageManager();
+        var translation = ANNIPlugin.getInstance().getTranslationManager();
 
         if (inventory == null)
-            inventory = Bukkit.createInventory(this, 54, mm.build("gui.point_charger.title"));
+            inventory = Bukkit.createInventory(this, 54, translation
+                    .component(player, "gui.point_charger.title")
+            );
 
-        ItemStack chargeButton = ItemStackBuilder.of(Material.LIME_STAINED_GLASS_PANE)
-                .name(mm.build("gui.point_charger.charge"))
-                .persistentData(new NamespacedKey(ANNIPlugin.getInstance(), "chargeraction"), PersistentDataType.STRING, "start_charge")
-                .build();
+        ItemStack chargeButton = ItemStack.of(Material.LIME_STAINED_GLASS_PANE);
+        chargeButton.editMeta(meta -> {
+            meta.displayName(translation.component(player, "gui.point_charger.charge"));
+            meta.getPersistentDataContainer().set(
+                    new NamespacedKey(ANNIPlugin.getInstance(), "chargeraction"), PersistentDataType.STRING, "start_charge"
+            );
+        });
 
         for (int i = 45; i < inventory.getSize(); i++) inventory.setItem(i, chargeButton);
     }
@@ -88,14 +91,14 @@ public class PointCharger extends AbstractGui {
             }
         }
 
-        MessageManager mm = ANNIPlugin.getInstance().getMessageManager();
+        var translation = ANNIPlugin.getInstance().getTranslationManager();
         double deposit = 50 * ingots + 100 * emeralds;
 
         if (deposit > 0) {
             VaultUtil.getEco().depositPlayer((OfflinePlayer) event.getPlayer(), deposit);
-            player.sendMessage(mm.build("gui.point_charger.charged", deposit, mm.build("gui.shop.ext")));
+            player.sendMessage(translation.component(player, "gui.point_charger.charged", VaultUtil.getEco().format(deposit)));
         }
-        else player.sendMessage(mm.build("gui.point_charger.not_charged"));
+        else player.sendMessage(translation.component(player, "gui.point_charger.not_charged"));
 
         CmnUtil.giveOrDrop(player, returns);
         unregisterAllGuiListeners((Player) event.getPlayer());

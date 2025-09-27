@@ -1,6 +1,7 @@
 package net.nekozouneko.anni.gui.map;
 
 import com.google.common.collect.Lists;
+import net.kyori.adventure.text.Component;
 import net.nekozouneko.anni.ANNIPlugin;
 import net.nekozouneko.anni.gui.AbstractGui;
 import net.nekozouneko.anni.map.ANNIMap;
@@ -20,7 +21,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Consumer;
-import java.util.stream.Collectors;
 
 public class MapSelector extends AbstractGui {
 
@@ -50,10 +50,12 @@ public class MapSelector extends AbstractGui {
     @Override
     public void update() {
         page = page < 1 || getTotalPageCount() < page ? 1 : page;
+        
+        var translation = ANNIPlugin.getInstance().getTranslationManager();
 
         if (inventory == null)
             inventory = Bukkit.createInventory(this, 36,
-                plugin.getMessageManager().build("gui.map_selector.title",
+                translation.component(player, "gui.map_selector.title",
                         Objects.toString(page),
                         Objects.toString(getTotalPageCount())
                 )
@@ -67,35 +69,39 @@ public class MapSelector extends AbstractGui {
         for (int i = 27; i < 36; i++) inventory.setItem(i, back);
 
         if (rand) {
-            inventory.setItem(31,
-                    ItemStackBuilder.of(Material.PAPER)
-                            .name(plugin.getMessageManager().build("gui.random"))
-                            .persistentData(new NamespacedKey(plugin, "map"), PersistentDataType.STRING, "@random")
-                            .build()
-            );
+            ItemStack random = ItemStack.of(Material.PAPER);
+            random.editMeta(meta -> {
+                meta.displayName(translation.component(player, "gui.random"));
+                meta.getPersistentDataContainer().set(
+                        new NamespacedKey(plugin, "map"), PersistentDataType.STRING, "@random"
+                );
+            });
+            inventory.setItem(31, random);
         }
 
         if (page < getTotalPageCount()) {
-            ItemStack next = ItemStackBuilder.of(Material.ARROW)
-                    .name(plugin.getMessageManager().build("gui.next_page"))
-                    .persistentData(
-                            new NamespacedKey(plugin, "page"),
-                            PersistentDataType.INTEGER,
-                            page + 1
-                    )
-                    .build();
+            ItemStack next = ItemStack.of(Material.ARROW);
+            next.editMeta(meta -> {
+                meta.displayName(translation.component(player, "gui.next_page"));
+                meta.getPersistentDataContainer().set(
+                        new NamespacedKey(plugin, "page"),
+                        PersistentDataType.INTEGER,
+                        page + 1
+                );
+            });
 
             inventory.setItem(35, next);
         }
         if (page > 1) {
-            ItemStack prev = ItemStackBuilder.of(Material.ARROW)
-                    .name(plugin.getMessageManager().build("gui.prev_page"))
-                    .persistentData(
-                            new NamespacedKey(plugin, "page"),
-                            PersistentDataType.INTEGER,
-                            page - 1
-                    )
-                    .build();
+            ItemStack prev = ItemStack.of(Material.ARROW);
+            prev.editMeta(meta -> {
+                meta.displayName(translation.component(player, "gui.prev_page"));
+                meta.getPersistentDataContainer().set(
+                        new NamespacedKey(plugin, "page"),
+                        PersistentDataType.INTEGER,
+                        page - 1
+                );
+            });
 
             inventory.setItem(27, prev);
         }
@@ -104,22 +110,23 @@ public class MapSelector extends AbstractGui {
 
         if (!partitions.isEmpty()) {
             List<ItemStack> part = partitions.get(page - 1).stream()
-                    .map((map) -> ItemStackBuilder.of(Material.MAP)
-                            .name("§f" + map.getName())
-                            .lore(plugin.getMessageManager()
-                                    .buildList(
+                    .map((map) -> {
+                        ItemStack item = ItemStack.of(Material.MAP);
+                        item.editMeta(meta -> {
+                            meta.displayName(Component.text(map.getName()));
+                            meta.lore(translation
+                                    .componentList(player,
                                             "gui.map_selector.map_lore",
                                             map.getId(),
                                             map.getWorld()
-                                    )
-                            )
-                            .persistentData(
-                                    new NamespacedKey(plugin, "map"),
-                                    PersistentDataType.STRING, map.getId()
-                            )
-                            .build()
-                    )
-                    .collect(Collectors.toList());
+                                    ));
+                            meta.getPersistentDataContainer()
+                                    .set(new NamespacedKey(plugin, "map"),
+                                            PersistentDataType.STRING, map.getId());
+                        });
+                        return item;
+                    })
+                    .toList();
 
             for (int i = 0; i < part.size() && i < 27; i++) {
                 inventory.setItem(i, part.get(i));
