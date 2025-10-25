@@ -5,6 +5,7 @@
     "actionbar.cooldown.time": "<red>あと<0>秒後に使用できます。",
     "actionbar.cooldown.end": "<green><0>のクールダウンが終わりました。",
     "actionbar.nexus_alert": "<red><0>によってネクサスが破壊されています!",
+    "actionbar.out_of_team_region": "<red>チームの領域外のため使用できません。",
     "actionbar.spectator": "<gray>観戦者モード",
 
     "notify.big.started.0": "<white>ゲームが開始しました！",
@@ -163,6 +164,11 @@
     "item.stun_grenade.lore.4": "<blue>* 敵が10秒間遅くなります",
     "item.stun_grenade.lore.5": "<blue>* 敵の視界が一瞬真っ黒になります。",
 
+    "item.swapper.name": "<green>スワッパー",
+    "item.swapper.lore.0": "<gray>当たった相手と位置をスワップします。",
+    "item.swapper.lore.1": "",
+    "item.swapper.lore.2": "<blue>クールダウン：120秒",
+
     "item.nexus_compass.name": "<gray>クリックして有効化",
     "item.nexus_compass.name.target": "<reset><0>のネクサス <gray>[クリック]",
 
@@ -197,6 +203,9 @@
     "kit.scouter.description.0": "<gray>グラップリングフックで素早く移動し、",
     "kit.scouter.description.1": "<gray>敵のアイテムを盗み出そう！",
 
+    "kit.swapper.name": "<white>スワッパー",
+    "kit.swapper.description.0": "<gray>相手との位置を入れ替えて罠にかけよう！",
+
     "kit.chaser.name": "追撃屋",
 
     "kit.worker.name": "ワーカーキット",
@@ -212,6 +221,7 @@
     "kit.musasabi.description.1": "<gray>敵に奇襲をしよう！",
 
     "money.deposit": "<green>+<0> Annihilation Point",
+    "notify.block.unbreakable": "<red>まだ破壊することができません。",
     "notify.draw": "<red>すべてのチームが敗退しているため引き分けとなります。",
 
     "notify.level_up.0": "<yellow>■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■",
@@ -221,7 +231,11 @@
     "notify.level_up.4": "<white><2> <dark_gray>/ <white><3> <gray>[<4><gray>]",
     "notify.level_up.5": "<yellow>■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■",
 
+    "notify.nexus.self": "<red>自チームのネクサスを破壊することはできません！",
+
     "notify.no_player_team": "<red>「<0>」にオンラインのプレイヤーがいないため自動的に敗退しました。",
+
+    "notify.removed_invisibility": "<red>透明化が解除されました！",
 
     "phase.one.name": "フェーズ 1",
     "phase.one.summary.0": "",
