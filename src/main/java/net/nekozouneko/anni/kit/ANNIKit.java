@@ -25,6 +25,7 @@ public enum ANNIKit {
     MOCHI_MOCHI(new MochiMochiKit()),
     MINER(new MinerKit()),
     SCOUTER(new ScouterKit()),
+    SWAPPER(new SwapperKit()),
     WORKER(new WorkerKit()),
     VAMPIRE(new VampireKit());
 
@@ -39,6 +40,7 @@ public enum ANNIKit {
         ID_MAP.put(MOCHI_MOCHI.getKit().getId(), MOCHI_MOCHI);
         ID_MAP.put(MINER.getKit().getId(), MINER);
         ID_MAP.put(SCOUTER.getKit().getId(), SCOUTER);
+        ID_MAP.put(SWAPPER.getKit().getId(), SWAPPER);
         ID_MAP.put(WORKER.getKit().getId(), WORKER);
         ID_MAP.put(VAMPIRE.getKit().getId(), VAMPIRE);
     }
