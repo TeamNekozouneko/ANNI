@@ -19,7 +19,7 @@ public class CooldownManager extends BukkitRunnable {
         AIR_JUMP("item.airjump.name"),
         DEFENSE_ARTIFACT("item.defense_artifact.name"),
         GRAPPLING_HOOK("item.grappling_hook.name"),
-        FLYING_BOOK("item.flying_book.name");
+        SWAPPER("item.swapper.name");
 
         private final String key;
     }
