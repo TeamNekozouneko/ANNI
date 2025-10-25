@@ -3,14 +3,26 @@ package net.nekozouneko.anni;
 import com.google.common.io.PatternFilenameFilter;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import io.papermc.paper.command.brigadier.Commands;
+import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
 import lombok.Getter;
 import net.nekozouneko.anni.arena.ANNIArena;
 import net.nekozouneko.anni.arena.manager.FurnaceManager;
 import net.nekozouneko.anni.arena.spectator.SpectatorTask;
 import net.nekozouneko.anni.board.BoardManager;
 import net.nekozouneko.anni.command.*;
+import net.nekozouneko.anni.command2.ChargeCommand;
+import net.nekozouneko.anni.command2.CombatShopCommand;
+import net.nekozouneko.anni.command2.KitCommand;
+import net.nekozouneko.anni.command2.PlayerCommand;
+import net.nekozouneko.anni.command2.PotionShopCommand;
+import net.nekozouneko.anni.command2.SuicideCommand;
+import net.nekozouneko.anni.command2.VoteCommand;
 import net.nekozouneko.anni.database.Database;
 import net.nekozouneko.anni.database.impl.SQLiteDatabase;
+import net.nekozouneko.anni.game.save.PaperSaveDataRepository;
+import net.nekozouneko.anni.game.team.PaperTeamRepository;
+import net.nekozouneko.anni.game.team.TeamManager;
 import net.nekozouneko.anni.item.*;
 import net.nekozouneko.anni.kit.custom.CustomKitManager;
 import net.nekozouneko.anni.listener.*;
@@ -177,26 +189,32 @@ public final class ANNIPlugin extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new AirJump(), this);
         getServer().getPluginManager().registerEvents(new GrapplingHook(), this);
         getServer().getPluginManager().registerEvents(new DefenseArtifact(), this);
-        getServer().getPluginManager().registerEvents(new FlyingBook(), this);
         getServer().getPluginManager().registerEvents(new NexusCompass(), this);
         getServer().getPluginManager().registerEvents(new EnderFurnace(), this);
+        getServer().getPluginManager().registerEvents(new Swapper(), this);
 
         furnaceManager = new FurnaceManager();
         furnaceManager.runTaskTimer(this, 0, 1);
-        currentGame = new ANNIArena(this, "current");
+
+        var teamManager = new TeamManager(new PaperTeamRepository(pluginBoard));
+
+        currentGame = new ANNIArena(this, "current", teamManager, new PaperSaveDataRepository(teamManager));
         spectatorTask = new SpectatorTask();
         currentGame.runTaskTimer(this, 0, 20);
         spectatorTask.runTaskTimer(this, 0, 20);
 
         getCommand("anni-admin").setExecutor(new ANNIAdminCommand());
         getCommand("anni").setExecutor(new ANNICommand());
-        getCommand("combat-shop").setExecutor(new CombatShopCommand());
-        getCommand("potion-shop").setExecutor(new PotionShopCommand());
-        getCommand("suicide").setExecutor(new SuicideCommand());
-        getCommand("vote").setExecutor(new VoteCommand());
-        getCommand("kit").setExecutor(new KitCommand());
-        getCommand("player").setExecutor(new PlayerCommand());
-        getCommand("charge").setExecutor(new ChargeCommand());
+
+        getLifecycleManager().registerEventHandler(LifecycleEvents.COMMANDS, event -> {
+            event.registrar().register(ChargeCommand.get(Commands.literal("charge")).build());
+            event.registrar().register(CombatShopCommand.get(Commands.literal("combat-shop")).build());
+            event.registrar().register(KitCommand.get(Commands.literal("kit")).build());
+            event.registrar().register(PlayerCommand.get(Commands.literal("player")).build());
+            event.registrar().register(PotionShopCommand.get(Commands.literal("potion-shop")).build());
+            event.registrar().register(SuicideCommand.get(Commands.literal("suicide")).build());
+            event.registrar().register(VoteCommand.get(Commands.literal("vote")).build());
+        });
 
         registerRecipe();
     }

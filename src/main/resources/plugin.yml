@@ -33,29 +33,23 @@ commands:
     description: "Potion Shop Command"
     permission: "anni.command.potionshop"
     usage: "/<command>"
-  vote:
-    description: "Vote command"
-    permission: anni.command.vote
-    usage: "/<command> <map>"
   kit:
     description: "Kit command"
     permission: anni.command.kit
     usage: "/<command>"
-  suicide:
-    aliases: [redeploy, kill]
-    description: "Suicide command"
-    permission: anni.command.suicide
-    usage: "/<command>"
-  charge:
-    description: "Charge command"
-    permission: anni.command.charge
-    usage: "/<command>"
-  player:
-    description: "Player command"
-    permission: anni.command.player
-    usage: "/<command> [target]"
-
 permissions:
+  anni.command.charge:
+    default: true
+
+  anni.command.player:
+    default: true
+
+  anni.command.player.others:
+    default: op
+
+  anni.command.vote:
+    default: true
+
   anni.mod.global_chat_on_spectator:
     default: op
 
