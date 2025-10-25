@@ -15,14 +15,16 @@ import java.util.Map;
 public enum ANNITeam {
 
     @SerializedName("RED")
-    RED("team.red.display", "team.red.prefix", "team.red.name", ChatColor.RED, 'r'),
+    RED("red", "team.red.display", "team.red.prefix", "team.red.name", ChatColor.RED, 'r'),
     @SerializedName("BLUE")
-    BLUE("team.blue.display", "team.blue.prefix", "team.blue.name", ChatColor.BLUE, 'b'),
+    BLUE("blue", "team.blue.display", "team.blue.prefix", "team.blue.name", ChatColor.BLUE, 'b'),
     @SerializedName("GREEN")
-    GREEN("team.green.display", "team.green.prefix", "team.green.name", ChatColor.GREEN, 'g'),
+    GREEN("green", "team.green.display", "team.green.prefix", "team.green.name", ChatColor.GREEN, 'g'),
     @SerializedName("YELLOW")
-    YELLOW("team.yellow.display", "team.yellow.prefix", "team.yellow.name", ChatColor.YELLOW, 'y');
+    YELLOW("yellow", "team.yellow.display", "team.yellow.prefix", "team.yellow.name", ChatColor.YELLOW, 'y');
 
+    @Getter
+    private final String id;
     private final String name;
     private final String prefix;
     @Getter
