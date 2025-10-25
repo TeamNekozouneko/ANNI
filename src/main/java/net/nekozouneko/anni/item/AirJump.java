@@ -1,7 +1,5 @@
 package net.nekozouneko.anni.item;
 
-import net.md_5.bungee.api.ChatMessageType;
-import net.md_5.bungee.api.chat.TextComponent;
 import net.nekozouneko.anni.ANNIPlugin;
 import net.nekozouneko.anni.message.TranslationManager;
 import net.nekozouneko.anni.task.CooldownManager;
@@ -63,11 +61,10 @@ public class AirJump implements Listener {
                     e.getPlayer().setVelocity(e.getPlayer().getLocation().getDirection().setY(1));
                 }
                 else {
-                    e.getPlayer().spigot().sendMessage(ChatMessageType.ACTION_BAR,
-                            new TextComponent(ANNIPlugin.getInstance().getMessageManager()
-                                    .build("actionbar.cooldown_stats", cm.getTimeLeftFormatted(e.getPlayer().getUniqueId(), CooldownManager.Type.AIR_JUMP))
-                            )
-                    );
+                    e.getPlayer().sendActionBar(ANNIPlugin.getInstance().getTranslationManager().component(
+                            "actionbar.cooldown.time", cm.getTimeLeftFormatted(e.getPlayer().getUniqueId(), CooldownManager.Type.AIR_JUMP)
+                    ));
+
                     e.getPlayer().playSound(e.getPlayer().getLocation(), Sound.ENTITY_GENERIC_EXTINGUISH_FIRE, 1, 2);
                 }
             }

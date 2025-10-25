@@ -54,7 +54,7 @@ public class DefenseArtifact implements Listener {
             }
 
             ANNIArena game = ANNIPlugin.getInstance().getCurrentGame();
-            String region = game.getMap().getTeamRegion(game.getTeamByPlayer(player));
+            String region = game.getMap().getTeamRegion(game.getTeamManager().getTeamColorByPlayer(player.getUniqueId()));
 
             if (region != null) {
                 ProtectedRegion pr = WorldGuard.getInstance().getPlatform().getRegionContainer()
@@ -62,11 +62,10 @@ public class DefenseArtifact implements Listener {
                         .getRegion(region);
 
                 if (!pr.contains(BukkitAdapter.asBlockVector(player.getLocation()))) {
-                    player.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(
-                            ANNIPlugin.getInstance().getMessageManager().build(
-                                    "actionbar.out_of_team_region"
-                            )
+                    player.sendActionBar(ANNIPlugin.getInstance().getTranslationManager().component(
+                            "actionbar.out_of_team_region"
                     ));
+
                     player.getWorld().playSound(player.getLocation(), Sound.BLOCK_GLASS_BREAK, 1, 0);
 
                     cancel();
@@ -87,10 +86,11 @@ public class DefenseArtifact implements Listener {
                 );
             }
 
+            var teamManager = game.getTeamManager();
             ANNIPlugin.getInstance().getCurrentGame().getPlayers().stream()
                     .filter(p -> !SpectatorManager.isSpectating(p))
-                    .filter(p -> game.getTeamByPlayer(p) != null)
-                    .filter(p -> game.getTeamByPlayer(p) != game.getTeamByPlayer(player))
+                    .filter(p -> teamManager.getTeamColorByPlayer(p.getUniqueId()) != null)
+                    .filter(p -> teamManager.getTeamColorByPlayer(p.getUniqueId()) != teamManager.getTeamColorByPlayer(player.getUniqueId()))
                     .filter(p -> isInCylinder(player.getLocation(), p.getLocation()))
                     .forEach(victim -> {
                         if (for_first_check == time) {
@@ -167,14 +167,14 @@ public class DefenseArtifact implements Listener {
 
         if (!cm.isCooldownEnd(event.getPlayer().getUniqueId(), CooldownManager.Type.DEFENSE_ARTIFACT)) {
             event.getPlayer().spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(ANNIPlugin.getInstance().getMessageManager().build(
-                    "command.err.cooldown", cm.getTimeLeftFormatted(event.getPlayer().getUniqueId(), CooldownManager.Type.DEFENSE_ARTIFACT)
+                    "command.error.cooldown", cm.getTimeLeftFormatted(event.getPlayer().getUniqueId(), CooldownManager.Type.DEFENSE_ARTIFACT)
             )));
             event.getPlayer().playSound(event.getPlayer().getLocation(), Sound.ENTITY_GENERIC_EXTINGUISH_FIRE, 1, 2);
             return;
         }
 
         ANNIArena game = ANNIPlugin.getInstance().getCurrentGame();
-        String region = game.getMap().getTeamRegion(game.getTeamByPlayer(event.getPlayer()));
+        String region = game.getMap().getTeamRegion(game.getTeamManager().getTeamColorByPlayer(event.getPlayer().getUniqueId()));
 
         if (region != null) {
             ProtectedRegion pr = WorldGuard.getInstance().getPlatform().getRegionContainer()
@@ -182,11 +182,9 @@ public class DefenseArtifact implements Listener {
                     .getRegion(region);
 
             if (!pr.contains(BukkitAdapter.asBlockVector(event.getPlayer().getLocation()))) {
-                event.getPlayer().spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(
-                        ANNIPlugin.getInstance().getMessageManager().build(
-                                "actionbar.out_of_team_region"
-                        )
-                ));
+                event.getPlayer().sendActionBar(
+                        ANNIPlugin.getInstance().getTranslationManager().component("actionbar.out_of_team_region")
+                );
                 return;
             }
         }

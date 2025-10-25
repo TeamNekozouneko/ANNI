@@ -1,7 +1,6 @@
 package net.nekozouneko.anni.item;
 
 import com.destroystokyo.paper.event.player.PlayerLaunchProjectileEvent;
-import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import net.nekozouneko.anni.ANNIPlugin;
 import net.nekozouneko.anni.task.CooldownManager;
 import net.nekozouneko.anni.task.RechargeManager;
@@ -56,11 +55,11 @@ public class StunGrenade implements Listener {
 
             ANNIPlugin plugin = ANNIPlugin.getInstance();
             if (plugin.getCurrentGame().getRechargeManager() != null) {
-                e.getPlayer().sendActionBar(LegacyComponentSerializer.legacyAmpersand().deserialize(
-                        plugin.getMessageManager().build("actionbar.cooldown_recharge",
+                e.getPlayer().sendActionBar(
+                        plugin.getTranslationManager().component("actionbar.cooldown.time",
                                 plugin.getCurrentGame().getRechargeManager().getTimeLeftFormatted(e.getPlayer(), RechargeManager.Type.STUN_GRENADE)
                         )
-                ));
+                );
             }
             return;
         }

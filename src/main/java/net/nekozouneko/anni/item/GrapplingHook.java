@@ -127,7 +127,7 @@ public class GrapplingHook implements Listener {
                 event.getPlayer().spigot().sendMessage(ChatMessageType.ACTION_BAR,
                         new TextComponent(
                                 ANNIPlugin.getInstance().getMessageManager().build(
-                                    "command.err.cooldown",
+                                    "command.error.cooldown",
                                         cm.getTimeLeftFormatted(event.getPlayer().getUniqueId(), CooldownManager.Type.GRAPPLING_HOOK)
 
                                 )
