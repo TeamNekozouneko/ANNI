@@ -42,6 +42,8 @@ public class ArenaDashboard extends AbstractGui {
                             .name(" ")
                             .build()
             );
+        
+        var teamManager = arena.getTeamManager();
 
         var red = ItemStack.of(Material.RED_WOOL);
         red.editMeta(m -> m.displayName(tm.component(player, ANNITeam.RED.getNameKey())));
@@ -63,9 +65,9 @@ public class ArenaDashboard extends AbstractGui {
 
         inventory.setItem(4, yellow);
 
-        var toggleRed = ItemStack.of(arena.isEnabledTeam(ANNITeam.RED) ? Material.END_STONE : Material.BEDROCK);
+        var toggleRed = ItemStack.of(teamManager.isEnabled(ANNITeam.RED) ? Material.END_STONE : Material.BEDROCK);
         toggleRed.editMeta(m -> m.displayName(
-                arena.isEnabledTeam(ANNITeam.RED) ?
+                teamManager.isEnabled(ANNITeam.RED) ?
                         tm.component(player, "gui.arena_dashboard.enabled_nexus") :
                         tm.component(player, "gui.arena_dashboard.disabled_nexus")
                 )
@@ -73,9 +75,9 @@ public class ArenaDashboard extends AbstractGui {
         CmnUtil.editPDC(toggleRed, c -> c.set(act, PersistentDataType.STRING, "toggle-red"));
         inventory.setItem(10, toggleRed);
 
-        var toggleBlue = ItemStack.of(arena.isEnabledTeam(ANNITeam.BLUE) ? Material.END_STONE : Material.BEDROCK);
+        var toggleBlue = ItemStack.of(teamManager.isEnabled(ANNITeam.BLUE) ? Material.END_STONE : Material.BEDROCK);
         toggleBlue.editMeta(m -> m.displayName(
-                        arena.isEnabledTeam(ANNITeam.BLUE) ?
+                        teamManager.isEnabled(ANNITeam.BLUE) ?
                                 tm.component(player, "gui.arena_dashboard.enabled_nexus") :
                                 tm.component(player, "gui.arena_dashboard.disabled_nexus")
                 )
@@ -83,9 +85,9 @@ public class ArenaDashboard extends AbstractGui {
         CmnUtil.editPDC(toggleBlue, c -> c.set(act, PersistentDataType.STRING, "toggle-blue"));
         inventory.setItem(11, toggleBlue);
 
-        var toggleGreen = ItemStack.of(arena.isEnabledTeam(ANNITeam.GREEN) ? Material.END_STONE : Material.BEDROCK);
+        var toggleGreen = ItemStack.of(teamManager.isEnabled(ANNITeam.GREEN) ? Material.END_STONE : Material.BEDROCK);
         toggleGreen.editMeta(m -> m.displayName(
-                        arena.isEnabledTeam(ANNITeam.GREEN) ?
+                        teamManager.isEnabled(ANNITeam.GREEN) ?
                                 tm.component(player, "gui.arena_dashboard.enabled_nexus") :
                                 tm.component(player, "gui.arena_dashboard.disabled_nexus")
                 )
@@ -93,9 +95,9 @@ public class ArenaDashboard extends AbstractGui {
         CmnUtil.editPDC(toggleGreen, c -> c.set(act, PersistentDataType.STRING, "toggle-green"));
         inventory.setItem(12, toggleGreen);
 
-        var toggleYellow = ItemStack.of(arena.isEnabledTeam(ANNITeam.YELLOW) ? Material.END_STONE : Material.BEDROCK);
+        var toggleYellow = ItemStack.of(teamManager.isEnabled(ANNITeam.YELLOW) ? Material.END_STONE : Material.BEDROCK);
         toggleYellow.editMeta(m -> m.displayName(
-                        arena.isEnabledTeam(ANNITeam.YELLOW) ?
+                        teamManager.isEnabled(ANNITeam.YELLOW) ?
                                 tm.component(player, "gui.arena_dashboard.enabled_nexus") :
                                 tm.component(player, "gui.arena_dashboard.disabled_nexus")
                 )
@@ -211,18 +213,20 @@ public class ArenaDashboard extends AbstractGui {
     }
 
     private void toggleTeam(ANNITeam at) {
-        if (arena.isEnabledTeam(at)) {
-            if (arena.getTeams().size() > 2) {
-                arena.disableTeam(at);
+        var teamManager = arena.getTeamManager();
+        
+        if (teamManager.isEnabled(at)) {
+            if (teamManager.getTeams().size() > 2) {
+                teamManager.disable(at);
             }
             else {
                 player.sendMessage(tm.component(player, "command.error.disable_team_limited"));
                 return;
             }
         }
-        else arena.enableTeam(at);
+        else teamManager.enable(at);
 
-        if (arena.isEnabledTeam(at))
+        if (teamManager.isEnabled(at))
             player.sendMessage(tm.component(player,"command.arena.enabled_team", tm.component(player, at.getNameKey())));
         else player.sendMessage(tm.component(player, "command.arena.disabled_team", tm.component(player, at.getNameKey())));
     }

@@ -45,9 +45,7 @@ public class ScoreboardManager {
                         fb.updateTitle(tm.component(player, "scoreboard.title"));
 
                         ANNIMap map = arena.getMap();
-                        long enabledTeams = arena.getEnabledTeams().entrySet().stream()
-                                .filter(Map.Entry::getValue)
-                                .count();
+                        long enabledTeams = arena.getTeamManager().getTeams().size();
                         long requiredPlayers = (enabledTeams * ANNIConfig.getTeamMinPlayers()) - Bukkit.getOnlinePlayers().size();
 
                         if (map != null)
@@ -116,7 +114,7 @@ public class ScoreboardManager {
     private Component nexusState(Player player, ANNITeam team) {
         TranslationManager translation = ANNIPlugin.getInstance().getTranslationManager();
 
-        return translation.component(player, arena.isNexusLost(team) ? "scoreboard.nexus.state.lost" : "scoreboard.nexus.state.active");
+        return translation.component(player, arena.getTeamManager().getTeam(team).isLost() ? "scoreboard.nexus.state.lost" : "scoreboard.nexus.state.active");
     }
 
     private Component nexusHealth(Player player, ANNITeam team) {

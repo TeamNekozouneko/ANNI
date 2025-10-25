@@ -11,7 +11,6 @@ import net.nekozouneko.anni.ANNIPlugin;
 import net.nekozouneko.anni.arena.ANNIArena;
 import net.nekozouneko.anni.arena.team.ANNITeam;
 import net.nekozouneko.anni.map.Nexus;
-import net.nekozouneko.anni.message.MessageManager;
 import net.nekozouneko.anni.util.CmnUtil;
 import net.nekozouneko.commons.spigot.inventory.ItemStackBuilder;
 import org.bukkit.*;
@@ -164,7 +163,7 @@ public class BlockBreakListener implements Listener {
 
     @EventHandler(ignoreCancelled = true)
     public void onBreak(BlockBreakEvent e) {
-        MessageManager mm = ANNIPlugin.getInstance().getMessageManager();
+        var tm = ANNIPlugin.getInstance().getTranslationManager();
 
         Consumer<Block> cb = QUEUED_ON_DAMAGE.get(e.getPlayer().getUniqueId());
         if (cb != null) {
@@ -176,29 +175,34 @@ public class BlockBreakListener implements Listener {
 
         ANNIPlugin plugin = ANNIPlugin.getInstance();
         ANNIArena current = plugin.getCurrentGame();
+        var teamManager = current.getTeamManager();
 
         if (current.getCopyWorld() != null && current.getMap() != null) {
             for (Map.Entry<ANNITeam, Nexus> ent : current.getMap().getNexuses().entrySet()) {
-                if (!current.getTeams().containsKey(ent.getKey())) continue;
+                if (!teamManager.isEnabled(ent.getKey())) continue;
+
                 Location loc = BukkitAdapter.adapt(
                         current.getCopyWorld(),
                         ent.getValue().getLocation()
                 );
+
                 if (e.getBlock().getLocation().equals(loc)) {
                     e.setDropItems(false);
                     e.setExpToDrop(0);
-                    if (current.isNexusLost(ent.getKey())) {
+
+                    var team = teamManager.getTeam(ent.getKey());
+                    if (team.getNexus().isDestroyed()) {
                         e.setCancelled(true);
                         return;
                     }
 
                     // 破壊しようとしてるのは自チームかどうか
-                    if (current.getTeamByPlayer(e.getPlayer()).equals(ent.getKey())) {
-                        e.getPlayer().sendMessage(plugin.getMessageManager().build("nexus.cant_destroy_self"));
+                    if (ent.getKey().equals(teamManager.getTeamColorByPlayer(e.getPlayer().getUniqueId()))) {
+                        e.getPlayer().sendMessage(tm.component("notify.nexus.self"));
                         e.setCancelled(true);
                     } else if (current.getState().canDestroyNexus()) { // 現在のフェーズで破壊できるなら
                         current.damageNexusHealth(ent.getKey(), current.getState().getNexusDamage(), e.getPlayer());
-                        if (current.isNexusLost(ent.getKey())) {
+                        if (team.getNexus().isDestroyed()) {
                             Nexus.finalDestroyEffects(loc);
                             Bukkit.getScheduler().runTask(plugin, () -> e.getBlock().setType(Material.BEDROCK));
                         } else {
@@ -206,7 +210,7 @@ public class BlockBreakListener implements Listener {
                             Bukkit.getScheduler().runTaskLater(plugin, () -> e.getBlock().setType(Material.END_STONE), 3);
                         }
                     } else { // 現在のフェーズで破壊できないなら
-                        e.getPlayer().sendMessage(plugin.getMessageManager().build("nexus.now_cant_destroy"));
+                        e.getPlayer().sendMessage(tm.component("notify.block.unbreakable"));
                         e.setCancelled(true);
                     }
 
@@ -222,7 +226,7 @@ public class BlockBreakListener implements Listener {
                 if (e.getPlayer().hasPotionEffect(PotionEffectType.INVISIBILITY)) {
                     e.getPlayer().removePotionEffect(PotionEffectType.INVISIBILITY);
                     e.getPlayer().playSound(e.getPlayer().getLocation(), Sound.ENTITY_GENERIC_EXTINGUISH_FIRE, 1, 2);
-                    e.getPlayer().sendMessage(mm.build("notify.removed_invisibility"));
+                    e.getPlayer().sendMessage(tm.component("notify.removed_invisibility"));
                 }
 
                 if (BLOCKS.containsKey(e.getBlock().getType())) {
@@ -235,7 +239,7 @@ public class BlockBreakListener implements Listener {
                     if (info == null) return;
 
                     if (info.isRare() && current.getState().getId() < 3) {
-                        e.getPlayer().sendMessage(mm.build("notify.cant_mine_now"));
+                        e.getPlayer().sendMessage(tm.component("notify.block.unbreakable"));
                         e.setCancelled(true);
                         return;
                     }

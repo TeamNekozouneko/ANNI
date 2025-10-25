@@ -5,7 +5,6 @@ import net.nekozouneko.anni.ANNIPlugin;
 import net.nekozouneko.anni.arena.ANNIArena;
 import net.nekozouneko.anni.arena.ArenaState;
 import net.nekozouneko.anni.arena.spectator.SpectatorManager;
-import net.nekozouneko.anni.arena.team.ANNITeam;
 import net.nekozouneko.anni.command.ASubCommand;
 import net.nekozouneko.anni.item.AirJump;
 import net.nekozouneko.anni.item.GrapplingHook;
@@ -17,7 +16,6 @@ import net.nekozouneko.anni.util.CmdUtil;
 import net.nekozouneko.anni.util.CmnUtil;
 import net.nekozouneko.commons.spigot.command.TabCompletes;
 import org.bukkit.Bukkit;
-import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -75,14 +73,6 @@ public class DebugSubCommand extends ASubCommand {
             }
             case "get-airjump": {
                 ((Player)sender).getInventory().addItem(AirJump.get(((Player) sender).locale()));
-                break;
-            }
-            case "teams": {
-                for (ANNITeam at : ar.getEnabledTeams().keySet()) {
-                    sender.sendMessage(at.name() + " list (" + ar.getTeamPlayers(at).size() + " | " + ar.getTeam(at).getPlayers().size() + "):");
-                    sender.sendMessage(ar.getTeam(at).getPlayers().stream().map(OfflinePlayer::getName).collect(Collectors.joining(", ")));
-                    sender.sendMessage("不正: " + ar.getTeam(at).getPlayers().stream().filter(op -> !op.isOnline()).map(OfflinePlayer::getName).collect(Collectors.joining(", ")));
-                }
                 break;
             }
             case "players": {

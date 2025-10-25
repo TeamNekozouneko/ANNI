@@ -1,25 +1,24 @@
 package net.nekozouneko.anni.arena;
 
 import com.google.common.base.Preconditions;
-import com.google.common.collect.BiMap;
-import com.google.common.collect.EnumHashBiMap;
-import com.google.common.collect.HashBiMap;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.protection.flags.Flags;
 import com.sk89q.worldguard.protection.flags.StateFlag;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.*;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
-import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import net.nekozouneko.anni.ANNIConfig;
 import net.nekozouneko.anni.ANNIPlugin;
 import net.nekozouneko.anni.arena.manager.BossbarManager;
 import net.nekozouneko.anni.arena.manager.ScoreboardManager;
 import net.nekozouneko.anni.arena.spectator.SpectatorManager;
 import net.nekozouneko.anni.arena.team.ANNITeam;
+import net.nekozouneko.anni.game.Nexus;
+import net.nekozouneko.anni.game.save.SaveDataRepository;
+import net.nekozouneko.anni.game.team.TeamManager;
 import net.nekozouneko.anni.item.DefenseArtifact;
 import net.nekozouneko.anni.kit.ANNIKit;
 import net.nekozouneko.anni.kit.Kit;
@@ -48,8 +47,6 @@ import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.scoreboard.Scoreboard;
-import org.bukkit.scoreboard.Team;
 
 import java.io.IOException;
 import java.util.*;
@@ -60,16 +57,6 @@ import java.util.stream.Collectors;
 public class ANNIArena extends BukkitRunnable {
 
     private static final Random rand = new Random();
-
-    @Getter @AllArgsConstructor
-    private static class SaveData {
-        private final boolean isSpectator;
-        private final ANNITeam team;
-        private final ItemStack[] inventory;
-        private final float exp;
-        private final int level;
-        private final double health;
-    }
 
     private final ANNIPlugin plugin;
     private final MessageManager mm;
@@ -86,8 +73,8 @@ public class ANNIArena extends BukkitRunnable {
 
     private final Set<Player> players = new HashSet<>();
 
-    private final BiMap<ANNITeam, Team> teams = HashBiMap.create(4);
-    private final Map<ANNITeam, Boolean> enabledTeams = new EnumMap<>(ANNITeam.class);
+    //private final BiMap<ANNITeam, Team> teams = HashBiMap.create(4);
+    //private final Map<ANNITeam, Boolean> enabledTeams = new EnumMap<>(ANNITeam.class);
 
     @Getter @Setter
     private ArenaState state = ArenaState.WAITING;
@@ -102,15 +89,19 @@ public class ANNIArena extends BukkitRunnable {
     private long timer = 0;
     private int fireworkTimer = 0;
 
-    private final Map<ANNITeam, Integer> nexus = new EnumMap<>(ANNITeam.class);
     private final Map<UUID, String> kit = new HashMap<>();
-    private final Map<UUID, SaveData> savedData = new HashMap<>();
 
-    public ANNIArena(ANNIPlugin plugin, String id) {
+    @Getter
+    private final TeamManager teamManager;
+    private final SaveDataRepository saveDataRepository;
+
+    public ANNIArena(ANNIPlugin plugin, String id, TeamManager teamManager, SaveDataRepository saveDataRepository) {
         Objects.requireNonNull(plugin);
         Preconditions.checkArgument(id.length() < 9, "Id length limit is 8! (" + id.length() + ")");
 
         this.plugin = plugin;
+        this.teamManager = teamManager;
+        this.saveDataRepository = saveDataRepository;
         this.mm = plugin.getMessageManager();
         this.tm = plugin.getTranslationManager();
         this.id = id;
@@ -121,13 +112,6 @@ public class ANNIArena extends BukkitRunnable {
         );
 
         this.bossbarManager = new BossbarManager(this);
-
-        createTeams();
-
-        for (ANNITeam at : ANNITeam.values()) {
-            if (!ANNIConfig.isTeamEnabled(at))
-                disableTeam(at);
-        }
     }
 
     public void join(Player player) {
@@ -142,42 +126,43 @@ public class ANNIArena extends BukkitRunnable {
             return;
         }
 
-        SaveData data = savedData.remove(player.getUniqueId());
-        ANNITeam team = data == null ? assignTeam() : data.getTeam();
-        setTeam(player, team);
+        ANNITeam color;
+        if (!saveDataRepository.canLoad(player.getUniqueId())) {
+            color = assignTeam();
 
-        if (isNexusLost(team)) {
+            teamManager.leave(player.getUniqueId());
+            teamManager.join(color, player.getUniqueId());
+
             Players.clearPotionEffects(player);
             initPlayer(player);
-            SpectatorManager.add(player);
-            player.teleport(map.getSpawnOrDefault(team).toLocation(copy));
-            return;
+            player.getInventory().setContents(ANNIKit.teamColor(getKit(player), player.locale(), color));
+            player.teleport(map.getSpawnOrDefault(color).toLocation(copy));
+        }
+        else {
+            saveDataRepository.load(player.getUniqueId());
+            saveDataRepository.remove(player.getUniqueId());
+
+            color = teamManager.getTeamColorByPlayer(player.getUniqueId());
+
+            if (teamManager.getTeam(color).isLost()) {
+                Players.clearPotionEffects(player);
+                initPlayer(player);
+                SpectatorManager.add(player);
+                player.teleport(map.getSpawnOrDefault(color).toLocation(copy));
+            }
         }
 
         player.setGameMode(GameMode.SURVIVAL);
-        if (data != null) {
-            player.getInventory().setContents(data.getInventory());
-            player.setExp(data.getExp());
-            player.setLevel(data.getLevel());
-            player.setHealth(data.getHealth());
-        }
-        else {
-            Players.clearPotionEffects(player);
-            initPlayer(player);
-            player.getInventory().setContents(ANNIKit.teamColor(getKit(player), player.locale(), team));
-            player.teleport(map.getSpawnOrDefault(team).toLocation(copy));
-        }
 
-
-        player.sendMessage(mm.buildBigChar(CmnUtil.numberToChar(state.getId()), Character.toString(team.getCCChar()),
-                (Object[]) mm.buildArray("notify.big.mid_join", team.getTeamName())
+        player.sendMessage(mm.buildBigChar(CmnUtil.numberToChar(state.getId()), Character.toString(color.getCCChar()),
+                (Object[]) mm.buildArray("notify.big.mid_join", LegacyComponentSerializer.legacyAmpersand().serialize(tm.component(color.getNameKey())))
         ));
     }
 
     public void leave(Player player) {
         players.remove(player);
 
-        if (state.getId() > 0 && getTeamByPlayer(player) != null) {
+        if (state.getId() > 0 && teamManager.getTeamColorByPlayer(player.getUniqueId()) != null) {
             if (PlayerDamageListener.isFighting(player)) {
                 Arrays.stream(player.getInventory().getContents())
                         .filter(Objects::nonNull)
@@ -191,23 +176,12 @@ public class ANNIArena extends BukkitRunnable {
                         })
                         .forEach(item -> player.getWorld().dropItemNaturally(player.getLocation(), item));
             }
-            else {
-                savedData.put(
-                        player.getUniqueId(),
-                        new SaveData(
-                                isNexusLost(getTeamByPlayer(player)) && SpectatorManager.isSpectating(player),
-                                getTeamByPlayer(player),
-                                player.getInventory().getContents(),
-                                player.getExp(),
-                                player.getLevel(),
-                                player.getHealth()
-                        )
-                );
-            }
+            else saveDataRepository.save(player.getUniqueId());
+
             player.getInventory().clear();
         }
 
-        if (getTeamByPlayer(player) != null) getTeam(getTeamByPlayer(player)).removePlayer(player);
+        teamManager.leave(player.getUniqueId());
 
         player.setScoreboard(plugin.getServer().getScoreboardManager().getMainScoreboard());
     }
@@ -220,112 +194,38 @@ public class ANNIArena extends BukkitRunnable {
         return players.contains(player);
     }
 
-    // Team
-
-    private void createTeams() {
-        final Scoreboard sb = plugin.getPluginBoard();
-
-        Team r = sb.registerNewTeam(id + "-red");
-        Team b = sb.registerNewTeam(id + "-blue");
-        Team g = sb.registerNewTeam(id + "-green");
-        Team y = sb.registerNewTeam(id + "-yellow");
-
-        teams.put(ANNITeam.RED, r);
-        teams.put(ANNITeam.BLUE, b);
-        teams.put(ANNITeam.GREEN, g);
-        teams.put(ANNITeam.YELLOW, y);
-
-        r.displayName(plugin.getTranslationManager().component("team.red.name"));
-        r.prefix(plugin.getTranslationManager().component("team.red.prefix"));
-        r.color(NamedTextColor.RED);
-
-        b.displayName(plugin.getTranslationManager().component("team.blue.name"));
-        b.prefix(plugin.getTranslationManager().component("team.blue.prefix"));
-        b.color(NamedTextColor.BLUE);
-
-        g.displayName(plugin.getTranslationManager().component("team.green.name"));
-        g.prefix(plugin.getTranslationManager().component("team.green.prefix"));
-        g.color(NamedTextColor.GREEN);
-
-        y.displayName(plugin.getTranslationManager().component("team.yellow.name"));
-        y.prefix(plugin.getTranslationManager().component("team.yellow.prefix"));
-        y.color(NamedTextColor.YELLOW);
-
-        teams.forEach((t, st) -> {
-            st.setAllowFriendlyFire(false);
-            st.setCanSeeFriendlyInvisibles(true);
-            enabledTeams.put(t, true);
-        });
-    }
-
     private void deleteTeams() {
-        teams.values().forEach(Team::unregister);
-        teams.clear();
+        teamManager.getTeams().keySet().forEach(teamManager::disable);
     }
 
-    public void enableTeam(ANNITeam team) {
-        enabledTeams.put(team, true);
-    }
+//    public ANNITeam getTeam(Team team) {
+//        return teams.inverse().get(team);
+//    }
 
-    public void disableTeam(ANNITeam team) {
-        enabledTeams.put(team, false);
-    }
+//    public ANNITeam getTeamByPlayer(Player player) {
+//        Team t = plugin.getPluginBoard().getPlayerTeam(player);
+//        return t != null ? getTeam(t) : null;
+//    }
 
-    public boolean isEnabledTeam(ANNITeam team) {
-        return enabledTeams.getOrDefault(team, true);
-    }
-
-    public Map<ANNITeam, Boolean> getEnabledTeams() {
-        return Collections.unmodifiableMap(enabledTeams);
-    }
-
-    public void setTeam(Player player, ANNITeam team) {
-        if (player.getScoreboard() != plugin.getPluginBoard()) player.setScoreboard(plugin.getPluginBoard());
-
-        getTeams(false).inverse().keySet().forEach(team1 -> team1.removePlayer(player));
-        if (team != null) {
-            getTeam(team).addPlayer(player);
-        }
-    }
-
-    public Team getTeam(ANNITeam team) {
-        return teams.get(team);
-    }
-
-    public ANNITeam getTeam(Team team) {
-        return teams.inverse().get(team);
-    }
-
-    public ANNITeam getTeamByPlayer(Player player) {
-        Team t = plugin.getPluginBoard().getPlayerTeam(player);
-        return t != null ? getTeam(t) : null;
-    }
-
-    public BiMap<ANNITeam, Team> getTeams() {
-        return getTeams(true);
-    }
-
-    public BiMap<ANNITeam, Team> getTeams(boolean enabledOnly) {
-        BiMap<ANNITeam, Team> res = EnumHashBiMap.create(ANNITeam.class);
-
-        teams.entrySet().stream()
-                .filter(t -> !enabledOnly || enabledTeams.getOrDefault(t.getKey(), true))
-                .forEach(e -> res.put(e.getKey(), e.getValue()));
-
-        return res;
-    }
+//    public BiMap<ANNITeam, Team> getTeams() {
+//        return getTeams(true);
+//    }
+//
+//    public BiMap<ANNITeam, Team> getTeams(boolean enabledOnly) {
+//        BiMap<ANNITeam, Team> res = EnumHashBiMap.create(ANNITeam.class);
+//
+//        teams.entrySet().stream()
+//                .filter(t -> !enabledOnly || enabledTeams.getOrDefault(t.getKey(), true))
+//                .forEach(e -> res.put(e.getKey(), e.getValue()));
+//
+//        return res;
+//    }
 
     public Set<Player> getTeamPlayers(ANNITeam team) {
-        Set<Player> ps = new HashSet<>();
-
-        teams.get(team).getPlayers().stream()
-                .filter(OfflinePlayer::isOnline)
-                .forEach((off) -> {
-                    Player p = Bukkit.getPlayer(off.getUniqueId());
-                    if (p != null && players.contains(p)) ps.add(p);
-                });
-
-        return ps;
+        return teamManager.getTeam(team).getPlayers().stream()
+                .map(Bukkit::getPlayer)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toSet());
     }
 
     // Timer
@@ -341,25 +241,27 @@ public class ANNIArena extends BukkitRunnable {
     // Nexus
 
     public Integer getNexusHealth(ANNITeam team) {
-        return nexus.get(team);
+        return teamManager.getTeam(team).getNexus().getHealth();
     }
 
     public void setNexusHealth(ANNITeam team, int health) {
-        nexus.put(team, health);
+        teamManager.getTeam(team).getNexus().setHealth(health);
     }
 
     public void healNexusHealth(ANNITeam team, int heal) {
-        if (!isNexusLost(team)) {
-            nexus.put(team, nexus.get(team) + heal);
-        }
-        else throw new IllegalStateException("Team" + team.name() + " is nexus lost.");
+        Preconditions.checkState(!teamManager.getTeam(team).isLost());
+
+        teamManager.getTeam(team).getNexus().heal(heal);
     }
 
     public void damageNexusHealth(ANNITeam team, int damage, Player player) {
         if (damage <= 0) return;
-        if (!isNexusLost(team)) {
-            int health = nexus.get(team) - damage;
-            nexus.put(team, health <= 0 ? null : health);
+
+        Nexus nexus = teamManager.getTeam(team).getNexus();
+
+        if (!teamManager.getTeam(team).getNexus().isDestroyed()) {
+            nexus.damage(damage);
+            int health = nexus.getHealth();
 
             if (player != null) {
                 bossbarManager.damageNexus(team, player, health);
@@ -369,15 +271,15 @@ public class ANNIArena extends BukkitRunnable {
                 });
 
                 VaultUtil.ifAvail((eco) -> {
-                    if (getTeamByPlayer(player) == null) return;
+                    if (teamManager.getTeamColorByPlayer(player.getUniqueId()) == null) return;
 
-                    getTeamPlayers(getTeamByPlayer(player)).forEach(teammate -> {
+                    getTeamPlayers(teamManager.getTeamColorByPlayer(player.getUniqueId())).forEach(teammate -> {
                         ANNIPlugin.getInstance().getPointManager().givePoint(teammate, 3);
                         teammate.sendMessage(tm.component(teammate, "money.deposit", "3"));
                     });
                 });
 
-                if (ANNIKit.get(getKit(player)) == ANNIKit.WORKER && !isNexusLost(getTeamByPlayer(player))) {
+                if (ANNIKit.get(getKit(player)) == ANNIKit.WORKER && !nexus.isDestroyed()) {
                     boolean isPass;
                     switch (getState()) {
                         case PHASE_TWO: {
@@ -398,18 +300,18 @@ public class ANNIArena extends BukkitRunnable {
                         }
                     }
 
-                    if (isPass) healNexusHealth(getTeamByPlayer(player), 1);
+                    if (isPass) teamManager.getTeamByPlayer(player.getUniqueId()).getNexus().heal(1);
                 }
             }
             else {
                 getTeamPlayers(team).forEach(p1 -> p1.playSound(p1.getLocation(), Sound.BLOCK_NOTE_BLOCK_HARP, 1, 2));
             }
 
-            if (isNexusLost(team)) {
+            if ((nexus.isDestroyed())) {
                 for (String s :
                         mm.buildBigChar(
                                 team.getBigChar(),
-                                Character.toString(getTeamByPlayer(player).getCCChar()),
+                                Character.toString(teamManager.getTeamColorByPlayer(player.getUniqueId()).getCCChar()),
                                 (Object[]) mm.buildArray("notify.big.lost_nexus",
                                         team.getColorCode() + team.getTeamName(),
                                         player != null ? player.getName() : "-----"
@@ -423,13 +325,9 @@ public class ANNIArena extends BukkitRunnable {
         else throw new IllegalStateException("Team " + team.name() + " is already nexus lost.");
     }
 
-    public boolean isNexusLost(ANNITeam team) {
-        return nexus.get(team) == null || nexus.get(team) <= 0;
-    }
-
     public void restoreNexus(ANNITeam team, Integer health) {
-        if (isNexusLost(team)) {
-            nexus.put(team, health == null ? 100 : health);
+        if (teamManager.getTeam(team).getNexus().isDestroyed()) {
+            teamManager.getTeam(team).getNexus().setHealth(health);
             BukkitAdapter.adapt(copy, map.getNexus(team).getLocation())
                     .getBlock().setType(Material.END_STONE);
         }
@@ -547,33 +445,36 @@ public class ANNIArena extends BukkitRunnable {
                 });
             }
 
-            getTeams(false).keySet()
-                    .forEach(at -> {
-                        Block bl = BukkitAdapter.adapt(copy, map.getNexus(at).getLocation()).getBlock();
-                        if (!isEnabledTeam(at))
-                            bl.setType(Material.BEDROCK);
-                        else bl.setType(Material.END_STONE);
-                    });
+            for (ANNITeam color : ANNITeam.values()) {
+                Block nexusBlock = BukkitAdapter.adapt(copy, map.getNexus(color).getLocation()).getBlock();
+                if (!teamManager.isEnabled(color))
+                    nexusBlock.setType(Material.BEDROCK);
+                else {
+                    teamManager.getTeam(color).getNexus().setHealth(ANNIConfig.getDefaultHealth());
+                    nexusBlock.setType(Material.END_STONE);
+                }
+            }
 
             log.info("Assigning players...");
-            savedData.clear();
-            players.forEach(player -> setTeam(player, assignTeam()));
-            nexus.clear();
-            getTeams().forEach((at, team) -> {
-                setNexusHealth(at, ANNIConfig.getDefaultHealth());
-                Location sl = map.getSpawnOrDefault(at).toLocation(copy);
+            saveDataRepository.clear();
+            players.forEach(player -> teamManager.join(assignTeam(), player.getUniqueId()));
+            teamManager.getTeams().forEach((color, team) -> {
+                team.getNexus().setHealth(ANNIConfig.getDefaultHealth());
+                team.getNexus().setMaxHealth(ANNIConfig.getDefaultHealth());
+
+                Location teamSpawn = map.getSpawnOrDefault(color).toLocation(copy);
                 team.getPlayers().stream()
-                        .filter(OfflinePlayer::isOnline)
-                        .map(offp -> Bukkit.getPlayer(offp.getUniqueId()))
-                        .forEach(p -> {
-                            p.teleport(sl);
-                            p.setGameMode(GameMode.SURVIVAL);
-                            initPlayer(p);
-                            p.getInventory().setContents(ANNIKit.teamColor(getKit(p), p.locale(), at));
+                        .map(Bukkit::getPlayer)
+                        .filter(Objects::nonNull)
+                        .forEach(player -> {
+                            player.teleport(teamSpawn);
+                            player.setGameMode(GameMode.SURVIVAL);
+                            initPlayer(player);
+                            player.getInventory().setContents(ANNIKit.teamColor(getKit(player), player.locale(), color));
                         });
-                for (String s : mm.buildBigChar('1', Character.toString(at.getCCChar()),
-                        (Object[]) mm.buildArray("notify.big.started", at.getTeamName())
-                )) broadcast(s, at);
+                for (String s : mm.buildBigChar('1', Character.toString(color.getCCChar()),
+                        (Object[]) mm.buildArray("notify.big.started", color.getTeamName())
+                )) broadcast(s, color);
             });
 
             rechargeManager = new RechargeManager();
@@ -598,7 +499,7 @@ public class ANNIArena extends BukkitRunnable {
         try {
             log.info("Initializing players...");
             SpectatorManager.clear();
-            savedData.clear();
+            saveDataRepository.clear();
             ANNIPlugin.getInstance().getFurnaceManager().clear();
             plugin.getCooldownManager().clear();
             players.forEach(player -> {
@@ -609,16 +510,13 @@ public class ANNIArena extends BukkitRunnable {
                 player.setFlying(player.getGameMode() == GameMode.CREATIVE || player.getGameMode() == GameMode.SPECTATOR);
             });
             log.info("Removing player from team...");
-            teams.values().forEach(team -> {
-                    team.getEntries().forEach(team::removeEntry);
-                    log.info(team.getEntries().toString());
+            teamManager.getTeams().forEach((color, team) -> {
+                team.getPlayers().forEach(teamManager::leave);
             });
             log.info("Cancelling tasks...");
             DefenseArtifact.cancelAllTasks();
             if (rechargeManager != null && !rechargeManager.isCancelled()) rechargeManager.cancel();
             rechargeManager = null;
-            log.info("Initializing nexus...");
-            nexus.clear();
             log.info("Initializing map...");
             map = null;
             if (copy != null) {
@@ -734,25 +632,26 @@ public class ANNIArena extends BukkitRunnable {
         if (state.isInArena()) {
             if (state.getId() > 0) {
                 // プレイヤー数が0のチームを退場させる
-                getTeams().keySet().forEach(at -> {
-                    if (!isNexusLost(at) && getTeamPlayers(at).isEmpty()) {
-                        nexus.put(at, null);
-                        broadcastTranslated("notify.no_player_team", getTeam(at).displayName());
+                teamManager.getTeams().keySet().forEach(color -> {
+                    var team = teamManager.getTeam(color);
+                    if (!team.getNexus().isDestroyed() && team.getPlayers().isEmpty()) {
+                        team.getNexus().setHealth(0);
+                        broadcastTranslated("notify.no_player_team", tm.component(color.getNameKey()));
                     }
                 });
 
                 if (state == ArenaState.PHASE_FIVE) {
-                    getTeams().keySet().forEach((at) -> {
+                    teamManager.getTeams().keySet().forEach((at) -> {
                         // (ネクサスを失ったもしくは、ネクサスの体力が1以下) ではないなら
-                        if (!(isNexusLost(at) || getNexusHealth(at) <= 1)) {
+                        if (!(teamManager.getTeam(at).isLost() || getNexusHealth(at) <= 1)) {
                             damageNexusHealth(at, 1, null);
                         }
                     });
                 }
 
                 // ネクサスを失っていないチーム数を調べる
-                List<ANNITeam> living = getTeams().keySet().stream()
-                        .filter(team -> !isNexusLost(team))
+                List<ANNITeam> living = teamManager.getTeams().keySet().stream()
+                        .filter(team -> !teamManager.getTeam(team).isLost())
                         .toList();
 
                 // もし1以下なら
@@ -809,7 +708,7 @@ public class ANNIArena extends BukkitRunnable {
     private void updatePhase() {
         switch (state) {
             case WAITING: {
-                if (players.size() >= getTeams().size() * 2) {
+                if (players.size() >= teamManager.getTeams().size() * ANNIConfig.getTeamMinPlayers()) {
                     enableTimer();
                     setTimer(ArenaState.STARTING.nextPhaseIn());
                     setState(ArenaState.STARTING);
@@ -817,7 +716,7 @@ public class ANNIArena extends BukkitRunnable {
                 break;
             }
             case STARTING: {
-                if (!(players.size() >= getTeams().size() * 2)) {
+                if (!(players.size() >= teamManager.getTeams().size() * ANNIConfig.getTeamMinPlayers())) {
                     disableTimer();
                     setState(ArenaState.WAITING);
                 }
@@ -842,7 +741,7 @@ public class ANNIArena extends BukkitRunnable {
             case PHASE_FOUR: {
                 enableTimer();
                 if (timer <= 0) {
-                    getTeams().forEach((at, t) -> {
+                    teamManager.getTeams().forEach((at, t) -> {
                         for (String s : mm.buildBigChar(
                                 CmnUtil.numberToChar(state.nextPhase().getId()),
                                 Character.toString(at.getCCChar()),
@@ -888,8 +787,8 @@ public class ANNIArena extends BukkitRunnable {
         colorMap.put(ANNITeam.GREEN, Color.GREEN);
         colorMap.put(ANNITeam.YELLOW, Color.YELLOW);
 
-        List<ANNITeam> living = getTeams().keySet().stream()
-                .filter(team -> !isNexusLost(team))
+        List<ANNITeam> living = teamManager.getTeams().keySet().stream()
+                .filter(team -> !teamManager.getTeam(team).isLost())
                 .toList();
 
         if (living.size() != 1) return;
@@ -939,8 +838,8 @@ public class ANNIArena extends BukkitRunnable {
 
     private ANNITeam assignTeam() {
         Map<ANNITeam, Integer> sizeOfTeam = new HashMap<>();
-        getTeams().keySet().stream()
-                .filter(t -> !state.isInArena() || !isNexusLost(t))
+        teamManager.getTeams().keySet().stream()
+                .filter(t -> !state.isInArena() || !teamManager.getTeam(t).isLost())
                 .forEach(t ->
                     sizeOfTeam.put(t, getTeamPlayers(t).size())
                 );

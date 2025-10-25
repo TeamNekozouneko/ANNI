@@ -1,6 +1,7 @@
 package net.nekozouneko.anni.listener;
 
 import com.google.common.base.Strings;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import net.md_5.bungee.api.ChatColor;
 import net.nekozouneko.anni.ANNIPlugin;
 import net.nekozouneko.anni.arena.ANNIArena;
@@ -11,7 +12,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
-import org.bukkit.scoreboard.Team;
 
 import java.util.Objects;
 import java.util.regex.Matcher;
@@ -41,7 +41,7 @@ public class AsyncPlayerChatListener implements Listener {
 
         // これからゲーム内のみ
 
-        ANNITeam at = plugin.getCurrentGame().getTeamByPlayer(e.getPlayer());
+        ANNITeam at = plugin.getCurrentGame().getTeamManager().getTeamColorByPlayer(e.getPlayer().getUniqueId());
 
         if (SpectatorManager.isSpectating(e.getPlayer())) {
             if (e.getMessage().startsWith("!") && e.getPlayer().hasPermission("anni.mod.global_chat_on_spectator")) {
@@ -68,13 +68,13 @@ public class AsyncPlayerChatListener implements Listener {
                     if (receiver != null) {
                         if (receiver.equals(e.getPlayer())) {
                             e.getPlayer().sendMessage(plugin.getMessageManager().build(
-                                    "command.err.self_message"
+                                    "command.error.self_message"
                             ));
                             return;
                         }
 
                         if (plugin.getCurrentGame().getTeamPlayers(
-                                plugin.getCurrentGame().getTeamByPlayer(e.getPlayer())
+                                plugin.getCurrentGame().getTeamManager().getTeamColorByPlayer(e.getPlayer().getUniqueId())
                         ).contains(receiver)) {
                             String senderMessage = plugin.getMessageManager().build("chat.tell.send",
                                     receiver.getName(),
@@ -92,11 +92,11 @@ public class AsyncPlayerChatListener implements Listener {
                             return;
                         }
                         else e.getPlayer().sendMessage(
-                                plugin.getMessageManager().build("command.err.non_equal_team")
+                                plugin.getMessageManager().build("command.error.non_equal_team")
                         );
                     }
                     else e.getPlayer().sendMessage(
-                            plugin.getMessageManager().build("command.err.player_not_found", matcher.group(1))
+                            plugin.getMessageManager().build("command.error.player_not_found", matcher.group(1))
                     );
 
                     return;
@@ -112,8 +112,9 @@ public class AsyncPlayerChatListener implements Listener {
 
     private boolean canSendPrivateMessage(Player from, Player to) {
         ANNIArena arena = ANNIPlugin.getInstance().getCurrentGame();
+        var teamManager = arena.getTeamManager();
 
-        boolean equalsTeam = arena.getTeamByPlayer(from) == arena.getTeamByPlayer(to);
+        boolean equalsTeam = teamManager.getTeamColorByPlayer(from.getUniqueId()) == teamManager.getTeamColorByPlayer(to.getUniqueId());
         boolean isSpectator = SpectatorManager.isSpectating(from) && SpectatorManager.isSpectating(to);
         boolean isNotSpectator = !SpectatorManager.isSpectating(from) && !SpectatorManager.isSpectating(to);
 
@@ -121,18 +122,21 @@ public class AsyncPlayerChatListener implements Listener {
     }
 
     private void globalChat(AsyncPlayerChatEvent e) {
-        ANNITeam at = ANNIPlugin.getInstance().getCurrentGame().getTeamByPlayer(e.getPlayer());
+        ANNITeam at = ANNIPlugin.getInstance().getCurrentGame().getTeamManager().getTeamColorByPlayer(e.getPlayer().getUniqueId());
+        var serializer = LegacyComponentSerializer.legacySection();
+        var tm = ANNIPlugin.getInstance().getTranslationManager();
 
         String prefix;
         String username;
         if (at != null) {
             e.setMessage(e.getMessage().substring(1));
-            Team t = plugin.getCurrentGame().getTeam(at);
+            //Team t = plugin.getCurrentGame().getTeam(at);
 
-            prefix = t.getColor() + Strings.nullToEmpty(t.getPrefix());
+            String uncoloredPrefix = Strings.nullToEmpty(serializer.serialize(tm.component(at.getTeamPrefix())));
+            prefix = at.getColorCode() + uncoloredPrefix;
             username = prefix + ChatColor.RESET
-                    + (Strings.nullToEmpty(t.getPrefix()).isEmpty() ? "" : " ")
-                    + t.getColor() + e.getPlayer().getName();
+                    + (uncoloredPrefix.isEmpty() ? "" : " ")
+                    + at.getColorCode() + e.getPlayer().getName();
         }
         else {
             prefix = "";
@@ -155,20 +159,23 @@ public class AsyncPlayerChatListener implements Listener {
     }
 
     private void teamChat(ANNITeam team, AsyncPlayerChatEvent e) {
-        Team t = ANNIPlugin.getInstance().getCurrentGame().getTeam(team);
+        var serializer = LegacyComponentSerializer.legacySection();
+        var tm = ANNIPlugin.getInstance().getTranslationManager();
+
+        String teamName = serializer.serialize(tm.component(team.getTeamName()));
 
         try {
             e.getRecipients().clear();
             e.getRecipients().addAll(plugin.getCurrentGame().getTeamPlayers(team));
             String form = plugin.getMessageManager().build("chat.team.format",
-                    t.getColor() + t.getDisplayName()
+                    teamName
             );
             e.setFormat(form);
         }
         catch (UnsupportedOperationException e1) {
             e.setCancelled(true);
             String mes = plugin.getMessageManager().build("chat.team",
-                    t.getColor() + t.getDisplayName(),
+                    teamName,
                     e.getPlayer().getName(),
                     e.getMessage()
             );

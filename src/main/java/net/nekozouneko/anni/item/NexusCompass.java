@@ -15,7 +15,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
-import org.bukkit.scoreboard.Team;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,7 +37,7 @@ public class NexusCompass implements Listener {
         PersistentDataContainer c = e.getItem().getItemMeta().getPersistentDataContainer();
         NamespacedKey key = new NamespacedKey(ANNIPlugin.getInstance(), "nexus-target");
         List<ANNITeam> enabled = new ArrayList<>(
-                ANNIPlugin.getInstance().getCurrentGame().getTeams().keySet()
+                ANNIPlugin.getInstance().getCurrentGame().getTeamManager().getTeams().keySet()
         );
 
         if (c.has(key, PersistentDataType.STRING)) {
@@ -68,10 +67,9 @@ public class NexusCompass implements Listener {
     private void setTarget(Player player, ItemStack is, ANNITeam target) {
         ItemMeta meta = is.getItemMeta();
 
-        Team t = ANNIPlugin.getInstance().getCurrentGame().getTeam(target);
-        meta.setDisplayName(ANNIPlugin.getInstance().getMessageManager().build(
+        meta.displayName(ANNIPlugin.getInstance().getTranslationManager().component(
                 "item.nexus_compass.name.target",
-                t.getColor() + t.getDisplayName()
+                ANNIPlugin.getInstance().getTranslationManager().component(target.getNameKey())
         ));
 
         PersistentDataContainer c = meta.getPersistentDataContainer();
