@@ -16,6 +16,7 @@ public class MessageManager {
         this.map = map;
     }
 
+    //@Deprecated(forRemoval = true, since = "4.0")
     public String build(String key, Object... args) {
         if (!map.containsKey(key))
             throw new RuntimeException("Message of key '" + key + "' is not defined.");
@@ -27,21 +28,6 @@ public class MessageManager {
                 Object arg = args[i];
                 if (arg == null) arg = "";
 
-                /*if (arg instanceof Integer) {
-                    int numb = (int) arg;
-
-                    Pattern p = Pattern.compile("(\\{" + i + "\\|(.+)})");
-                    Matcher m = p.matcher(s);
-
-                    if (m.find()) {
-                        String format1 = m.group(1);
-                        String args1 = m.group(2);
-                        String[] args2 = args1.split("(?!\\\\)\\|");
-
-                        s = s.replace(format1, args2[numb]);
-                    }
-                }
-                else 未使用のためコメントアウト*/
                 s = s != null ? s.replace("{" + i + "}", Objects.toString(arg)) : "";
             }
         }
@@ -49,6 +35,7 @@ public class MessageManager {
         return CmnUtil.replaceColorCode(s);
     }
 
+    //@Deprecated(forRemoval = true, since = "4.0")
     public List<String> buildList(String key, Object... args) {
         List<String> l = new ArrayList<>();
 
@@ -62,20 +49,24 @@ public class MessageManager {
         return l;
     }
 
+    //@Deprecated(forRemoval = true, since = "4.0")
     public String[] buildArray(String key, Object... args) {
         return buildList(key, args).toArray(new String[0]);
     }
 
+    //@Deprecated(forRemoval = true, since = "4.0")
     public String buildLines(String key, Object... args) {
         return String.join("\n", buildList(key, args));
     }
 
     public String[] buildBigChar(char chara, String color, Object... args) {
-        List<Object> l = new LinkedList<>();
+        List<Object> l = new ArrayList<>();
         for (Object obj : args) {
-            if (obj instanceof String) {
-                String s = (String) obj;
+            if (obj instanceof String s) {
                 l.addAll(Arrays.asList(s.split("\n")));
+            }
+            else if (obj instanceof List<?> list) {
+                l.addAll(list);
             }
             else l.add(obj);
         }

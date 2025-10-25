@@ -30,14 +30,14 @@ public class KitSubCommand extends ASubCommand {
         CustomKit ck = plugin.getCustomKitManager().getKit(args.get(0));
 
         if (ck == null) {
-            sender.sendMessage(plugin.getMessageManager().build("command.err.kit_not_found", args.get(0)));
+            sender.sendMessage(plugin.getMessageManager().build("command.error.kit_not_found", args.get(0)));
             return true;
         }
 
         switch (args.get(1)) {
             case "editor": {
                 if (!(sender instanceof Player)) {
-                    sender.sendMessage(plugin.getMessageManager().build("command.err.player_only"));
+                    sender.sendMessage(plugin.getMessageManager().build("command.error.player_only"));
                     return true;
                 }
                 new CustomKitEditor(plugin, (Player) sender, ck).open();
@@ -78,7 +78,7 @@ public class KitSubCommand extends ASubCommand {
                     sender.sendMessage(plugin.getMessageManager().build("command.kit.set_icon", opt.get().name()));
                 }
                 else {
-                    sender.sendMessage(plugin.getMessageManager().build("command.err.material_not_defined", args.get(2).toUpperCase()));
+                    sender.sendMessage(plugin.getMessageManager().build("command.error.material_not_defined", args.get(2).toUpperCase()));
                 }
                 break;
             }

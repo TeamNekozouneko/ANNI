@@ -47,7 +47,7 @@ public class MapSubCommand extends ASubCommand {
                 .getMap(args.get(0));
 
         if (map == null) {
-            sender.sendMessage(mem.build("command.err.map_not_found", args.get(0)));
+            sender.sendMessage(mem.build("command.error.map_not_found", args.get(0)));
             return true;
         }
 
@@ -111,7 +111,7 @@ public class MapSubCommand extends ASubCommand {
                             FileUtil.writeGson(new File(plugin.getDefaultMapsDir(), map.getId() + ".json"), map, ANNIMap.class);
                             plugin.getMapManager().reload();
                         }
-                        else sender.sendMessage(mem.build("command.err.player_only"));
+                        else sender.sendMessage(mem.build("command.error.player_only"));
                     }
                     break;
                 }
@@ -119,20 +119,20 @@ public class MapSubCommand extends ASubCommand {
                     if (new File(plugin.getDefaultMapsDir(), map.getId() + ".json").delete()) {
                         plugin.getMapManager().reload();
                     }
-                    else sender.sendMessage(mem.build("command.err.ioe"));
+                    else sender.sendMessage(mem.build("command.error.io"));
                     break;
                 }
                 case "editor": {
                     if (sender instanceof Player) {
                         new MapEditor(plugin, (Player) sender, map).open();
                     }
-                    else sender.sendMessage(mem.build("command.err.player_only"));
+                    else sender.sendMessage(mem.build("command.error.player_only"));
                     break;
                 }
                 case "spawn": {
                     if (args.size() < 3) return false;
                     if (!(sender instanceof Player)) {
-                        sender.sendMessage(mem.build("command.err.player_only"));
+                        sender.sendMessage(mem.build("command.error.player_only"));
                         return true;
                     }
 
@@ -146,7 +146,7 @@ public class MapSubCommand extends ASubCommand {
                 case "nexus": {
                     if (args.size() < 3) return false;
                     if (!(sender instanceof Player)) {
-                        sender.sendMessage(mem.build("command.err.player_only"));
+                        sender.sendMessage(mem.build("command.error.player_only"));
                         return true;
                     }
 
@@ -165,7 +165,7 @@ public class MapSubCommand extends ASubCommand {
                     ANNITeam at = Enums.getIfPresent(ANNITeam.class, args.get(2)).orNull();
 
                     if (at == null) {
-                        sender.sendMessage(mem.build("command.err.team_undefined", args.get(2)));
+                        sender.sendMessage(mem.build("command.error.team_undefined", args.get(2)));
                         return true;
                     }
 
@@ -176,7 +176,7 @@ public class MapSubCommand extends ASubCommand {
                             .getRegion(region);
 
                     if (pr == null) {
-                        sender.sendMessage(mem.build("command.err.region_not_found", args.get(3)));
+                        sender.sendMessage(mem.build("command.error.region_not_found", args.get(3)));
                         return true;
                     }
 

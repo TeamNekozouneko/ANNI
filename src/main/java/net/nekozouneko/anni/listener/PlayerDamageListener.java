@@ -5,7 +5,6 @@ import net.nekozouneko.anni.arena.ANNIArena;
 import net.nekozouneko.anni.arena.ArenaState;
 import net.nekozouneko.anni.arena.spectator.SpectatorManager;
 import net.nekozouneko.anni.kit.ANNIKit;
-import net.nekozouneko.anni.message.MessageManager;
 import net.nekozouneko.anni.task.CooldownManager;
 import org.bukkit.*;
 import org.bukkit.attribute.Attribute;
@@ -52,10 +51,11 @@ public class PlayerDamageListener implements Listener {
     }
 
     private final ANNIPlugin plugin = ANNIPlugin.getInstance();
-    private final MessageManager mm = plugin.getMessageManager();
 
     @EventHandler(ignoreCancelled = true)
     public void onDamage(EntityDamageEvent e) {
+        var tm = ANNIPlugin.getInstance().getTranslationManager();
+
         if (e.getEntity() instanceof Player) {
             Player p = ((Player) e.getEntity());
 
@@ -93,7 +93,7 @@ public class PlayerDamageListener implements Listener {
                 if (p.hasPotionEffect(PotionEffectType.INVISIBILITY)) {
                     p.removePotionEffect(PotionEffectType.INVISIBILITY);
                     p.playSound(p.getLocation(), Sound.ENTITY_GENERIC_EXTINGUISH_FIRE, 1, 2);
-                    p.sendMessage(mm.build("notify.removed_invisibility"));
+                    p.sendMessage(tm.component("notify.removed_invisibility"));
                 }
             }
         }

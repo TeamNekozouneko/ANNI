@@ -2,7 +2,6 @@ package net.nekozouneko.anni.listener;
 
 import net.nekozouneko.anni.ANNIPlugin;
 import net.nekozouneko.anni.item.DefenseArtifact;
-import net.nekozouneko.anni.message.MessageManager;
 import net.nekozouneko.anni.task.CooldownManager;
 import net.nekozouneko.anni.util.CmnUtil;
 import org.bukkit.ChatColor;
@@ -20,10 +19,11 @@ import java.util.Objects;
 public class PlayerDeathListener implements Listener {
 
     private final ANNIPlugin plugin = ANNIPlugin.getInstance();
-    private final MessageManager mm = plugin.getMessageManager();
 
     @EventHandler
     public void onDeath(PlayerDeathEvent e) {
+        var mm = ANNIPlugin.getInstance().getMessageManager();
+
         ChatColor cc = CmnUtil.getJoinedTeam(e.getEntity()) != null ?
                 CmnUtil.getJoinedTeam(e.getEntity()).getColor() : ChatColor.WHITE;
 

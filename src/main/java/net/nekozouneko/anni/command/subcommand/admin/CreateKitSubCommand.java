@@ -27,7 +27,7 @@ public class CreateKitSubCommand extends ASubCommand {
         String name = args.size() >= 3 ? String.join(" ", args.subList(2, args.size())) : id;
 
         if (ANNIPlugin.getInstance().getCustomKitManager().getKit(id) != null) {
-            sender.sendMessage(mm.build("command.err.kit_exists"));
+            sender.sendMessage(mm.build("command.error.kit_exists"));
             return true;
         }
 
@@ -44,11 +44,11 @@ public class CreateKitSubCommand extends ASubCommand {
             if (ANNIPlugin.getInstance().getCustomKitManager().getKit(id) != null) {
                 sender.sendMessage(mm.build("command.createkit.success", name, shortName));
             }
-            else sender.sendMessage(mm.build("command.err.unknown"));
+            else sender.sendMessage(mm.build("command.error.unknown"));
         }
         catch (IOException e) {
             e.printStackTrace();
-            sender.sendMessage(mm.build("command.err.ioe"));
+            sender.sendMessage(mm.build("command.error.io"));
         }
 
         return true;
