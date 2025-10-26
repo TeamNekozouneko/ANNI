@@ -18,7 +18,8 @@ public class TeamManager {
     public TeamManager(TeamRepository repository) {
         this.repository = repository;
 
-        for (ANNITeam color : ANNITeam.values()) enable(color);
+        for (ANNITeam color : ANNITeam.values())
+            if (ANNIConfig.isTeamEnabled(color)) enable(color);
     }
 
     public void join(ANNITeam color, UUID player) {
