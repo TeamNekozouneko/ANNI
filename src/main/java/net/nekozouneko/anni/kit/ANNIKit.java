@@ -1,5 +1,6 @@
 package net.nekozouneko.anni.kit;
 
+import lombok.Getter;
 import net.nekozouneko.anni.ANNIPlugin;
 import net.nekozouneko.anni.arena.team.ANNITeam;
 import org.bukkit.Color;
@@ -15,6 +16,7 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
+@Getter
 public enum ANNIKit {
 
     ACROBAT(new AcrobatKit()),
@@ -22,6 +24,7 @@ public enum ANNIKit {
     BOW(new BowKit()),
     DEFAULT(new DefaultKit()),
     DEFENSE(new DefenseKit()),
+    ENCHANTER(new EnchanterKit()),
     MOCHI_MOCHI(new MochiMochiKit()),
     MINER(new MinerKit()),
     SCOUTER(new ScouterKit()),
@@ -37,6 +40,7 @@ public enum ANNIKit {
         ID_MAP.put(BOW.getKit().getId(), BOW);
         ID_MAP.put(DEFAULT.getKit().getId(), DEFAULT);
         ID_MAP.put(DEFENSE.getKit().getId(), DEFENSE);
+        ID_MAP.put(ENCHANTER.getKit().getId(), ENCHANTER);
         ID_MAP.put(MOCHI_MOCHI.getKit().getId(), MOCHI_MOCHI);
         ID_MAP.put(MINER.getKit().getId(), MINER);
         ID_MAP.put(SCOUTER.getKit().getId(), SCOUTER);
@@ -49,10 +53,6 @@ public enum ANNIKit {
 
     private ANNIKit(Kit kit) {
         this.kit = kit;
-    }
-
-    public Kit getKit() {
-        return kit;
     }
 
     public static ANNIKit getKitById(String id) {
