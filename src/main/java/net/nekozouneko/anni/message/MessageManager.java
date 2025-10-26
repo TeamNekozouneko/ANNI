@@ -1,7 +1,8 @@
 package net.nekozouneko.anni.message;
 
-import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.math.BlockVector3;
+import net.kyori.adventure.text.ComponentLike;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import net.nekozouneko.anni.map.SpawnLocation;
 import net.nekozouneko.anni.util.CmnUtil;
 import org.bukkit.Location;
@@ -27,6 +28,7 @@ public class MessageManager {
             for (int i = 0; i < args.length; i++) {
                 Object arg = args[i];
                 if (arg == null) arg = "";
+                if (arg instanceof ComponentLike) arg = LegacyComponentSerializer.legacySection().serialize(((ComponentLike) arg).asComponent());
 
                 s = s != null ? s.replace("{" + i + "}", Objects.toString(arg)) : "";
             }
@@ -84,20 +86,6 @@ public class MessageManager {
                 String.format(format, loc.x()),
                 String.format(format, loc.y()),
                 String.format(format, loc.z())
-        );
-    }
-
-    public String blockLocationFormat(Location loc) {
-        return blockLocationFormat(BukkitAdapter.asBlockVector(loc));
-    }
-
-    public String locationFormat(Location loc) {
-        String format = build("xyz.format");
-        return build(
-                "xyz",
-                String.format(format, loc.getX()),
-                String.format(format, loc.getY()),
-                String.format(format, loc.getZ())
         );
     }
 
