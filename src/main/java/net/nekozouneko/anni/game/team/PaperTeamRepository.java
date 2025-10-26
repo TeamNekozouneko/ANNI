@@ -21,8 +21,6 @@ public class PaperTeamRepository implements TeamRepository {
 
     public PaperTeamRepository(Scoreboard scoreboard) {
         this.scoreboard = scoreboard;
-
-        for (ANNITeam at : ANNITeam.values()) create(at);
     }
 
     @Override
@@ -32,6 +30,8 @@ public class PaperTeamRepository implements TeamRepository {
         Team team = scoreboard.registerNewTeam(color.getId());
 
         team.displayName(ANNIPlugin.getInstance().getTranslationManager().component(color.getNameKey()));
+        team.prefix(ANNIPlugin.getInstance().getTranslationManager().component(color.getPrefix()));
+        team.color(color.getColor());
         team.setAllowFriendlyFire(false);
         team.setCanSeeFriendlyInvisibles(true);
         team.setOption(Team.Option.NAME_TAG_VISIBILITY, Team.OptionStatus.FOR_OWN_TEAM);
