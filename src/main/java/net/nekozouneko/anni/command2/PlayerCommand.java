@@ -51,7 +51,7 @@ public final class PlayerCommand {
         if (resolver != null) profiles.addAll(resolver.resolve(ctx.getSource()));
         else {
             try {
-                profiles.add(((Player) ctx.getSource()).getPlayerProfile());
+                profiles.add(((Player) ctx.getSource().getSender()).getPlayerProfile());
             }
             catch (ClassCastException cast) {
                 throw new SimpleCommandExceptionType(MessageComponentSerializer.message().serialize(
