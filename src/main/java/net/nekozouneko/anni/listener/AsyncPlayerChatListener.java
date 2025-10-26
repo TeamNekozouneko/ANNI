@@ -1,8 +1,9 @@
 package net.nekozouneko.anni.listener;
 
-import com.google.common.base.Strings;
-import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
-import net.md_5.bungee.api.ChatColor;
+import io.papermc.paper.event.player.AsyncChatEvent;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import net.nekozouneko.anni.ANNIPlugin;
 import net.nekozouneko.anni.arena.ANNIArena;
 import net.nekozouneko.anni.arena.spectator.SpectatorManager;
@@ -11,21 +12,22 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.player.AsyncPlayerChatEvent;
 
+import java.util.Locale;
 import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 public class AsyncPlayerChatListener implements Listener {
 
     private final ANNIPlugin plugin = ANNIPlugin.getInstance();
 
     @EventHandler
-    public void onChat(AsyncPlayerChatEvent e) {
+    public void onChat(AsyncChatEvent e) {
+        String plain = PlainTextComponentSerializer.plainText().serialize(e.message());
+
         if (BlockBreakListener.getQueuedOnDamageMap().containsKey(e.getPlayer().getUniqueId())) {
-            if (e.getMessage().equalsIgnoreCase("cancel")) {
+            if (plain.equalsIgnoreCase("cancel")) {
                 BlockBreakListener.getQueuedOnDamageMap().remove(e.getPlayer().getUniqueId());
                 e.setCancelled(true);
                 return;
@@ -42,9 +44,11 @@ public class AsyncPlayerChatListener implements Listener {
         // これからゲーム内のみ
 
         ANNITeam at = plugin.getCurrentGame().getTeamManager().getTeamColorByPlayer(e.getPlayer().getUniqueId());
+        var translationManager = ANNIPlugin.getInstance().getTranslationManager();
 
         if (SpectatorManager.isSpectating(e.getPlayer())) {
-            if (e.getMessage().startsWith("!") && e.getPlayer().hasPermission("anni.mod.global_chat_on_spectator")) {
+            if (plain.startsWith("!") && e.getPlayer().hasPermission("anni.mod.global_chat_on_spectator")) {
+                e.message(Component.text(plain.substring(1)));
                 globalChat(e);
                 return;
             }
@@ -54,22 +58,21 @@ public class AsyncPlayerChatListener implements Listener {
         }
 
         if (at != null) {
-            if (e.getMessage().startsWith("!")) {
+            if (plain.startsWith("!")) {
+                e.message(Component.text(plain.substring(1)));
                 globalChat(e);
                 return;
             }
 
-            if (e.getMessage().startsWith("@")) {
-                Matcher matcher = Pattern.compile("^@([^ ]{2,20}) (.+)$").matcher(e.getMessage());
+            if (plain.startsWith("@")) {
+                Matcher matcher = Pattern.compile("^@([^ ]{2,20}) (.+)$").matcher(plain);
                 if (matcher.find()) {
                     Player receiver = Bukkit.getPlayer(matcher.group(1));
 
                     e.setCancelled(true);
                     if (receiver != null) {
                         if (receiver.equals(e.getPlayer())) {
-                            e.getPlayer().sendMessage(plugin.getMessageManager().build(
-                                    "command.error.self_message"
-                            ));
+                            e.getPlayer().sendMessage(translationManager.component(e.getPlayer(), "command.error.self_message"));
                             return;
                         }
 
@@ -92,11 +95,11 @@ public class AsyncPlayerChatListener implements Listener {
                             return;
                         }
                         else e.getPlayer().sendMessage(
-                                plugin.getMessageManager().build("command.error.non_equal_team")
+                                translationManager.component(e.getPlayer(),"command.error.non_equal_team")
                         );
                     }
                     else e.getPlayer().sendMessage(
-                            plugin.getMessageManager().build("command.error.player_not_found", matcher.group(1))
+                            translationManager.component(e.getPlayer(), "command.error.player_not_found", matcher.group(1))
                     );
 
                     return;
@@ -110,114 +113,105 @@ public class AsyncPlayerChatListener implements Listener {
         globalChat(e);
     }
 
-    private boolean canSendPrivateMessage(Player from, Player to) {
-        ANNIArena arena = ANNIPlugin.getInstance().getCurrentGame();
-        var teamManager = arena.getTeamManager();
-
-        boolean equalsTeam = teamManager.getTeamColorByPlayer(from.getUniqueId()) == teamManager.getTeamColorByPlayer(to.getUniqueId());
-        boolean isSpectator = SpectatorManager.isSpectating(from) && SpectatorManager.isSpectating(to);
-        boolean isNotSpectator = !SpectatorManager.isSpectating(from) && !SpectatorManager.isSpectating(to);
-
-        return (equalsTeam && isNotSpectator) || isSpectator;
-    }
-
-    private void globalChat(AsyncPlayerChatEvent e) {
+    private void globalChat(AsyncChatEvent e) {
         ANNITeam at = ANNIPlugin.getInstance().getCurrentGame().getTeamManager().getTeamColorByPlayer(e.getPlayer().getUniqueId());
-        var serializer = LegacyComponentSerializer.legacySection();
         var tm = ANNIPlugin.getInstance().getTranslationManager();
 
-        String prefix;
-        String username;
+        var name = Component.text();
+
         if (at != null) {
-            e.setMessage(e.getMessage().substring(1));
-            //Team t = plugin.getCurrentGame().getTeam(at);
-
-            String uncoloredPrefix = Strings.nullToEmpty(serializer.serialize(tm.component(at.getTeamPrefix())));
-            prefix = at.getColorCode() + uncoloredPrefix;
-            username = prefix + ChatColor.RESET
-                    + (uncoloredPrefix.isEmpty() ? "" : " ")
-                    + at.getColorCode() + e.getPlayer().getName();
-        }
-        else {
-            prefix = "";
-            username = e.getPlayer().getName();
+            name.append(tm.component(at.getPrefix()).color(at.getColor()));
         }
 
+        name.append(e.getPlayer().displayName()).color(at != null ? at.getColor() : NamedTextColor.WHITE);
 
         try {
-            String form = plugin.getMessageManager().build("chat.global.format", prefix.isEmpty() ? "" : prefix + "§r ");
-            e.setFormat(form);
+            e.renderer((sender, senderName, message, audience) ->
+                    tm.component(audience instanceof Player player ? player.locale() : null, "chat.global", name.asComponent(), message)
+            );
         }
         catch (UnsupportedOperationException e1) {
             e.setCancelled(true);
-            String mes = plugin.getMessageManager().build("chat.global",
-                    username,
-                    e.getMessage()
+            Bukkit.getOnlinePlayers().forEach(player ->
+                    player.sendMessage(tm.component(player, "chat.global", name.asComponent(), e.message()))
             );
-            plugin.getCurrentGame().broadcast(mes);
         }
     }
 
-    private void teamChat(ANNITeam team, AsyncPlayerChatEvent e) {
-        var serializer = LegacyComponentSerializer.legacySection();
+    private void teamChat(ANNITeam team, AsyncChatEvent e) {
         var tm = ANNIPlugin.getInstance().getTranslationManager();
 
-        String teamName = serializer.serialize(tm.component(team.getTeamName()));
-
         try {
-            e.getRecipients().clear();
-            e.getRecipients().addAll(plugin.getCurrentGame().getTeamPlayers(team));
-            String form = plugin.getMessageManager().build("chat.team.format",
-                    teamName
-            );
-            e.setFormat(form);
+            e.viewers().clear();
+            e.viewers().addAll(plugin.getCurrentGame().getTeamPlayers(team));
+            e.viewers().add(Bukkit.getConsoleSender());
+
+            e.renderer((sender, senderName, message, audience) -> {
+                Locale locale = audience instanceof Player player ? player.locale() : null;
+
+                return tm.component(locale, "chat.team", tm.component(locale, team.getNameKey()), senderName, message);
+            });
         }
         catch (UnsupportedOperationException e1) {
             e.setCancelled(true);
-            String mes = plugin.getMessageManager().build("chat.team",
-                    teamName,
-                    e.getPlayer().getName(),
-                    e.getMessage()
-            );
-            plugin.getCurrentGame().broadcast(mes, team);
+
+            plugin.getCurrentGame().getTeamPlayers(team).forEach(player ->
+                    player.sendMessage(tm.component(player, "chat.team", tm.component(player, team.getNameKey()), e.getPlayer().displayName(), e.message())));
+            Bukkit.getConsoleSender().sendMessage(tm.component("chat.team", tm.component(team.getNameKey()), e.getPlayer().displayName(), e.message()));
         }
     }
 
-    private void spectatorChat(AsyncPlayerChatEvent e) {
+    private void spectatorChat(AsyncChatEvent e) {
+        var translationManager = ANNIPlugin.getInstance().getTranslationManager();
+
         try {
-            e.getRecipients().clear();
-            e.getRecipients().addAll(
+            e.viewers().clear();
+            e.viewers().addAll(
                     SpectatorManager.getPlayers().stream()
                             .map(Bukkit::getPlayer)
                             .filter(Objects::nonNull)
-                            .collect(Collectors.toList())
+                            .toList()
             );
-            e.getRecipients().addAll(
+            e.viewers().addAll(
                     SpectatorManager.getWatchablePlayers().stream()
                             .map(Bukkit::getPlayer)
                             .filter(Objects::nonNull)
-                            .collect(Collectors.toList())
+                            .toList()
             );
-            String form = plugin.getMessageManager().build("chat.spectator.format");
-            e.setFormat(form);
+            e.viewers().add(Bukkit.getConsoleSender());
+
+            e.renderer(((sender, senderName, message, audience) ->
+                    translationManager.component(audience instanceof Player player ? player.locale() : null,
+                            "chat.spectator", senderName, message
+                    )
+            ));
         }
         catch (UnsupportedOperationException e1) {
             e.setCancelled(true);
-            String mes = plugin.getMessageManager().build("chat.spectator",
-                    e.getPlayer().getName(),
-                    e.getMessage()
-            );
 
             SpectatorManager.getPlayers().stream()
                     .map(Bukkit::getPlayer)
                     .filter(Objects::nonNull)
-                    .forEach(p -> p.sendMessage(mes));
+                    .forEach(p -> p.sendMessage(translationManager.component(
+                            p,
+                            "chat.spectator",
+                            e.getPlayer().displayName(),
+                            e.message()
+                    )));
 
             SpectatorManager.getWatchablePlayers().stream()
                     .map(Bukkit::getPlayer)
                     .filter(Objects::nonNull)
-                    .forEach(p -> p.sendMessage(mes));
-            Bukkit.getConsoleSender().sendMessage(mes);
+                    .forEach(p -> p.sendMessage(translationManager.component(
+                            p,
+                            "chat.spectator",
+                            e.getPlayer().displayName(),
+                            e.message()
+                    )));
+            Bukkit.getConsoleSender().sendMessage(translationManager.component("chat.spectator",
+                    e.getPlayer().displayName(),
+                    e.message()
+            ));
         }
     }
 
