@@ -26,6 +26,12 @@
     "bossbar.timer": "<0> - <1>",
     "bossbar.damaged_nexus": "<0>が<1>のネクサスにダメージを与えました！",
 
+    "chat.global": "<0><green>:</green> <reset><1>",
+    "chat.team": "<dark_gray>[<0>]</dark_gray> <1><green>:</green> <reset><2>",
+    "chat.tell.receive": "<dark_gray>[<0>から]</dark_gray> <reset><1>",
+    "chat.tell.send": "<dark_gray>[<0>へ]</dark_gray> <reset><1>",
+    "chat.spectator": "<dark_gray>[<gray>観戦</gray>]</dark_gray> <reset><0><green>:</green> <reset><1>",
+
     "command.arena.disabled_team": "<green>「<0>」というチームを無効化しました。",
     "command.arena.enabled_team": "<green>「<0>」というチームを有効化しました。",
     "command.arena.set_map": "<green>マップを「<0>」に設定しました。",
@@ -187,6 +193,11 @@
     "kit.defense.description.0": "<gray>重装備で抵抗しながら、",
     "kit.defense.description.1": "<gray>防衛の心で、相手のネクサス破壊から妨害しよう！",
 
+    "kit.enchanter.name": "エンチャンターキット",
+    "kit.enchanter.description.0": "<gray>経験値を2倍お得にもらって、",
+    "kit.enchanter.description.1": "<gray>相手より先に装備を整えつつ、",
+    "kit.enchanter.description.2": "<gray>装備を経験値で大切に使おう。",
+
     "kit.mochimochi.name": "もちもち",
     "kit.mochimochi.description.0": "<gray>もちっとスタングレネードを当てて、",
     "kit.mochimochi.description.1": "<gray>敵の撤退を妨害しよう！",
@@ -238,15 +249,18 @@
     "notify.removed_invisibility": "<red>透明化が解除されました！",
 
     "phase.one.name": "フェーズ 1",
-    "phase.one.summary.0": "",
+    "phase.one.summary.0": "<gray>ネクサスは無敵状態です。",
     "phase.two.name": "フェーズ 2",
-    "phase.two.summary.0": "",
+    "phase.two.summary.0": "<gray>ネクサスへダメージを",
+    "phase.two.summary.1": "<gray>与えられるようになりました。",
     "phase.three.name": "フェーズ 3",
-    "phase.three.summary.0": "",
+    "phase.three.summary.0": "<gray>ダイヤモンド・エメラルド鉱石が、",
+    "phase.three.summary.1": "<gray>採掘できるようになりました。",
     "phase.four.name": "フェーズ 4",
-    "phase.four.summary.0": "",
+    "phase.four.summary.0": "<gray>ネクサスへのダメージが2になります。",
     "phase.five.name": "フェーズ 5",
-    "phase.five.summary.0": "",
+    "phase.five.summary.0": "<gray>各チームのネクサスの体力が1に",
+    "phase.five.summary.1": "<gray>なるまで減っていきます。",
     "phase.restarting.name": "再起動",
 
     "scoreboard.title": "<b><red>ANNI<blue>HI<green>LA<yellow>TION</b>",
