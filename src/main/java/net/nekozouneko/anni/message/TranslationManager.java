@@ -26,7 +26,7 @@ public class TranslationManager {
     }
 
     public Component component(Locale locale, String key, Object... args) {
-        String message = rawString(locale, key);
+        String message = "<!i><!b><!u><!st><!obf>" + rawString(locale, key);
 
         if (message.isEmpty()) return Component.empty();
 
