@@ -111,15 +111,19 @@ public class ScoreboardManager {
         }
     }
 
-    private Component nexusState(Player player, ANNITeam team) {
+    private Component nexusState(Player player, ANNITeam color) {
         TranslationManager translation = ANNIPlugin.getInstance().getTranslationManager();
 
-        return translation.component(player, arena.getTeamManager().getTeam(team).isLost() ? "scoreboard.nexus.state.lost" : "scoreboard.nexus.state.active");
+        var team = arena.getTeamManager().getTeam(color);
+
+        return translation.component(player, team == null || team.isLost() ? "scoreboard.nexus.state.lost" : "scoreboard.nexus.state.active");
     }
 
     private Component nexusHealth(Player player, ANNITeam team) {
         TranslationManager translation = ANNIPlugin.getInstance().getTranslationManager();
-        Integer health = ANNIPlugin.getInstance().getCurrentGame().getNexusHealth(team);
+        var teamManager = ANNIPlugin.getInstance().getCurrentGame().getTeamManager();
+
+        Integer health = teamManager.isEnabled(team) ? teamManager.getTeam(team).getNexus().getHealth() : null;
 
         return health != null ?
                 Component.text(String.format(translation.string(player, "format.nexus_health"), health))
