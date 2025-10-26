@@ -170,6 +170,8 @@ public final class ANNIPlugin extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new ProjectileLaunchListener(), this);
         getServer().getPluginManager().registerEvents(new BlockPistonListener(), this);
         getServer().getPluginManager().registerEvents(new InventoryClickListener(), this);
+        getServer().getPluginManager().registerEvents(new PlayerItemDamageListener(), this);
+        getServer().getPluginManager().registerEvents(new PlayerExpChargeListener(), this);
 
         if (!VaultUtil.hasEco()) {
             setEnabled(false);
