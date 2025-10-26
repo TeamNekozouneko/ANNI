@@ -73,9 +73,6 @@ public class ANNIArena extends BukkitRunnable {
 
     private final Set<Player> players = new HashSet<>();
 
-    //private final BiMap<ANNITeam, Team> teams = HashBiMap.create(4);
-    //private final Map<ANNITeam, Boolean> enabledTeams = new EnumMap<>(ANNITeam.class);
-
     @Getter @Setter
     private ArenaState state = ArenaState.WAITING;
 
@@ -746,8 +743,8 @@ public class ANNIArena extends BukkitRunnable {
                                 CmnUtil.numberToChar(state.nextPhase().getId()),
                                 Character.toString(at.getCCChar()),
                                 (Object[]) mm.buildArray("notify.big.next_phase",
-                                    mm.build(state.nextPhase().getName()),
-                                    mm.build(state.nextPhase().getDescription())
+                                    tm.component(state.nextPhase().getName()),
+                                    tm.componentLines(state.nextPhase().getDescription())
                                 )
                         )) {
                             broadcast(s, at);
