@@ -195,29 +195,6 @@ public class ANNIArena extends BukkitRunnable {
         teamManager.getTeams().keySet().forEach(teamManager::disable);
     }
 
-//    public ANNITeam getTeam(Team team) {
-//        return teams.inverse().get(team);
-//    }
-
-//    public ANNITeam getTeamByPlayer(Player player) {
-//        Team t = plugin.getPluginBoard().getPlayerTeam(player);
-//        return t != null ? getTeam(t) : null;
-//    }
-
-//    public BiMap<ANNITeam, Team> getTeams() {
-//        return getTeams(true);
-//    }
-//
-//    public BiMap<ANNITeam, Team> getTeams(boolean enabledOnly) {
-//        BiMap<ANNITeam, Team> res = EnumHashBiMap.create(ANNITeam.class);
-//
-//        teams.entrySet().stream()
-//                .filter(t -> !enabledOnly || enabledTeams.getOrDefault(t.getKey(), true))
-//                .forEach(e -> res.put(e.getKey(), e.getValue()));
-//
-//        return res;
-//    }
-
     public Set<Player> getTeamPlayers(ANNITeam team) {
         return teamManager.getTeam(team).getPlayers().stream()
                 .map(Bukkit::getPlayer)
@@ -239,16 +216,6 @@ public class ANNIArena extends BukkitRunnable {
 
     public Integer getNexusHealth(ANNITeam team) {
         return teamManager.getTeam(team).getNexus().getHealth();
-    }
-
-    public void setNexusHealth(ANNITeam team, int health) {
-        teamManager.getTeam(team).getNexus().setHealth(health);
-    }
-
-    public void healNexusHealth(ANNITeam team, int heal) {
-        Preconditions.checkState(!teamManager.getTeam(team).isLost());
-
-        teamManager.getTeam(team).getNexus().heal(heal);
     }
 
     public void damageNexusHealth(ANNITeam team, int damage, Player player) {
