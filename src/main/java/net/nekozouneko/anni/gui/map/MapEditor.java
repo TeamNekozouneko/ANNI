@@ -143,7 +143,7 @@ public class MapEditor extends AbstractGui {
         });
 
         ItemStack blueNexus = ItemStack.of(Material.END_STONE);
-        redNexus.editMeta(meta -> {
+        blueNexus.editMeta(meta -> {
             meta.displayName(translation.component(player,
                     "gui.map_editor.team_nexus",
                     translation.component(player, ANNITeam.BLUE.getNameKey())
@@ -154,7 +154,7 @@ public class MapEditor extends AbstractGui {
         });
 
         ItemStack greenNexus = ItemStack.of(Material.END_STONE);
-        redNexus.editMeta(meta -> {
+        greenNexus.editMeta(meta -> {
             meta.displayName(translation.component(player,
                     "gui.map_editor.team_nexus",
                     translation.component(player, ANNITeam.GREEN.getNameKey())
@@ -165,7 +165,7 @@ public class MapEditor extends AbstractGui {
         });
 
         ItemStack yellowNexus = ItemStack.of(Material.END_STONE);
-        redNexus.editMeta(meta -> {
+        yellowNexus.editMeta(meta -> {
             meta.displayName(translation.component(player,
                     "gui.map_editor.team_nexus",
                     translation.component(player, ANNITeam.YELLOW.getNameKey())
