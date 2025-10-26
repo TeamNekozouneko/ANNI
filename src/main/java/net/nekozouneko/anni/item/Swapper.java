@@ -74,9 +74,7 @@ public class Swapper implements Listener {
 
     @EventHandler
     public void onHit(ProjectileHitEvent event) {
-        String specialItem = event.getEntity().getPersistentDataContainer().get(new NamespacedKey(ANNIPlugin.getInstance(), "special-item"), PersistentDataType.STRING);
-
-        if (!specialItem.equals("swapper")) return;
+        if (!isSwapper(event.getEntity())) return;
 
         if (!(event.getHitEntity() instanceof Player hit)) return;
 
