@@ -1,6 +1,5 @@
 package net.nekozouneko.anni.arena;
 
-import com.google.common.base.Preconditions;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.protection.flags.Flags;
@@ -26,6 +25,7 @@ import net.nekozouneko.anni.listener.PlayerDamageListener;
 import net.nekozouneko.anni.map.ANNIMap;
 import net.nekozouneko.anni.message.MessageManager;
 import net.nekozouneko.anni.message.TranslationManager;
+import net.nekozouneko.anni.point.PlayerListService;
 import net.nekozouneko.anni.task.RechargeManager;
 import net.nekozouneko.anni.util.CmnUtil;
 import net.nekozouneko.anni.util.FileUtil;
@@ -69,7 +69,7 @@ public class ANNIArena extends BukkitRunnable {
     @Getter
     private RechargeManager rechargeManager = null;
     @Getter
-    private final String id;
+    private final String id = "current";
 
     private final Set<Player> players = new HashSet<>();
 
@@ -91,17 +91,14 @@ public class ANNIArena extends BukkitRunnable {
     @Getter
     private final TeamManager teamManager;
     private final SaveDataRepository saveDataRepository;
+    private final PlayerListService playerListService;
 
-    public ANNIArena(ANNIPlugin plugin, String id, TeamManager teamManager, SaveDataRepository saveDataRepository) {
-        Objects.requireNonNull(plugin);
-        Preconditions.checkArgument(id.length() < 9, "Id length limit is 8! (" + id.length() + ")");
-
+    public ANNIArena(ANNIPlugin plugin, TeamManager teamManager, SaveDataRepository saveDataRepository, PlayerListService playerListService) {
         this.plugin = plugin;
         this.teamManager = teamManager;
         this.saveDataRepository = saveDataRepository;
         this.mm = plugin.getMessageManager();
         this.tm = plugin.getTranslationManager();
-        this.id = id;
         this.voteManager = new VoteManager(plugin.getMapManager().getMaps().stream()
                 .filter(ANNIMap::canUseOnArena)
                 .map(ANNIMap::getId)
@@ -109,6 +106,7 @@ public class ANNIArena extends BukkitRunnable {
         );
 
         this.bossbarManager = new BossbarManager(this);
+        this.playerListService = playerListService;
     }
 
     public void join(Player player) {
@@ -120,8 +118,12 @@ public class ANNIArena extends BukkitRunnable {
         if (state.getId() <= 0) {
             initPlayer(player);
             if (plugin.getLobby() != null) player.teleport(plugin.getLobby());
+
+            playerListService.showPlayerLevels(player.getUniqueId());
             return;
         }
+
+        playerListService.reset(player.getUniqueId());
 
         ANNITeam color;
         if (!saveDataRepository.canLoad(player.getUniqueId())) {
@@ -427,7 +429,10 @@ public class ANNIArena extends BukkitRunnable {
 
             log.info("Assigning players...");
             saveDataRepository.clear();
-            players.forEach(player -> teamManager.join(assignTeam(), player.getUniqueId()));
+            players.forEach(player -> {
+                playerListService.reset(player.getUniqueId());
+                teamManager.join(assignTeam(), player.getUniqueId());
+            });
             teamManager.getTeams().forEach((color, team) -> {
                 team.getNexus().setHealth(ANNIConfig.getDefaultHealth());
                 team.getNexus().setMaxHealth(ANNIConfig.getDefaultHealth());
@@ -478,6 +483,7 @@ public class ANNIArena extends BukkitRunnable {
                 Players.clearPotionEffects(player);
                 player.teleport(plugin.getLobby());
                 player.setFlying(player.getGameMode() == GameMode.CREATIVE || player.getGameMode() == GameMode.SPECTATOR);
+                playerListService.showPlayerLevels(player.getUniqueId());
             });
             log.info("Removing player from team...");
             teamManager.getTeams().forEach((color, team) -> {

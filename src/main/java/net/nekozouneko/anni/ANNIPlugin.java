@@ -31,6 +31,7 @@ import net.nekozouneko.anni.map.MapManager;
 import net.nekozouneko.anni.message.MessageManager;
 import net.nekozouneko.anni.message.TranslationManager;
 import net.nekozouneko.anni.point.LevelManager;
+import net.nekozouneko.anni.point.PaperPlayerListService;
 import net.nekozouneko.anni.point.PointManager;
 import net.nekozouneko.anni.task.CooldownManager;
 import net.nekozouneko.anni.util.CmnUtil;
@@ -200,7 +201,7 @@ public final class ANNIPlugin extends JavaPlugin {
 
         var teamManager = new TeamManager(new PaperTeamRepository(pluginBoard));
 
-        currentGame = new ANNIArena(this, "current", teamManager, new PaperSaveDataRepository(teamManager));
+        currentGame = new ANNIArena(this, teamManager, new PaperSaveDataRepository(teamManager), new PaperPlayerListService(levelManager));
         spectatorTask = new SpectatorTask();
         currentGame.runTaskTimer(this, 0, 20);
         spectatorTask.runTaskTimer(this, 0, 20);
