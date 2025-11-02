@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import net.nekozouneko.anni.arena.team.ANNITeam;
 import net.nekozouneko.anni.game.team.TeamManager;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.HashMap;
@@ -14,7 +15,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class PaperSaveDataRepository implements SaveDataRepository {
 
-    public record SaveData(ANNITeam color, ItemStack[] inventory, double health, int level, float experience) {}
+    public record SaveData(boolean saveOnlyTeamColor, ANNITeam color, ItemStack[] inventory, ItemStack[] enderChest, Location lastLocation, double health, int level, float experience) {}
 
     private final Map<UUID, SaveData> data = new HashMap<>();
     private final TeamManager teamManager;
@@ -30,17 +31,26 @@ public class PaperSaveDataRepository implements SaveDataRepository {
     }
 
     @Override
-    public void load(UUID player) {
+    public boolean load(UUID player) {
         var playerData = data.get(player);
         var bukkitPlayer = Bukkit.getPlayer(player);
 
         Preconditions.checkArgument(bukkitPlayer != null);
 
         teamManager.join(playerData.color(), player);
-        bukkitPlayer.getInventory().setContents(playerData.inventory());
-        bukkitPlayer.setHealth(playerData.health());
-        bukkitPlayer.setLevel(playerData.level());
-        bukkitPlayer.setExp(playerData.experience());
+
+        if (!playerData.saveOnlyTeamColor()) {
+            bukkitPlayer.getInventory().setContents(playerData.inventory());
+            bukkitPlayer.getEnderChest().setContents(playerData.enderChest());
+            bukkitPlayer.teleportAsync(playerData.lastLocation());
+            bukkitPlayer.setHealth(playerData.health());
+            bukkitPlayer.setLevel(playerData.level());
+            bukkitPlayer.setExp(playerData.experience());
+
+            return true;
+        }
+
+        return false;
     }
 
     @Override
@@ -49,17 +59,20 @@ public class PaperSaveDataRepository implements SaveDataRepository {
     }
 
     @Override
-    public void save(UUID player) {
+    public void save(UUID player, boolean saveOnlyTeamColor) {
         var bukkitPlayer = Bukkit.getPlayer(player);
 
         Preconditions.checkArgument(bukkitPlayer != null);
 
         data.put(player, new SaveData(
+                saveOnlyTeamColor,
                 teamManager.getTeamColorByPlayer(player),
-                bukkitPlayer.getInventory().getContents().clone(),
-                bukkitPlayer.getHealth(),
-                bukkitPlayer.getLevel(),
-                bukkitPlayer.getExp()
+                saveOnlyTeamColor ? null : bukkitPlayer.getInventory().getContents().clone(),
+                saveOnlyTeamColor ? null : bukkitPlayer.getEnderChest().getContents().clone(),
+                saveOnlyTeamColor ? null : bukkitPlayer.getLocation().clone(),
+                saveOnlyTeamColor ? 0 : bukkitPlayer.getHealth(),
+                saveOnlyTeamColor ? 0 : bukkitPlayer.getLevel(),
+                saveOnlyTeamColor ? 0 : bukkitPlayer.getExp()
         ));
     }
 }

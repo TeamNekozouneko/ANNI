@@ -8,10 +8,10 @@ public interface SaveDataRepository {
 
     void remove(UUID player);
 
-    void load(UUID player);
+    boolean load(UUID player);
 
     boolean canLoad(UUID player);
 
-    void save(UUID player);
+    void save(UUID player, boolean saveOnlyTeamColor);
 
 }

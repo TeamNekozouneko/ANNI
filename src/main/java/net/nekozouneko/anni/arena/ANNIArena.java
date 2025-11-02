@@ -136,10 +136,14 @@ public class ANNIArena extends BukkitRunnable {
             player.teleport(map.getSpawnOrDefault(color).toLocation(copy));
         }
         else {
-            saveDataRepository.load(player.getUniqueId());
+            boolean savedInventories = saveDataRepository.load(player.getUniqueId());
             saveDataRepository.remove(player.getUniqueId());
 
             color = teamManager.getTeamColorByPlayer(player.getUniqueId());
+            if (!savedInventories) {
+                player.teleportAsync(map.getSpawn(color).toLocation(copy));
+                initPlayer(player);
+            }
 
             if (teamManager.getTeam(color).isLost()) {
                 Players.clearPotionEffects(player);
@@ -172,8 +176,10 @@ public class ANNIArena extends BukkitRunnable {
                             ) == 0;
                         })
                         .forEach(item -> player.getWorld().dropItemNaturally(player.getLocation(), item));
+
+                saveDataRepository.save(player.getUniqueId(), true);
             }
-            else saveDataRepository.save(player.getUniqueId());
+            else saveDataRepository.save(player.getUniqueId(), false);
 
             player.getInventory().clear();
         }
