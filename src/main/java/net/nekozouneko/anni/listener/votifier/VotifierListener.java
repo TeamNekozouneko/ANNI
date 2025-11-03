@@ -7,7 +7,6 @@ import net.nekozouneko.anni.message.MessageManager;
 import net.nekozouneko.anni.util.VaultUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
-import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 
@@ -34,7 +33,7 @@ public class VotifierListener implements Listener {
             VaultUtil.getEco().depositPlayer(op, ANNIConfig.getVotePoints());
         }
         if (op.isOnline()) {
-            ((Player) op).sendMessage(mm.build(
+            op.getPlayer().sendMessage(mm.build(
                     "notify.thank_you_voting",
                     Double.toString(ANNIConfig.getVotePoints()),
                     mm.build("gui.shop.ext")
