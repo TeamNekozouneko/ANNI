@@ -19,13 +19,8 @@ public class VotifierListener implements Listener {
     public void onVote(VotifierEvent e) {
         if (!ANNIConfig.isVotifierVoteEnabled()) return;
 
-        OfflinePlayer op = null;
-        for (OfflinePlayer off : Bukkit.getOfflinePlayers()) {
-            if (e.getVote().getUsername().equals(off.getName())) {
-                op = off;
-                break;
-            }
-        }
+        OfflinePlayer op = Bukkit.getOfflinePlayerIfCached(e.getVote().getUsername());
+
         if (op == null) {
             Bukkit.getLogger().info("Failed vote. by " + e.getVote().getUsername());
             return;
