@@ -9,7 +9,7 @@ import java.util.UUID;
 
 public class LevelManager {
 
-    public static final int MAX_LEVEL = 9;
+    public static final int MAX_LEVEL = 1;
 
     public void giveExp(Player player, long exp) {
         int befLevel = getLevel(player);
