@@ -95,8 +95,6 @@ public class ANNIArena extends BukkitRunnable {
 
     public ANNIArena(ANNIPlugin plugin, TeamManager teamManager, SaveDataRepository saveDataRepository, PlayerListService playerListService) {
         this.plugin = plugin;
-        this.teamManager = teamManager;
-        this.saveDataRepository = saveDataRepository;
         this.mm = plugin.getMessageManager();
         this.tm = plugin.getTranslationManager();
         this.voteManager = new VoteManager(plugin.getMapManager().getMaps().stream()
@@ -104,8 +102,10 @@ public class ANNIArena extends BukkitRunnable {
                 .map(ANNIMap::getId)
                 .collect(Collectors.toSet())
         );
-
         this.bossbarManager = new BossbarManager(this);
+
+        this.teamManager = teamManager;
+        this.saveDataRepository = saveDataRepository;
         this.playerListService = playerListService;
     }
 
