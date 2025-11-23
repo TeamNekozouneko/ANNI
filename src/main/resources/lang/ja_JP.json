@@ -85,9 +85,9 @@
     "command.player.result.3": "<dark_gray>・<white>AP: <b><5></b>",
     "command.player.result.4": "",
     "command.player.result.5": "<yellow>> <aqua><b>統計</b>",
-    "command.player.result.6": "<dark_gray>・<white>キル: <dark_gray>-",
-    "command.player.result.7": "<dark_gray>・<white>デス: <dark_gray>-",
-    "command.player.result.8": "<dark_gray>・<white>K/D: <dark_gray>-",
+    "command.player.result.6": "<dark_gray>・<white>キル: <gray><6>",
+    "command.player.result.7": "<dark_gray>・<white>デス: <gray><7>",
+    "command.player.result.8": "<dark_gray>・<white>K/D: <gray><8>",
     "command.player.result.9": "<yellow>■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■",
 
     "format.scoreboard_datetime": "yyyy/MM/dd HH:mm",
@@ -197,6 +197,10 @@
     "kit.enchanter.description.0": "<gray>経験値を2倍お得にもらって、",
     "kit.enchanter.description.1": "<gray>相手より先に装備を整えつつ、",
     "kit.enchanter.description.2": "<gray>装備を経験値で大切に使おう。",
+
+    "kit.lumberjack.name": "木こりキット",
+    "kit.lumberjack.description.0": "<gray>木を多めに入手しつつ、",
+    "kit.lumberjack.description.1": "<gray>斧を振り投げて相手を無力化しよう！",
 
     "kit.mochimochi.name": "もちもち",
     "kit.mochimochi.description.0": "<gray>もちっとスタングレネードを当てて、",

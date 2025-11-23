@@ -10,9 +10,7 @@ public class ProjectileLaunchListener implements Listener {
 
     @EventHandler
     public void onLaunch(ProjectileLaunchEvent e) {
-        if (e.getEntity().getShooter() == null && !(e.getEntity().getShooter() instanceof Player)) return;
-
-        Player shooter = (Player) e.getEntity().getShooter();
+        if (e.getEntity().getShooter() == null || !(e.getEntity().getShooter() instanceof Player shooter)) return;
 
         if (SpectatorManager.isSpectating(shooter)) e.setCancelled(true);
     }
