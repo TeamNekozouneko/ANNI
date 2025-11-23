@@ -20,6 +20,7 @@ import net.nekozouneko.anni.command2.SuicideCommand;
 import net.nekozouneko.anni.command2.VoteCommand;
 import net.nekozouneko.anni.database.Database;
 import net.nekozouneko.anni.database.impl.SQLiteDatabase;
+import net.nekozouneko.anni.game.StatisticChangeService;
 import net.nekozouneko.anni.game.save.PaperSaveDataRepository;
 import net.nekozouneko.anni.game.team.PaperTeamRepository;
 import net.nekozouneko.anni.game.team.TeamManager;
@@ -173,6 +174,8 @@ public final class ANNIPlugin extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new InventoryClickListener(), this);
         getServer().getPluginManager().registerEvents(new EnchantItemListener(), this);
         getServer().getPluginManager().registerEvents(new PlayerExpChargeListener(), this);
+        getServer().getPluginManager().registerEvents(new BlockDropItemListener(), this);
+        getServer().getPluginManager().registerEvents(new ProjectileHitListener(), this);
 
         if (!VaultUtil.hasEco()) {
             setEnabled(false);
@@ -220,6 +223,9 @@ public final class ANNIPlugin extends JavaPlugin {
         });
 
         registerRecipe();
+
+        getServer().getPluginManager().registerEvents(new PlayerInteractListener(currentGame), this);
+        getServer().getPluginManager().registerEvents(new PlayerStatisticIncrementListener(new StatisticChangeService(currentGame)), this);
     }
 
     @Override
