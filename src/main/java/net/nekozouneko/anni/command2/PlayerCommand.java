@@ -17,6 +17,8 @@ import net.nekozouneko.anni.ANNIPlugin;
 import net.nekozouneko.anni.point.LevelManager;
 import net.nekozouneko.anni.util.CmnUtil;
 import org.bukkit.Bukkit;
+import org.bukkit.OfflinePlayer;
+import org.bukkit.Statistic;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
@@ -76,11 +78,25 @@ public final class PlayerCommand {
 
         double progress = (double) exp / LevelManager.calculateExpForNextLevel(lvl);
 
+        OfflinePlayer offPlayer = Bukkit.getOfflinePlayer(profile.getId());
+
+        int death = offPlayer.getStatistic(Statistic.DEATHS);
+        int kill = offPlayer.getStatistic(Statistic.PLAYER_KILLS);
+
         return translation.componentLines(locale, "command.player.result",
                 profile.getName(), lvl, exp, LevelManager.calculateExpForNextLevel(lvl),
                 CmnUtil.progressBar(progress, 20),
-                String.format("%,d", plugin.getPointManager().getPoint(Bukkit.getOfflinePlayer(profile.getId())))
+                String.format("%,d", plugin.getPointManager().getPoint(Bukkit.getOfflinePlayer(profile.getId()))),
+                death,
+                kill,
+                kd(kill, death)
         );
+    }
+
+    private static String kd(int kill, int death) {
+        if (death == 0) return "1";
+
+        return String.format("%,2f", (double) kill / death);
     }
 
 }
