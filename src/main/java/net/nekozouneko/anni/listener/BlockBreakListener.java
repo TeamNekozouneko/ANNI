@@ -10,6 +10,7 @@ import lombok.Getter;
 import net.nekozouneko.anni.ANNIPlugin;
 import net.nekozouneko.anni.arena.ANNIArena;
 import net.nekozouneko.anni.arena.team.ANNITeam;
+import net.nekozouneko.anni.kit.ANNIKit;
 import net.nekozouneko.anni.map.Nexus;
 import net.nekozouneko.anni.util.CmnUtil;
 import net.nekozouneko.commons.spigot.inventory.ItemStackBuilder;
@@ -102,6 +103,10 @@ public class BlockBreakListener implements Listener {
 
     public static Set<Material> getRegenerativeBlocks() {
         return Collections.unmodifiableSet(BLOCKS.keySet());
+    }
+
+    public static boolean isLog(Material material) {
+        return WOODS.contains(material);
     }
 
     static {
@@ -285,6 +290,17 @@ public class BlockBreakListener implements Listener {
                             }, 100);
                             break;
                         }
+                    }
+
+                    var arena = plugin.getCurrentGame();
+
+                    if (ANNIKit.get(arena.getKit(e.getPlayer())) == ANNIKit.LUMBERJACK) {
+                        if (!e.isDropItems()) {
+                            CmnUtil.giveOrDrop(e.getPlayer(), e.getBlock().getDrops(mainHand).toArray(new ItemStack[0]));
+                            return;
+                        }
+
+
                     }
                 }
                 else if (e.getBlock().getType() == Material.WHEAT) {
