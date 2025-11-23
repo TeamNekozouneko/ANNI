@@ -25,6 +25,7 @@ public enum ANNIKit {
     DEFAULT(new DefaultKit()),
     DEFENSE(new DefenseKit()),
     ENCHANTER(new EnchanterKit()),
+    LUMBERJACK(new LumberjackKit()),
     MOCHI_MOCHI(new MochiMochiKit()),
     MINER(new MinerKit()),
     SCOUTER(new ScouterKit()),
@@ -41,6 +42,7 @@ public enum ANNIKit {
         ID_MAP.put(DEFAULT.getKit().getId(), DEFAULT);
         ID_MAP.put(DEFENSE.getKit().getId(), DEFENSE);
         ID_MAP.put(ENCHANTER.getKit().getId(), ENCHANTER);
+        ID_MAP.put(LUMBERJACK.getKit().getId(), LUMBERJACK);
         ID_MAP.put(MOCHI_MOCHI.getKit().getId(), MOCHI_MOCHI);
         ID_MAP.put(MINER.getKit().getId(), MINER);
         ID_MAP.put(SCOUTER.getKit().getId(), SCOUTER);
