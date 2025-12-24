@@ -45,7 +45,7 @@ public class CombatShop extends AbstractGui {
         inventory.setItem(10, shopItem(Material.IRON_HELMET, 1, 1200));
         inventory.setItem(19, shopItem(Material.IRON_CHESTPLATE, 1, 1700));
         inventory.setItem(28, shopItem(Material.IRON_LEGGINGS, 1, 1500));
-        inventory.setItem(37, shopItem(Material.IRON_LEGGINGS, 1, 1200));
+        inventory.setItem(37, shopItem(Material.IRON_BOOTS, 1, 1200));
 
         // 武器/ツール
         inventory.setItem(12, shopItem(Material.IRON_SWORD, 1, 1500));
