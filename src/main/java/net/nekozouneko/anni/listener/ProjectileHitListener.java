@@ -35,6 +35,9 @@ public class ProjectileHitListener implements Listener {
             }
         }
 
-        dmg.damage(damage, snowball);
+        var victim = ANNIPlugin.getInstance().getPluginBoard().getEntityTeam(dmg);
+        var damager = ANNIPlugin.getInstance().getPluginBoard().getEntityTeam(snowball);
+
+        if (victim != damager) dmg.damage(damage, snowball);
     }
 }
