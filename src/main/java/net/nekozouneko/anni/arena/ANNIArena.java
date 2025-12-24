@@ -342,6 +342,7 @@ public class ANNIArena extends BukkitRunnable {
                 log.warning("Copy map failed.");
                 return false;
             }
+            copy.setGameRule(GameRule.LOCATOR_BAR, false);
             log.info("Copy complete.");
 
             RegionContainer rc = WorldGuard.getInstance().getPlatform().getRegionContainer();
