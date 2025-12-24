@@ -216,10 +216,12 @@ public final class ANNIPlugin extends JavaPlugin {
             event.registrar().register(ChargeCommand.get(Commands.literal("charge")).build());
             event.registrar().register(CombatShopCommand.get(Commands.literal("combat-shop")).build());
             event.registrar().register(CombatShopCommand.get(Commands.literal("cshop")).build());
+            event.registrar().register(CombatShopCommand.get(Commands.literal("shop-combat")).build());
             event.registrar().register(KitCommand.get(Commands.literal("kit")).build());
             event.registrar().register(PlayerCommand.get(Commands.literal("player")).build());
             event.registrar().register(PotionShopCommand.get(Commands.literal("potion-shop")).build());
             event.registrar().register(PotionShopCommand.get(Commands.literal("pshop")).build());
+            event.registrar().register(PotionShopCommand.get(Commands.literal("shop-potion")).build());
             event.registrar().register(SuicideCommand.get(Commands.literal("suicide")).build());
             event.registrar().register(SuicideCommand.get(Commands.literal("redeploy")).build());
             event.registrar().register(VoteCommand.get(Commands.literal("vote")).build());
