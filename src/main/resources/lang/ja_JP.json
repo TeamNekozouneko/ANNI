@@ -157,7 +157,7 @@
     "item.ender_furnace.name": "<light_purple>エンダーかまど",
     "item.ender_furnace.lore.0": "<gray>どこでも開けるあなただけのかまどです。",
 
-    "item.grappling_hook": "<green>グラップリングフック",
+    "item.grappling_hook.name": "<green>グラップリングフック",
     "item.grappling_hook.lore.0": "<gray>竿を投げ、巻き戻すと竿のあった場所にめがけて飛ぶことができる。",
     "item.grappling_hook.lore.1": "",
     "item.grappling_hook.lore.2": "<blue>クールダウン：5秒",
