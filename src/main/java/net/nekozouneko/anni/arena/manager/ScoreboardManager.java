@@ -70,7 +70,7 @@ public class ScoreboardManager {
                         fb.updateLines(tm.componentList(player, "scoreboard.begins_soon",
                                 datetime,
                                 arena.getTimer(),
-                                arena.getMap().getName()
+                                arena.getMap() != null ? arena.getMap().getName() : "--"
                         ));
                     }
                     case PHASE_ONE, PHASE_TWO, PHASE_THREE, PHASE_FOUR, PHASE_FIVE, GAME_OVER -> {
