@@ -187,7 +187,7 @@ public final class ANNIPlugin extends JavaPlugin {
                 Class.forName("com.vexsoftware.votifier.model.VotifierEvent");
                 getServer().getPluginManager().registerEvents(new VotifierListener(), this);
             } catch (ClassNotFoundException e) {
-                getLogger().info("Votifier event class is not defined.");
+                getLogger().info("Votifier event class is not loaded.");
             }
         }
 
@@ -215,10 +215,13 @@ public final class ANNIPlugin extends JavaPlugin {
         getLifecycleManager().registerEventHandler(LifecycleEvents.COMMANDS, event -> {
             event.registrar().register(ChargeCommand.get(Commands.literal("charge")).build());
             event.registrar().register(CombatShopCommand.get(Commands.literal("combat-shop")).build());
+            event.registrar().register(CombatShopCommand.get(Commands.literal("cshop")).build());
             event.registrar().register(KitCommand.get(Commands.literal("kit")).build());
             event.registrar().register(PlayerCommand.get(Commands.literal("player")).build());
             event.registrar().register(PotionShopCommand.get(Commands.literal("potion-shop")).build());
+            event.registrar().register(PotionShopCommand.get(Commands.literal("pshop")).build());
             event.registrar().register(SuicideCommand.get(Commands.literal("suicide")).build());
+            event.registrar().register(SuicideCommand.get(Commands.literal("redeploy")).build());
             event.registrar().register(VoteCommand.get(Commands.literal("vote")).build());
         });
 
