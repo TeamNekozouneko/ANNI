@@ -27,9 +27,10 @@ public class ProjectileHitListener implements Listener {
 
         double damage;
         switch (type) {
-            case WOODEN_AXE, GOLDEN_AXE-> damage = 3;
-            case STONE_AXE -> damage = 4;
-            case IRON_AXE, DIAMOND_AXE, NETHERITE_AXE -> damage = 5;
+            case WOODEN_AXE, GOLDEN_AXE-> damage = 2;
+            case STONE_AXE -> damage = 3;
+            case IRON_AXE -> damage = 4;
+            case DIAMOND_AXE, NETHERITE_AXE -> damage = 5;
             default -> {
                 return;
             }
