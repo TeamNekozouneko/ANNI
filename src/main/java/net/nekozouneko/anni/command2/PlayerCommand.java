@@ -87,8 +87,8 @@ public final class PlayerCommand {
                 profile.getName(), lvl, exp, LevelManager.calculateExpForNextLevel(lvl),
                 CmnUtil.progressBar(progress, 20),
                 String.format("%,d", plugin.getPointManager().getPoint(Bukkit.getOfflinePlayer(profile.getId()))),
-                death,
                 kill,
+                death,
                 kd(kill, death)
         );
     }
