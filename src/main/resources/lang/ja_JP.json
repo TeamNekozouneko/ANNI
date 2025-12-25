@@ -140,7 +140,7 @@
 
     "gui.team_selector.title": "チームを選択...",
 
-    "item.arijump.name": "<aqua>空中ジャンプ",
+    "item.airjump.name": "<aqua>空中ジャンプ",
     "item.airjump.lore.0": "<gray>右クリックすることで大きなジャンプができる",
     "item.airjump.lore.1": "",
     "item.airjump.lore.2": "<blue>クールタイム: 20秒",
