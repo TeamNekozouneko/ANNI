@@ -1,7 +1,5 @@
 package net.nekozouneko.anni.item;
 
-import net.md_5.bungee.api.ChatMessageType;
-import net.md_5.bungee.api.chat.TextComponent;
 import net.nekozouneko.anni.ANNIPlugin;
 import net.nekozouneko.anni.message.TranslationManager;
 import net.nekozouneko.anni.task.CooldownManager;
@@ -124,14 +122,11 @@ public class GrapplingHook implements Listener {
             if (!cm.isCooldownEnd(event.getPlayer().getUniqueId(), CooldownManager.Type.GRAPPLING_HOOK)) {
                 event.setCancelled(true);
 
-                event.getPlayer().spigot().sendMessage(ChatMessageType.ACTION_BAR,
-                        new TextComponent(
-                                ANNIPlugin.getInstance().getMessageManager().build(
-                                    "command.error.cooldown",
-                                        cm.getTimeLeftFormatted(event.getPlayer().getUniqueId(), CooldownManager.Type.GRAPPLING_HOOK)
-
-                                )
-                        )
+                event.getPlayer().sendActionBar(
+                            ANNIPlugin.getInstance().getTranslationManager().component(
+                                "command.error.cooldown",
+                                    cm.getTimeLeftFormatted(event.getPlayer().getUniqueId(), CooldownManager.Type.GRAPPLING_HOOK)
+                            )
                 );
                 event.getPlayer().playSound(event.getPlayer().getLocation(), Sound.ENTITY_GENERIC_EXTINGUISH_FIRE, 1, 2);
                 return;
