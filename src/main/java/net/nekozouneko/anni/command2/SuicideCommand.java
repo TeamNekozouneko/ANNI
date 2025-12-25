@@ -9,9 +9,9 @@ public class SuicideCommand {
 
     public static LiteralArgumentBuilder<CommandSourceStack> get(LiteralArgumentBuilder<CommandSourceStack> builder) {
         return builder
-                .requires(stack -> stack.getExecutor() != null && stack instanceof Damageable && stack.getSender().hasPermission("anni.command.suicide"))
+                .requires(stack -> stack.getSender() instanceof Damageable && stack.getSender().hasPermission("anni.command.suicide"))
                 .executes(stack -> {
-                    Damageable entity = (Damageable) stack.getSource().getExecutor();
+                    Damageable entity = (Damageable) stack.getSource().getSender();
 
                     entity.setHealth(0);
 
