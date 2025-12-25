@@ -67,10 +67,19 @@ public class ScoreboardManager {
                     case STARTING -> {
                         fb.updateTitle(tm.component(player, "scoreboard.title"));
 
-                        fb.updateLines(tm.componentList(player, "scoreboard.begins_soon",
+                        var map = arena.getMap();
+                        if (map == null)
+                            fb.updateLines(tm.componentList(player, "scoreboard.begins_soon",
+                                    datetime,
+                                    arena.getTimer(),
+                                    mapEntry(player, 0),
+                                    mapEntry(player, 1),
+                                    mapEntry(player, 2)
+                            ));
+                        else fb.updateLines(tm.componentList(player, "scoreboard.begins_soon.map_selected",
                                 datetime,
                                 arena.getTimer(),
-                                arena.getMap() != null ? arena.getMap().getName() : "--"
+                                arena.getMap().getName()
                         ));
                     }
                     case PHASE_ONE, PHASE_TWO, PHASE_THREE, PHASE_FOUR, PHASE_FIVE, GAME_OVER -> {
