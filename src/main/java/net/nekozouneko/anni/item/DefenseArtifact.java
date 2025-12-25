@@ -3,8 +3,6 @@ package net.nekozouneko.anni.item;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
-import net.md_5.bungee.api.ChatMessageType;
-import net.md_5.bungee.api.chat.TextComponent;
 import net.nekozouneko.anni.ANNIPlugin;
 import net.nekozouneko.anni.arena.ANNIArena;
 import net.nekozouneko.anni.arena.spectator.SpectatorManager;
@@ -78,7 +76,7 @@ public class DefenseArtifact implements Listener {
             if (for_first_check == time) {
                 player.getWorld().spawnParticle(
                         Particle.DRAGON_BREATH, player.getLocation(),
-                        1000, .1, .1, .1, 1
+                        1000, .1, .1, .1, .1F
                 );
                 player.getWorld().playSound(
                         player.getLocation(), Sound.BLOCK_ANVIL_USE, 1, 0
@@ -165,9 +163,9 @@ public class DefenseArtifact implements Listener {
         CooldownManager cm = ANNIPlugin.getInstance().getCooldownManager();
 
         if (!cm.isCooldownEnd(event.getPlayer().getUniqueId(), CooldownManager.Type.DEFENSE_ARTIFACT)) {
-            event.getPlayer().spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(ANNIPlugin.getInstance().getMessageManager().build(
+            event.getPlayer().sendActionBar(ANNIPlugin.getInstance().getTranslationManager().component(
                     "command.error.cooldown", cm.getTimeLeftFormatted(event.getPlayer().getUniqueId(), CooldownManager.Type.DEFENSE_ARTIFACT)
-            )));
+            ));
             event.getPlayer().playSound(event.getPlayer().getLocation(), Sound.ENTITY_GENERIC_EXTINGUISH_FIRE, 1, 2);
             return;
         }
