@@ -63,7 +63,7 @@ public class Swapper implements Listener {
             return;
         }
 
-        cm.set(e.getPlayer().getUniqueId(), CooldownManager.Type.SWAPPER, 120*1000);
+        cm.set(e.getPlayer().getUniqueId(), CooldownManager.Type.SWAPPER, 30*1000);
 
         Snowball snowball = e.getPlayer().launchProjectile(Snowball.class);
         snowball.setItem(ItemStack.of(Material.MUSIC_DISC_CAT));
