@@ -76,7 +76,7 @@ public class DefenseArtifact implements Listener {
             if (for_first_check == time) {
                 player.getWorld().spawnParticle(
                         Particle.DRAGON_BREATH, player.getLocation(),
-                        1000, .1, .1, .1, .1F
+                        1000, .1, .1, .1, .1F, 1F
                 );
                 player.getWorld().playSound(
                         player.getLocation(), Sound.BLOCK_ANVIL_USE, 1, 0
