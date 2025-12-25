@@ -487,7 +487,7 @@ public class ANNIArena extends BukkitRunnable {
                 playerListService.showPlayerLevels(player.getUniqueId());
             });
             log.info("Removing player from team...");
-            teamManager.getTeams().forEach((color, team) -> {
+            new HashMap<>(teamManager.getTeams()).forEach((color, team) -> {
                 team.getPlayers().forEach(teamManager::leave);
             });
             log.info("Cancelling tasks...");
