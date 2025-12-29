@@ -64,16 +64,16 @@
     "command.error.no_permissions": "<red>権限が不足しています。",
     "command.error.region_not_found": "<red>「<0>」という保護領域が見つかりませんでした。",
 
-    "command.rule.0": "&7**** &cAnnihilationの遊び方&7 ****&r",
-    "command.rule.1": "&7・&f相手の拠点に侵入し、ネクサスを壊そう！",
-    "command.rule.2": "&7・&fあなたのチームのネクサスが破壊されたらリスポーンできない。",
-    "command.rule.3": "&7・&fフェーズ1ではネクサスを壊せないから、その間に準備をしておこう。",
-    "command.rule.4": "&7・&fフェーズ2からネクサスが壊せます。",
-    "command.rule.5": "&7・&fフェーズ3ではダイヤモンドやエメラルドといった希少な鉱石が採掘できるようになります。",
-    "command.rule.6": "&7・&fフェーズ4になるとネクサスに対してのダメージが2に増加します。守りも固めておこう。",
-    "command.rule.7": "&7・&fフェーズ5になると1秒ごとにネクサスのダメージが1になるまで減り続ける。",
-    "command.rule.8": "&7・&f/kitを打つとキットが選択できる。好きなキットを使って戦ってみよう。",
-    "command.rule.9": "&7・&f/vote <map>でゲーム開始前にマップが投票できる。気になるマップなどに投票してみよう。",
+    "command.rule.0": "<gray>**** <red>Annihilationの遊び方<gray> ****",
+    "command.rule.1": "<gray>・<white>相手の拠点に侵入し、ネクサスを壊そう！",
+    "command.rule.2": "<gray>・<white>あなたのチームのネクサスが破壊されたらリスポーンできない。",
+    "command.rule.3": "<gray>・<white>フェーズ1ではネクサスを壊せないから、その間に準備をしておこう。",
+    "command.rule.4": "<gray>・<white>フェーズ2からネクサスが壊せます。",
+    "command.rule.5": "<gray>・<white>フェーズ3ではダイヤモンドやエメラルドといった希少な鉱石が採掘できるようになります。",
+    "command.rule.6": "<gray>・<white>フェーズ4になるとネクサスに対してのダメージが2に増加します。守りも固めておこう。",
+    "command.rule.7": "<gray>・<white>フェーズ5になると1秒ごとにネクサスのダメージが1になるまで減り続ける。",
+    "command.rule.8": "<gray>・<white>/kitを打つとキットが選択できる。好きなキットを使って戦ってみよう。",
+    "command.rule.9": "<gray>・<white>/vote <map>でゲーム開始前にマップが投票できる。気になるマップなどに投票してみよう。",
 
     "command.usage": "<red>使用方法: <0>",
 
@@ -123,8 +123,8 @@
     "gui.map_editor.set_team_nexus_loc": "<green><0>のネクサスの位置を設定しました。<gray>(<1>)",
 
     "gui.map_selector.title": "マップを選択... (<0>/<1>)",
-    "gui.map_selector.map_lore.0": "&7ID: <0>",
-    "gui.map_selector.map_lore.1": "&7ワールド: <1>",
+    "gui.map_selector.map_lore.0": "<gray>ID: <0>",
+    "gui.map_selector.map_lore.1": "<gray>ワールド: <1>",
 
     "gui.point_charger.title": "ポイントをチャージ",
     "gui.point_charger.charged": "<green>合計 <white><0>をチャージしました。",
