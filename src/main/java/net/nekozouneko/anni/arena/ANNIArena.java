@@ -6,6 +6,7 @@ import com.sk89q.worldguard.protection.flags.Flags;
 import com.sk89q.worldguard.protection.flags.StateFlag;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.*;
+import com.viaversion.viaversion.api.Via;
 import lombok.Getter;
 import lombok.Setter;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
@@ -65,7 +66,7 @@ public class ANNIArena extends BukkitRunnable {
     private final BossbarManager bossbarManager;
     @Getter
     private VoteManager voteManager;
-    private final ScoreboardManager scoreboardManager = new ScoreboardManager(this);
+    private final ScoreboardManager scoreboardManager;
     @Getter
     private RechargeManager rechargeManager = null;
     @Getter
@@ -107,6 +108,7 @@ public class ANNIArena extends BukkitRunnable {
         this.teamManager = teamManager;
         this.saveDataRepository = saveDataRepository;
         this.playerListService = playerListService;
+        this.scoreboardManager = new ScoreboardManager(this, plugin.getBoardManager(), plugin.getTranslationManager(), Via.getAPI());
     }
 
     public void join(Player player) {

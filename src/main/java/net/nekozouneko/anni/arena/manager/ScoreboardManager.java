@@ -1,9 +1,10 @@
 package net.nekozouneko.anni.arena.manager;
 
-import com.viaversion.viaversion.api.Via;
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.Multimap;
 import com.viaversion.viaversion.api.ViaAPI;
 import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
-import fr.mrmicky.fastboard.adventure.FastBoard;
+import lombok.RequiredArgsConstructor;
 import net.kyori.adventure.text.Component;
 import net.nekozouneko.anni.ANNIConfig;
 import net.nekozouneko.anni.ANNIPlugin;
@@ -17,138 +18,187 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
+@RequiredArgsConstructor
 public class ScoreboardManager {
 
     private final ANNIArena arena;
+    private final BoardManager boardManager;
+    private final TranslationManager translationManager;
+    private final ViaAPI<Player> viaApi;
 
-    public ScoreboardManager(ANNIArena arena) {
-        this.arena = arena;
-    }
+    private final Map<Locale, SimpleDateFormat> cachedFormat = new HashMap<>();
+
+    private record BoardOutput(Component title, List<Component> lines) {}
 
     public void update() {
-        BoardManager bm = ANNIPlugin.getInstance().getBoardManager();
-        TranslationManager tm = ANNIPlugin.getInstance().getTranslationManager();
-        ViaAPI<Player> viaApi = Via.getAPI();
+        Multimap<Locale, Player> localePlayerMap = HashMultimap.create();
+        Multimap<Locale, Player> legacyLocalePlayerMap = HashMultimap.create();
 
-        for (Player player : Bukkit.getOnlinePlayers()) {
-            try {
-                FastBoard fb = bm.get(player); //TODO
-                SimpleDateFormat df = new SimpleDateFormat(tm.string(player, "format.scoreboard_datetime"));
-                Component datetime = Component.text(df.format(Calendar.getInstance().getTime()));
+        var loaded = translationManager.getLoadedLocales();
+        Bukkit.getOnlinePlayers().forEach(player -> {
+            boolean usingLoaded = loaded.contains(player.locale());
 
-                switch (arena.getState()) {
-                    case WAITING -> {
-                        fb.updateTitle(tm.component(player, "scoreboard.title"));
+            if (arena.getState().isInArena() && viaApi.getPlayerVersion(player) < ProtocolVersion.v1_13.getVersion()) { //legacy
+                if (usingLoaded)
+                    legacyLocalePlayerMap.put(player.locale(), player);
+                else legacyLocalePlayerMap.put(ANNIConfig.getDefaultLocale(), player);
+            }
+            else { // modern
+                if (usingLoaded)
+                    localePlayerMap.put(player.locale(), player);
+                else localePlayerMap.put(ANNIConfig.getDefaultLocale(), player);
+            }
+        });
 
-                        ANNIMap map = arena.getMap();
-                        long enabledTeams = arena.getTeamManager().getTeams().size();
-                        long requiredPlayers = (enabledTeams * ANNIConfig.getTeamMinPlayers()) - Bukkit.getOnlinePlayers().size();
+        final Date now = new Date();
+        Map<Locale, BoardOutput> boards = new HashMap<>();
 
-                        if (map != null)
-                            fb.updateLines(tm.componentList(player, "scoreboard.not_enough.map_selected",
-                                    datetime,
-                                    requiredPlayers,
-                                    map.getName()
-                            ));
-                        else {
-                            fb.updateLines(tm.componentList(player, "scoreboard.not_enough",
-                                    datetime,
-                                    requiredPlayers,
-                                    mapEntry(player, 0),
-                                    mapEntry(player, 1),
-                                    mapEntry(player, 2)
-                            ));
-                        }
-                    }
-                    case STARTING -> {
-                        fb.updateTitle(tm.component(player, "scoreboard.title"));
+        if (!legacyLocalePlayerMap.isEmpty()) {
+            Map<Locale, BoardOutput> legacy = new HashMap<>();
 
-                        var map = arena.getMap();
-                        if (map == null)
-                            fb.updateLines(tm.componentList(player, "scoreboard.begins_soon",
-                                    datetime,
-                                    arena.getTimer(),
-                                    mapEntry(player, 0),
-                                    mapEntry(player, 1),
-                                    mapEntry(player, 2)
-                            ));
-                        else fb.updateLines(tm.componentList(player, "scoreboard.begins_soon.map_selected",
-                                datetime,
-                                arena.getTimer(),
-                                arena.getMap().getName()
-                        ));
-                    }
-                    case PHASE_ONE, PHASE_TWO, PHASE_THREE, PHASE_FOUR, PHASE_FIVE, GAME_OVER -> {
-                        if (viaApi.getPlayerVersion(player) < ProtocolVersion.v1_13.getVersion()) {
-                            if (arena.getMap() != null && arena.getMap().getName() != null)
-                                fb.updateTitle(tm.component(player, "scoreboard.playing.short.title", arena.getMap().getName()));
-                            else fb.updateTitle(tm.component(player, "scoreboard.title"));
+            legacyLocalePlayerMap.keySet().forEach(locale -> {
+                legacy.put(locale, generateLegacyLocalized(locale));
+            });
 
-                            fb.updateLines(
-                                    tm.component(player, "scoreboard.playing.short.team_entry", tm.component(player, ANNITeam.RED.getNameKey()), nexusHealth(player, ANNITeam.RED)),
-                                    tm.component(player, "scoreboard.playing.short.team_entry", tm.component(player, ANNITeam.BLUE.getNameKey()), nexusHealth(player, ANNITeam.BLUE)),
-                                    tm.component(player, "scoreboard.playing.short.team_entry", tm.component(player, ANNITeam.GREEN.getNameKey()), nexusHealth(player, ANNITeam.GREEN)),
-                                    tm.component(player, "scoreboard.playing.short.team_entry", tm.component(player, ANNITeam.YELLOW.getNameKey()), nexusHealth(player, ANNITeam.YELLOW))
-                            );
-                        }
-                        else {
-                            fb.updateTitle(tm.component(player, "scoreboard.title"));
-                            fb.updateLines(tm.componentList(player, "scoreboard.playing",
-                                    datetime,
-                                    nexusState(player, ANNITeam.RED),
-                                    nexusState(player, ANNITeam.BLUE),
-                                    nexusState(player, ANNITeam.GREEN),
-                                    nexusState(player, ANNITeam.YELLOW),
-                                    nexusHealth(player, ANNITeam.RED),
-                                    nexusHealth(player, ANNITeam.BLUE),
-                                    nexusHealth(player, ANNITeam.GREEN),
-                                    nexusHealth(player, ANNITeam.YELLOW),
-                                    arena.getMap().getName()
-                            ));
-                        }
-                    }
-                    default -> fb.updateLines(tm.componentList(player, "scoreboard.stopped", datetime));
+            new HashSet<>(localePlayerMap.keySet()).forEach(locale -> {
+                final var output = legacy.get(locale);
+
+                legacyLocalePlayerMap.get(locale).forEach(player -> {
+                    var board = boardManager.get(player);
+
+                    if (board.getTitle() == null || !board.getTitle().equals(output.title)) board.updateTitle(output.title());
+
+                    board.updateLines(output.lines());
+                });
+            });
+        }
+
+        localePlayerMap.keySet().forEach(locale -> {
+            boards.put(locale, generateLocalized(locale, now));
+        });
+
+        new HashSet<>(localePlayerMap.keySet()).forEach(locale -> {
+            final var output = boards.get(locale);
+
+            localePlayerMap.get(locale).forEach(player -> {
+                var board = boardManager.get(player);
+
+                if (board.getTitle() == null || !board.getTitle().equals(output.title)) board.updateTitle(output.title());
+
+                board.updateLines(output.lines());
+            });
+        });
+    }
+
+    private BoardOutput generateLocalized(Locale locale, Date now) {
+        SimpleDateFormat df = cachedFormat.computeIfAbsent(locale, (loc) -> new SimpleDateFormat(translationManager.string("format.scoreboard_datetime")));
+        Component datetime = Component.text(df.format(now));
+
+        Component title = translationManager.component(locale, "scoreboard.title");
+        List<Component> lines;
+
+        switch (arena.getState()) {
+            case WAITING -> {
+                ANNIMap map = arena.getMap();
+                long enabledTeams = arena.getTeamManager().getTeams().size();
+                long requiredPlayers = (enabledTeams * ANNIConfig.getTeamMinPlayers()) - Bukkit.getOnlinePlayers().size();
+
+                if (map != null)
+                    lines = translationManager.componentList(locale, "scoreboard.not_enough.map_selected",
+                            datetime,
+                            requiredPlayers,
+                            map.getName()
+                    );
+                else {
+                    lines = translationManager.componentList(locale, "scoreboard.not_enough",
+                            datetime,
+                            requiredPlayers,
+                            mapEntry(locale, 0),
+                            mapEntry(locale, 1),
+                            mapEntry(locale, 2)
+                    );
                 }
             }
-            catch (Exception e) {
-                e.printStackTrace();
+            case STARTING -> {
+                var map = arena.getMap();
+                if (map == null)
+                    lines = translationManager.componentList(locale, "scoreboard.begins_soon",
+                            datetime,
+                            arena.getTimer(),
+                            mapEntry(locale, 0),
+                            mapEntry(locale, 1),
+                            mapEntry(locale, 2)
+                    );
+                else lines = translationManager.componentList(locale, "scoreboard.begins_soon.map_selected",
+                        datetime,
+                        arena.getTimer(),
+                        arena.getMap().getName()
+                );
             }
+            case PHASE_ONE, PHASE_TWO, PHASE_THREE, PHASE_FOUR, PHASE_FIVE, GAME_OVER -> {
+                lines = translationManager.componentList(locale, "scoreboard.playing",
+                        datetime,
+                        nexusState(locale, ANNITeam.RED),
+                        nexusState(locale, ANNITeam.BLUE),
+                        nexusState(locale, ANNITeam.GREEN),
+                        nexusState(locale, ANNITeam.YELLOW),
+                        nexusHealth(locale, ANNITeam.RED),
+                        nexusHealth(locale, ANNITeam.BLUE),
+                        nexusHealth(locale, ANNITeam.GREEN),
+                        nexusHealth(locale, ANNITeam.YELLOW),
+                        arena.getMap().getName()
+                );
+            }
+            default -> lines = translationManager.componentList(locale, "scoreboard.stopped", datetime);
         }
+
+        return new BoardOutput(title, lines);
     }
 
-    private Component nexusState(Player player, ANNITeam color) {
-        TranslationManager translation = ANNIPlugin.getInstance().getTranslationManager();
+    private BoardOutput generateLegacyLocalized(Locale locale) {
+        Component title;
 
+        if (arena.getMap() != null && arena.getMap().getName() != null)
+            title = translationManager.component(locale, "scoreboard.playing.short.title", arena.getMap().getName());
+        else title = translationManager.component(locale, "scoreboard.title");
+
+        List<Component> lines = Arrays.asList(
+                translationManager.component(locale, "scoreboard.playing.short.team_entry", translationManager.component(locale, ANNITeam.RED.getNameKey()), nexusHealth(locale, ANNITeam.RED)),
+                translationManager.component(locale, "scoreboard.playing.short.team_entry", translationManager.component(locale, ANNITeam.BLUE.getNameKey()), nexusHealth(locale, ANNITeam.BLUE)),
+                translationManager.component(locale, "scoreboard.playing.short.team_entry", translationManager.component(locale, ANNITeam.GREEN.getNameKey()), nexusHealth(locale, ANNITeam.GREEN)),
+                translationManager.component(locale, "scoreboard.playing.short.team_entry", translationManager.component(locale, ANNITeam.YELLOW.getNameKey()), nexusHealth(locale, ANNITeam.YELLOW))
+        );
+
+        return new BoardOutput(title, lines);
+    }
+
+    private Component nexusState(Locale locale, ANNITeam color) {
         var team = arena.getTeamManager().getTeam(color);
 
-        return translation.component(player, team == null || team.isLost() ? "scoreboard.nexus.state.lost" : "scoreboard.nexus.state.active");
+        return translationManager.component(locale, team == null || team.isLost() ? "scoreboard.nexus.state.lost" : "scoreboard.nexus.state.active");
     }
 
-    private Component nexusHealth(Player player, ANNITeam team) {
-        TranslationManager translation = ANNIPlugin.getInstance().getTranslationManager();
-        var teamManager = ANNIPlugin.getInstance().getCurrentGame().getTeamManager();
+    private Component nexusHealth(Locale locale, ANNITeam team) {
+        var teamManager = arena.getTeamManager();
 
         Integer health = teamManager.isEnabled(team) ? teamManager.getTeam(team).getNexus().getHealth() : null;
 
         return health != null ?
-                Component.text(String.format(translation.string(player, "format.nexus_health"), health))
-                : translation.component(player, "scoreboard.nexus.health.none");
+                Component.text(String.format(translationManager.string(locale, "format.nexus_health"), health))
+                : translationManager.component(locale, "scoreboard.nexus.health.none");
     }
 
-    private Component mapEntry(Player player, int index) {
-        TranslationManager translation = ANNIPlugin.getInstance().getTranslationManager();
+    private Component mapEntry(Locale locale, int index) {
         VoteManager vote = ANNIPlugin.getInstance().getCurrentGame().getVoteManager();
         List<Map.Entry<String, Integer>> results = vote.getSortedResults();
 
         if (results.isEmpty() || results.size() <= index)
-            return translation.component(player, "scoreboard.entry", "-", "-");
+            return translationManager.component(locale, "scoreboard.entry", "-", "-");
 
         Map.Entry<String, Integer> entry = results.get(index);
 
-        return translation.component(player, "scoreboard.entry", entry.getKey(), entry.getValue());
+        return translationManager.component(locale, "scoreboard.entry", entry.getKey(), entry.getValue());
     }
 }

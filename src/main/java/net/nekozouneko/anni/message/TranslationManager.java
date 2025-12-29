@@ -17,6 +17,12 @@ public class TranslationManager {
     private final Locale defaultLocale;
     private final Map<Locale, Map<String, String>> data;
 
+    private static final String RESET_STYLES =  "<!i><!b><!u><!st><!obf>";
+
+    public Set<Locale> getLoadedLocales() {
+        return data.keySet();
+    }
+
     public Component component(String key, Object... args) {
         return component(defaultLocale, key, args);
     }
@@ -26,9 +32,9 @@ public class TranslationManager {
     }
 
     public Component component(Locale locale, String key, Object... args) {
-        String message = "<!i><!b><!u><!st><!obf>" + rawString(locale, key);
+        String message = RESET_STYLES + rawString(locale, key);
 
-        if (message.isEmpty()) return Component.empty();
+        if (message.length() - RESET_STYLES.length() == 0) return Component.empty();
 
         List<TagResolver> argResolvers = new ArrayList<>();
         for (int i = 0; i < args.length; i++) {
