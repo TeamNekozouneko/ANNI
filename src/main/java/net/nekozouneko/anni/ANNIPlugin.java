@@ -6,6 +6,7 @@ import com.google.gson.JsonObject;
 import io.papermc.paper.command.brigadier.Commands;
 import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
 import lombok.Getter;
+import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.nekozouneko.anni.arena.ANNIArena;
 import net.nekozouneko.anni.arena.manager.FurnaceManager;
 import net.nekozouneko.anni.arena.spectator.SpectatorTask;
@@ -329,7 +330,7 @@ public final class ANNIPlugin extends JavaPlugin {
             }
         }
 
-        translationManager = new TranslationManager(ANNIConfig.getDefaultLocale(), messages);
+        translationManager = new TranslationManager(MiniMessage.miniMessage(), ANNIConfig.getDefaultLocale(), messages);
     }
 
     private void registerRecipe() {
