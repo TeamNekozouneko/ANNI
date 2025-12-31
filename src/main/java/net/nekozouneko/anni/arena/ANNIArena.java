@@ -484,6 +484,7 @@ public class ANNIArena extends BukkitRunnable {
                 player.spigot().respawn();
                 initPlayer(player);
                 Players.clearPotionEffects(player);
+                log.info("Lobby teleported for: " + player.getName());
                 player.teleport(plugin.getLobby());
                 player.setFlying(player.getGameMode() == GameMode.CREATIVE || player.getGameMode() == GameMode.SPECTATOR);
                 playerListService.showPlayerLevels(player.getUniqueId());
