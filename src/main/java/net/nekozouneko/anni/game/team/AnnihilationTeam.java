@@ -5,7 +5,6 @@ import lombok.RequiredArgsConstructor;
 import net.nekozouneko.anni.arena.team.ANNITeam;
 import net.nekozouneko.anni.game.Nexus;
 
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
@@ -31,7 +30,7 @@ public class AnnihilationTeam {
     }
 
     public Set<UUID> getPlayers() {
-        return Collections.unmodifiableSet(players);
+        return Set.copyOf(players);
     }
 
 }

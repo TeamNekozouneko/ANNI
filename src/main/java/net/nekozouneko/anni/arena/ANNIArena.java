@@ -484,15 +484,14 @@ public class ANNIArena extends BukkitRunnable {
                 player.spigot().respawn();
                 initPlayer(player);
                 Players.clearPotionEffects(player);
-                log.info("Lobby teleported for: " + player.getName());
                 player.teleport(plugin.getLobby());
                 player.setFlying(player.getGameMode() == GameMode.CREATIVE || player.getGameMode() == GameMode.SPECTATOR);
                 playerListService.showPlayerLevels(player.getUniqueId());
             });
             log.info("Removing player from team...");
-            new HashMap<>(teamManager.getTeams()).forEach((color, team) -> {
-                team.getPlayers().forEach(teamManager::leave);
-            });
+            teamManager.getTeams().values().forEach(team ->
+                team.getPlayers().forEach(teamManager::leave)
+            );
             log.info("Cancelling tasks...");
             DefenseArtifact.cancelAllTasks();
             if (rechargeManager != null && !rechargeManager.isCancelled()) rechargeManager.cancel();

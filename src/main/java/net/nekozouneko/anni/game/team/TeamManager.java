@@ -5,7 +5,6 @@ import net.nekozouneko.anni.ANNIConfig;
 import net.nekozouneko.anni.arena.team.ANNITeam;
 import net.nekozouneko.anni.game.Nexus;
 
-import java.util.Collections;
 import java.util.EnumMap;
 import java.util.Map;
 import java.util.UUID;
@@ -62,7 +61,7 @@ public class TeamManager {
     }
 
     public Map<ANNITeam, AnnihilationTeam> getTeams() {
-        return Collections.unmodifiableMap(teams);
+        return Map.copyOf(teams);
     }
 
 }
