@@ -4,6 +4,7 @@ import net.kyori.adventure.key.Key;
 import net.kyori.adventure.sound.Sound;
 import net.nekozouneko.anni.ANNIPlugin;
 import net.nekozouneko.anni.task.CooldownManager;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -70,6 +71,7 @@ public class Swapper implements Listener {
         snowball.setGravity(false);
 
         snowball.getPersistentDataContainer().set(new NamespacedKey(ANNIPlugin.getInstance(), "special-item"), PersistentDataType.STRING, "swapper");
+        Bukkit.getScheduler().runTaskLater(ANNIPlugin.getInstance(), snowball::remove, 20 * 10);
     }
 
     @EventHandler
