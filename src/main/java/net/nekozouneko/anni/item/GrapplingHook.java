@@ -15,7 +15,6 @@ import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.player.PlayerFishEvent;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataHolder;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.potion.PotionEffectType;
@@ -54,8 +53,7 @@ public class GrapplingHook implements Listener {
             return;
         }
 
-        if (isGrapplingHook(event.getHook()))
-            return;
+        if (!isGrapplingHook(event.getHook())) return;
 
         CooldownManager cm = ANNIPlugin.getInstance().getCooldownManager();
 
@@ -87,10 +85,7 @@ public class GrapplingHook implements Listener {
         if (event.getEntity().getShooter() == null) return;
         if (!(event.getEntity() instanceof FishHook)) return;
 
-        PersistentDataContainer c = event.getEntity().getPersistentDataContainer();
-
-        if (c.getOrDefault(new NamespacedKey(ANNIPlugin.getInstance(), "grappling-hook"), PersistentDataType.INTEGER, 0) != 1)
-            return;
+        if (!isGrapplingHook(event.getEntity())) return;
 
         if (event.getHitEntity() != null) {
             event.setCancelled(true);
@@ -136,7 +131,7 @@ public class GrapplingHook implements Listener {
         }
 
         event.getHook().getPersistentDataContainer()
-                .set(new NamespacedKey(ANNIPlugin.getInstance(), "grappling-hook"), PersistentDataType.INTEGER, 1);
+                .set(new NamespacedKey(ANNIPlugin.getInstance(), "special-item"), PersistentDataType.STRING, "grappling-hook");
         event.getHook().setVelocity(event.getHook().getVelocity().multiply(1.75));
     }
 
