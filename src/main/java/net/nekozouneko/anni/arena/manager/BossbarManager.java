@@ -20,6 +20,7 @@ public class BossbarManager {
 
     private final ANNIArena arena;
     private final Map<Locale, KeyedBossBar> bossBars = new HashMap<>();
+    private final Set<Locale> usingLocale = new HashSet<>();
 
     public BossbarManager(ANNIArena arena) {
         this.arena = arena;
@@ -30,27 +31,37 @@ public class BossbarManager {
     }
     
     public void update() {
-        Set<Locale> locales = new HashSet<>();
+        usingLocale.clear();
+        var translation = ANNIPlugin.getInstance().getTranslationManager();
 
         Bukkit.getOnlinePlayers().forEach(player -> {
-            locales.add(player.locale());
-            var bossBar = bossBars.get(player.locale());
+            Locale playerLocale = player.locale() != null && translation.getLoadedLocales().contains(player.locale()) ? player.locale() : ANNIConfig.getDefaultLocale();
+
+            usingLocale.add(playerLocale);
+            var bossBar = bossBars.get(playerLocale);
 
             if (bossBar == null) {
-                bossBar = Bukkit.createBossBar(new NamespacedKey(ANNIPlugin.getInstance(), player.locale().toLanguageTag().toLowerCase()), "", BarColor.BLUE, BarStyle.SOLID);
-                bossBars.put(player.locale(), bossBar);
+                bossBar = Bukkit.createBossBar(new NamespacedKey(ANNIPlugin.getInstance(), playerLocale.toLanguageTag().toLowerCase()), "", BarColor.BLUE, BarStyle.SOLID);
+                var prev = bossBars.put(playerLocale, bossBar);
+
+                if (prev != null) {
+                    prev.removeAll();
+                    Bukkit.removeBossBar(prev.getKey());
+                }
             }
 
             bossBar.addPlayer(player);
         });
 
-        if (!locales.containsAll(bossBars.keySet())) {
+        if (!usingLocale.containsAll(bossBars.keySet())) {
             new HashSet<>(bossBars.keySet()).forEach(locale -> {
-                if (!locales.contains(locale)) Bukkit.removeBossBar(bossBars.remove(locale).getKey());
+                if (!usingLocale.contains(locale)) {
+                    var removed = bossBars.remove(locale);
+                    removed.removeAll();
+                    Bukkit.removeBossBar(removed.getKey());
+                }
             });
         }
-
-        TranslationManager translation = ANNIPlugin.getInstance().getTranslationManager();
 
         LegacyComponentSerializer serializer = LegacyComponentSerializer.legacySection();
 
