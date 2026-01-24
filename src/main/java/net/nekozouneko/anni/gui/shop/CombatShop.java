@@ -54,7 +54,7 @@ public class CombatShop extends AbstractGui {
         inventory.setItem(22, shopItem(Material.CROSSBOW, 1, 1700));
 
         inventory.setItem(39, shopItem(Material.SHIELD, 1, 1500));
-        inventory.setItem(40, shopItem(Material.ARROW, 1, 800));
+        inventory.setItem(40, shopItem(Material.ARROW, 16, 800));
 
         // 食料
         inventory.setItem(15, shopItem(Material.COOKED_BEEF, 16, 500));
