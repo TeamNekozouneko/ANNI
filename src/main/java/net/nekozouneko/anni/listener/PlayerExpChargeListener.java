@@ -1,21 +1,18 @@
 package net.nekozouneko.anni.listener;
 
-import net.nekozouneko.anni.ANNIPlugin;
-import net.nekozouneko.anni.kit.ANNIKit;
+import lombok.RequiredArgsConstructor;
+import net.nekozouneko.anni.game.PlayerExpChargeService;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerExpChangeEvent;
 
+@RequiredArgsConstructor
 public class PlayerExpChargeListener implements Listener {
+
+    private final PlayerExpChargeService service;
 
     @EventHandler
     public void onExpCharge(PlayerExpChangeEvent event) {
-        var arena = ANNIPlugin.getInstance().getCurrentGame();
-
-        if (!arena.getState().isInArena()) return;
-
-        if (ANNIKit.getKitById(arena.getKit(event.getPlayer()).getId()) != ANNIKit.ENCHANTER) return;
-
-        event.setAmount(event.getAmount() * 2);
+        event.setAmount(service.getChargeAmount(event.getPlayer(), event.getAmount()));
     }
 }

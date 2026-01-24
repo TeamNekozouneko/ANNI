@@ -7,9 +7,11 @@ import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import com.sk89q.worldguard.protection.regions.RegionContainer;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import net.nekozouneko.anni.ANNIPlugin;
 import net.nekozouneko.anni.arena.ANNIArena;
 import net.nekozouneko.anni.arena.team.ANNITeam;
+import net.nekozouneko.anni.game.PlayerExpChargeService;
 import net.nekozouneko.anni.kit.ANNIKit;
 import net.nekozouneko.anni.map.Nexus;
 import net.nekozouneko.anni.util.CmnUtil;
@@ -29,6 +31,7 @@ import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.IntSupplier;
 
+@RequiredArgsConstructor
 public class BlockBreakListener implements Listener {
 
     @AllArgsConstructor
@@ -166,6 +169,8 @@ public class BlockBreakListener implements Listener {
         }
     }
 
+    private final PlayerExpChargeService playerExpChargeService;
+
     @EventHandler(ignoreCancelled = true)
     public void onBreak(BlockBreakEvent e) {
         var tm = ANNIPlugin.getInstance().getTranslationManager();
@@ -256,7 +261,7 @@ public class BlockBreakListener implements Listener {
                     e.setExpToDrop(0);
                     e.setDropItems(false);
                     int exp = info.getXp();
-                    if (exp > 0) e.getPlayer().giveExp(exp);
+                    if (exp > 0) e.getPlayer().giveExp(playerExpChargeService.getChargeAmount(e.getPlayer(), exp));
 
                     new RegenerateBlockTask(info, e.getBlock().getType(), e.getBlock().getBlockData(), e.getBlock().getLocation())
                             .runTaskTimer(ANNIPlugin.getInstance(), 0, 20);
@@ -279,7 +284,7 @@ public class BlockBreakListener implements Listener {
                             );
 
                             e.setDropItems(false);
-                            e.getPlayer().giveExp(e.getExpToDrop());
+                            e.getPlayer().giveExp(playerExpChargeService.getChargeAmount(e.getPlayer(), e.getExpToDrop()));
                             e.setExpToDrop(0);
 
                             BlockData cloned = e.getBlock().getBlockData().clone(); // ブロックデータを複製
