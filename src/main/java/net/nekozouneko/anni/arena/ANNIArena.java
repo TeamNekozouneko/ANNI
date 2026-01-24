@@ -41,6 +41,7 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Firework;
 import org.bukkit.entity.Player;
+import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.FireworkMeta;
 import org.bukkit.persistence.PersistentDataContainer;
@@ -806,7 +807,12 @@ public class ANNIArena extends BukkitRunnable {
     }
 
     private void initPlayer(Player player) {
+        player.setItemOnCursor(null);
         player.getInventory().clear();
+
+        var open = player.getOpenInventory().getTopInventory();
+        if (open.getType() == InventoryType.CRAFTING || open.getType() == InventoryType.CRAFTER || open.getType() == InventoryType.WORKBENCH) open.clear();
+
         player.getEnderChest().clear();
         player.setHealth(player.getAttribute(Attribute.MAX_HEALTH).getValue());
         player.setFoodLevel(20);
