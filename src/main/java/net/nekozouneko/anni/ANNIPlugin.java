@@ -21,6 +21,7 @@ import net.nekozouneko.anni.command2.SuicideCommand;
 import net.nekozouneko.anni.command2.VoteCommand;
 import net.nekozouneko.anni.database.Database;
 import net.nekozouneko.anni.database.impl.SQLiteDatabase;
+import net.nekozouneko.anni.game.PlayerExpChargeService;
 import net.nekozouneko.anni.game.StatisticChangeService;
 import net.nekozouneko.anni.game.save.PaperSaveDataRepository;
 import net.nekozouneko.anni.game.team.PaperTeamRepository;
@@ -160,8 +161,10 @@ public final class ANNIPlugin extends JavaPlugin {
 
         pluginBoard = getServer().getScoreboardManager().getNewScoreboard();
 
+        var playerExpChargeService = new PlayerExpChargeService(currentGame);
+
         getServer().getPluginManager().registerEvents(new AsyncPlayerChatListener(), this);
-        getServer().getPluginManager().registerEvents(new BlockBreakListener(), this);
+        getServer().getPluginManager().registerEvents(new BlockBreakListener(playerExpChargeService), this);
         getServer().getPluginManager().registerEvents(new BlockPlaceListener(), this);
         getServer().getPluginManager().registerEvents(new PlayerDamageListener(), this);
         getServer().getPluginManager().registerEvents(new PlayerDeathListener(), this);
@@ -174,7 +177,6 @@ public final class ANNIPlugin extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new BlockPistonListener(), this);
         getServer().getPluginManager().registerEvents(new InventoryClickListener(), this);
         getServer().getPluginManager().registerEvents(new EnchantItemListener(), this);
-        getServer().getPluginManager().registerEvents(new PlayerExpChargeListener(), this);
         getServer().getPluginManager().registerEvents(new BlockDropItemListener(), this);
         getServer().getPluginManager().registerEvents(new ProjectileHitListener(), this);
 
@@ -231,6 +233,7 @@ public final class ANNIPlugin extends JavaPlugin {
 
         registerRecipe();
 
+        getServer().getPluginManager().registerEvents(new PlayerExpChargeListener(playerExpChargeService), this);
         getServer().getPluginManager().registerEvents(new PlayerInteractListener(currentGame), this);
         getServer().getPluginManager().registerEvents(new PlayerStatisticIncrementListener(new StatisticChangeService(currentGame)), this);
     }
