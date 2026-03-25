@@ -34,7 +34,7 @@ public class PaperTeamRepository implements TeamRepository {
         team.color(color.getColor());
         team.setAllowFriendlyFire(false);
         team.setCanSeeFriendlyInvisibles(true);
-        team.setOption(Team.Option.NAME_TAG_VISIBILITY, Team.OptionStatus.FOR_OWN_TEAM);
+        team.setOption(Team.Option.NAME_TAG_VISIBILITY, Team.OptionStatus.FOR_OTHER_TEAMS);
 
         teams.put(color, team);
     }
