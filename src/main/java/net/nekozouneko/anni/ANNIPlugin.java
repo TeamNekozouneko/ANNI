@@ -161,10 +161,7 @@ public final class ANNIPlugin extends JavaPlugin {
 
         pluginBoard = getServer().getScoreboardManager().getNewScoreboard();
 
-        var playerExpChargeService = new PlayerExpChargeService(currentGame);
-
         getServer().getPluginManager().registerEvents(new AsyncPlayerChatListener(), this);
-        getServer().getPluginManager().registerEvents(new BlockBreakListener(playerExpChargeService), this);
         getServer().getPluginManager().registerEvents(new BlockPlaceListener(), this);
         getServer().getPluginManager().registerEvents(new PlayerDamageListener(), this);
         getServer().getPluginManager().registerEvents(new PlayerDeathListener(), this);
@@ -208,6 +205,8 @@ public final class ANNIPlugin extends JavaPlugin {
         var teamManager = new TeamManager(new PaperTeamRepository(pluginBoard));
 
         currentGame = new ANNIArena(this, teamManager, new PaperSaveDataRepository(teamManager), new PaperPlayerListService(levelManager));
+        var playerExpChargeService = new PlayerExpChargeService(currentGame);
+        getServer().getPluginManager().registerEvents(new BlockBreakListener(playerExpChargeService), this);
         spectatorTask = new SpectatorTask();
         currentGame.runTaskTimer(this, 0, 20);
         spectatorTask.runTaskTimer(this, 0, 20);
