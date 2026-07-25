@@ -6,6 +6,7 @@ import net.nekozouneko.anni.arena.ANNIArena;
 import net.nekozouneko.anni.kit.ANNIKit;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
+import org.bukkit.block.Shelf;
 import org.bukkit.entity.Snowball;
 import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
@@ -30,6 +31,11 @@ public class PlayerInteractListener implements Listener {
         if (!event.getAction().isRightClick()) return;
 
         if (!arena.getState().isInArena()) return;
+
+        if (event.getClickedBlock() != null && event.getClickedBlock() instanceof Shelf) {
+            event.setCancelled(true);
+            return;
+        }
 
         if (ANNIKit.get(arena.getKit(event.getPlayer())) != ANNIKit.LUMBERJACK) return;
 
