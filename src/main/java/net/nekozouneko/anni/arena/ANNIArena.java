@@ -7,6 +7,7 @@ import com.sk89q.worldguard.protection.flags.StateFlag;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.*;
 import com.viaversion.viaversion.api.Via;
+import io.papermc.paper.registry.keys.GameRuleKeys;
 import lombok.Getter;
 import lombok.Setter;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
@@ -169,7 +170,17 @@ public class ANNIArena extends BukkitRunnable {
         players.remove(player);
 
         if (state.getId() > 0 && teamManager.getTeamColorByPlayer(player.getUniqueId()) != null) {
-            if (PlayerDamageListener.isFighting(player)) {
+            var container = WorldGuard.getInstance().getPlatform().getRegionContainer();
+            var regionManager = container.get(BukkitAdapter.adapt(copy));
+            var enemyRegions = new ArrayList<>(map.getTeamRegions().values());
+            enemyRegions.remove(map.getTeamRegion(getTeamManager().getTeamColorByPlayer(player.getUniqueId())));
+            var regions = regionManager.getApplicableRegions(BukkitAdapter.asBlockVector(player.getLocation())).getRegions()
+                    .stream().map(ProtectedRegion::getId);
+
+            boolean isInEnemyRegion = regions.anyMatch(enemyRegions::contains);
+            boolean isFighting = PlayerDamageListener.isFighting(player);
+
+            if (isFighting || isInEnemyRegion) {
                 Arrays.stream(player.getInventory().getContents())
                         .filter(Objects::nonNull)
                         .filter(is -> {
@@ -182,9 +193,9 @@ public class ANNIArena extends BukkitRunnable {
                         })
                         .forEach(item -> player.getWorld().dropItemNaturally(player.getLocation(), item));
 
-                saveDataRepository.save(player.getUniqueId(), true);
+                saveDataRepository.save(player.getUniqueId(), isFighting, isInEnemyRegion);
             }
-            else saveDataRepository.save(player.getUniqueId(), false);
+            else saveDataRepository.save(player.getUniqueId(), false, false);
 
             player.getInventory().clear();
         }
@@ -345,7 +356,7 @@ public class ANNIArena extends BukkitRunnable {
                 log.warning("Copy map failed.");
                 return false;
             }
-            copy.setGameRule(GameRule.LOCATOR_BAR, false);
+            copy.setGameRule(GameRules.LOCATOR_BAR, false);
             log.info("Copy complete.");
 
             RegionContainer rc = WorldGuard.getInstance().getPlatform().getRegionContainer();
