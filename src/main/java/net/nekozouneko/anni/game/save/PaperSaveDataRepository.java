@@ -31,7 +31,7 @@ public class PaperSaveDataRepository implements SaveDataRepository {
     }
 
     @Override
-    public boolean load(UUID player) {
+    public SavedResult load(UUID player) {
         var playerData = data.get(player);
         var bukkitPlayer = Bukkit.getPlayer(player);
 
@@ -42,15 +42,16 @@ public class PaperSaveDataRepository implements SaveDataRepository {
         if (!playerData.saveOnlyTeamColor()) {
             bukkitPlayer.getInventory().setContents(playerData.inventory());
             bukkitPlayer.getEnderChest().setContents(playerData.enderChest());
-            bukkitPlayer.teleportAsync(playerData.lastLocation());
+            if (playerData.lastLocation != null)
+                bukkitPlayer.teleportAsync(playerData.lastLocation());
             bukkitPlayer.setHealth(playerData.health());
             bukkitPlayer.setLevel(playerData.level());
             bukkitPlayer.setExp(playerData.experience());
 
-            return true;
+            return new SavedResult(playerData.lastLocation() != null, true);
         }
 
-        return false;
+        return new SavedResult(false, false);
     }
 
     @Override
@@ -59,7 +60,7 @@ public class PaperSaveDataRepository implements SaveDataRepository {
     }
 
     @Override
-    public void save(UUID player, boolean saveOnlyTeamColor) {
+    public void save(UUID player, boolean saveOnlyTeamColor, boolean resetPosition) {
         var bukkitPlayer = Bukkit.getPlayer(player);
 
         Preconditions.checkArgument(bukkitPlayer != null);
@@ -69,7 +70,7 @@ public class PaperSaveDataRepository implements SaveDataRepository {
                 teamManager.getTeamColorByPlayer(player),
                 saveOnlyTeamColor ? null : bukkitPlayer.getInventory().getContents().clone(),
                 saveOnlyTeamColor ? null : bukkitPlayer.getEnderChest().getContents().clone(),
-                saveOnlyTeamColor ? null : bukkitPlayer.getLocation().clone(),
+                saveOnlyTeamColor || resetPosition ? null : bukkitPlayer.getLocation().clone(),
                 saveOnlyTeamColor ? 0 : bukkitPlayer.getHealth(),
                 saveOnlyTeamColor ? 0 : bukkitPlayer.getLevel(),
                 saveOnlyTeamColor ? 0 : bukkitPlayer.getExp()
