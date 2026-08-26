@@ -6,7 +6,8 @@ import net.nekozouneko.anni.arena.ArenaState;
 import net.nekozouneko.anni.arena.team.ANNITeam;
 import net.nekozouneko.anni.gui.AbstractGui;
 import net.nekozouneko.anni.gui.map.MapSelector;
-import net.nekozouneko.anni.message.MessageManager;
+import net.nekozouneko.anni.message.TranslationManager;
+import net.nekozouneko.anni.util.CmnUtil;
 import net.nekozouneko.commons.spigot.inventory.ItemStackBuilder;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -21,7 +22,7 @@ import org.bukkit.persistence.PersistentDataType;
 
 public class ArenaDashboard extends AbstractGui {
 
-    private final MessageManager mm = plugin.getMessageManager();
+    private final TranslationManager tm = plugin.getTranslationManager();
     private final ANNIArena arena = plugin.getCurrentGame();
     private final NamespacedKey act = new NamespacedKey(plugin, "arena-action");
 
@@ -32,7 +33,7 @@ public class ArenaDashboard extends AbstractGui {
     @Override
     public void update() {
         if (inventory == null)
-            inventory = Bukkit.createInventory(this, 27, mm.build("gui.arena_dashboard.title", arena.getId()));
+            inventory = Bukkit.createInventory(this, 27, tm.component(player, "gui.arena_dashboard.title"));
 
         inventory.clear();
         for (int i = 0; i < inventory.getSize(); i++)
@@ -41,96 +42,102 @@ public class ArenaDashboard extends AbstractGui {
                             .name(" ")
                             .build()
             );
+        
+        var teamManager = arena.getTeamManager();
 
-        inventory.setItem(1,
-                ItemStackBuilder.of(Material.RED_WOOL)
-                        .name(ANNITeam.RED.getColoredName())
-                        .build()
-        );
-        inventory.setItem(2,
-                ItemStackBuilder.of(Material.BLUE_WOOL)
-                        .name(ANNITeam.BLUE.getColoredName())
-                        .build()
-        );
-        inventory.setItem(3,
-                ItemStackBuilder.of(Material.GREEN_WOOL)
-                        .name(ANNITeam.GREEN.getColoredName())
-                        .build()
-        );
-        inventory.setItem(4,
-                ItemStackBuilder.of(Material.YELLOW_WOOL)
-                        .name(ANNITeam.YELLOW.getColoredName())
-                        .build()
-        );
+        var red = ItemStack.of(Material.RED_WOOL);
+        red.editMeta(m -> m.displayName(tm.component(player, ANNITeam.RED.getNameKey())));
 
-        inventory.setItem(10,
-                ItemStackBuilder.of(arena.isEnabledTeam(ANNITeam.RED) ? Material.END_STONE : Material.BEDROCK)
-                        .name(arena.isEnabledTeam(ANNITeam.RED) ?
-                                mm.build("gui.arena_dashboard.enabled_nexus") :
-                                mm.build("gui.arena_dashboard.disabled_nexus"))
-                        .persistentData(act, PersistentDataType.STRING, "toggle-red")
-                        .build()
+        inventory.setItem(1, red);
+
+        var blue = ItemStack.of(Material.BLUE_WOOL);
+        blue.editMeta(m -> m.displayName(tm.component(player, ANNITeam.BLUE.getNameKey())));
+
+        inventory.setItem(2, blue);
+
+        var green = ItemStack.of(Material.GREEN_WOOL);
+        green.editMeta(m -> m.displayName(tm.component(player, ANNITeam.GREEN.getNameKey())));
+
+        inventory.setItem(3, green);
+
+        var yellow = ItemStack.of(Material.YELLOW_WOOL);
+        yellow.editMeta(m -> m.displayName(tm.component(player, ANNITeam.YELLOW.getNameKey())));
+
+        inventory.setItem(4, yellow);
+
+        var toggleRed = ItemStack.of(teamManager.isEnabled(ANNITeam.RED) ? Material.END_STONE : Material.BEDROCK);
+        toggleRed.editMeta(m -> m.displayName(
+                teamManager.isEnabled(ANNITeam.RED) ?
+                        tm.component(player, "gui.arena_dashboard.enabled_nexus") :
+                        tm.component(player, "gui.arena_dashboard.disabled_nexus")
+                )
         );
-        inventory.setItem(11,
-                ItemStackBuilder.of(arena.isEnabledTeam(ANNITeam.BLUE) ? Material.END_STONE : Material.BEDROCK)
-                        .name(arena.isEnabledTeam(ANNITeam.BLUE) ?
-                                mm.build("gui.arena_dashboard.enabled_nexus") :
-                                mm.build("gui.arena_dashboard.disabled_nexus"))
-                        .persistentData(act, PersistentDataType.STRING, "toggle-blue")
-                        .build()
+        CmnUtil.editPDC(toggleRed, c -> c.set(act, PersistentDataType.STRING, "toggle-red"));
+        inventory.setItem(10, toggleRed);
+
+        var toggleBlue = ItemStack.of(teamManager.isEnabled(ANNITeam.BLUE) ? Material.END_STONE : Material.BEDROCK);
+        toggleBlue.editMeta(m -> m.displayName(
+                        teamManager.isEnabled(ANNITeam.BLUE) ?
+                                tm.component(player, "gui.arena_dashboard.enabled_nexus") :
+                                tm.component(player, "gui.arena_dashboard.disabled_nexus")
+                )
         );
-        inventory.setItem(12,
-                ItemStackBuilder.of(arena.isEnabledTeam(ANNITeam.GREEN) ? Material.END_STONE : Material.BEDROCK)
-                        .name(arena.isEnabledTeam(ANNITeam.GREEN) ?
-                                mm.build("gui.arena_dashboard.enabled_nexus") :
-                                mm.build("gui.arena_dashboard.disabled_nexus"))
-                        .persistentData(act, PersistentDataType.STRING, "toggle-green")
-                        .build()
+        CmnUtil.editPDC(toggleBlue, c -> c.set(act, PersistentDataType.STRING, "toggle-blue"));
+        inventory.setItem(11, toggleBlue);
+
+        var toggleGreen = ItemStack.of(teamManager.isEnabled(ANNITeam.GREEN) ? Material.END_STONE : Material.BEDROCK);
+        toggleGreen.editMeta(m -> m.displayName(
+                        teamManager.isEnabled(ANNITeam.GREEN) ?
+                                tm.component(player, "gui.arena_dashboard.enabled_nexus") :
+                                tm.component(player, "gui.arena_dashboard.disabled_nexus")
+                )
         );
-        inventory.setItem(13,
-                ItemStackBuilder.of(arena.isEnabledTeam(ANNITeam.YELLOW) ? Material.END_STONE : Material.BEDROCK)
-                        .name(arena.isEnabledTeam(ANNITeam.YELLOW) ?
-                                mm.build("gui.arena_dashboard.enabled_nexus") :
-                                mm.build("gui.arena_dashboard.disabled_nexus"))
-                        .persistentData(act, PersistentDataType.STRING, "toggle-yellow")
-                        .build()
+        CmnUtil.editPDC(toggleGreen, c -> c.set(act, PersistentDataType.STRING, "toggle-green"));
+        inventory.setItem(12, toggleGreen);
+
+        var toggleYellow = ItemStack.of(teamManager.isEnabled(ANNITeam.YELLOW) ? Material.END_STONE : Material.BEDROCK);
+        toggleYellow.editMeta(m -> m.displayName(
+                        teamManager.isEnabled(ANNITeam.YELLOW) ?
+                                tm.component(player, "gui.arena_dashboard.enabled_nexus") :
+                                tm.component(player, "gui.arena_dashboard.disabled_nexus")
+                )
         );
+        CmnUtil.editPDC(toggleYellow, c -> c.set(act, PersistentDataType.STRING, "toggle-yellow"));
+        inventory.setItem(13, toggleYellow);
 
         // マップ
-        inventory.setItem(6,
-                ItemStackBuilder.of(Material.MAP)
-                        .name(mm.build("gui.arena_dashboard.select_map"))
-                        .persistentData(act, PersistentDataType.STRING, "select-map")
-                        .build()
-        );
+        var map = ItemStack.of(Material.MAP);
+        map.editMeta(m -> m.displayName(tm.component("gui.arena_dashboard.select_map")));
+        CmnUtil.editPDC(map, c -> c.set(act, PersistentDataType.STRING, "select-map"));
+
+        inventory.setItem(15, map);
 
         Material icon;
-        String display;
+        String displayNameKey;
         switch (arena.getState()) {
             case STOPPED: {
                 icon = Material.YELLOW_CONCRETE;
-                display = mm.build("gui.arena_dashboard.launch.restore");
+                displayNameKey = "gui.arena_dashboard.launch.restore";
                 break;
             }
             case WAITING:
             case STARTING: {
                 icon = Material.LIME_CONCRETE;
-                display = mm.build("gui.arena_dashboard.launch.start");
+                displayNameKey = "gui.arena_dashboard.launch.start";
                 break;
             }
             default: {
                 icon = Material.REDSTONE_BLOCK;
-                display = mm.build("gui.arena_dashboard.launch.end_now");
+                displayNameKey = "gui.arena_dashboard.launch.end_now";
                 break;
             }
         }
 
-        inventory.setItem(26,
-                ItemStackBuilder.of(icon)
-                        .name(display)
-                        .persistentData(act, PersistentDataType.STRING, "launch")
-                        .build()
-        );
+        ItemStack launchButton = ItemStack.of(icon);
+        launchButton.editMeta(m -> m.displayName(tm.component(player, displayNameKey)));
+        CmnUtil.editPDC(launchButton, c -> c.set(act, PersistentDataType.STRING, "launch"));
+
+        inventory.setItem(26, launchButton);
     }
 
     @EventHandler
@@ -168,8 +175,8 @@ public class ArenaDashboard extends AbstractGui {
                     new MapSelector(plugin, player, 1, true, (map) -> {
                         arena.setMap(map);
                         if (map != null)
-                            player.sendMessage(mm.build("command.arena.set_map", map.getId()));
-                        else player.sendMessage(mm.build("command.arena.map_random"));
+                            player.sendMessage(tm.component(player, "command.arena.set_map", map.getId()));
+                        else player.sendMessage(tm.component(player,"command.arena.map_random"));
                     }).open()
                 );
                 break;
@@ -181,9 +188,9 @@ public class ArenaDashboard extends AbstractGui {
                         break;
                     case WAITING:
                     case STARTING:
-                        player.sendMessage(mm.build("command.arena.starting"));
+                        player.sendMessage(tm.component(player, "command.arena.starting"));
                         if (!arena.start()) {
-                            player.sendMessage(mm.build("command.err.game_start_failed"));
+                            player.sendMessage(tm.component(player, "command.error.game_start_failed"));
                         }
                         break;
                     default:
@@ -206,19 +213,21 @@ public class ArenaDashboard extends AbstractGui {
     }
 
     private void toggleTeam(ANNITeam at) {
-        if (arena.isEnabledTeam(at)) {
-            if (arena.getTeams().size() > 2) {
-                arena.disableTeam(at);
+        var teamManager = arena.getTeamManager();
+        
+        if (teamManager.isEnabled(at)) {
+            if (teamManager.getTeams().size() > 2) {
+                teamManager.disable(at);
             }
             else {
-                player.sendMessage(mm.build("command.err.no_more_teams_can_be_disabled"));
+                player.sendMessage(tm.component(player, "command.error.disable_team_limited"));
                 return;
             }
         }
-        else arena.enableTeam(at);
+        else teamManager.enable(at);
 
-        if (arena.isEnabledTeam(at))
-            player.sendMessage(mm.build("command.arena.enabled_team", at.getTeamName()));
-        else player.sendMessage(mm.build("command.arena.disabled_team", at.getTeamName()));
+        if (teamManager.isEnabled(at))
+            player.sendMessage(tm.component(player,"command.arena.enabled_team", tm.component(player, at.getNameKey())));
+        else player.sendMessage(tm.component(player, "command.arena.disabled_team", tm.component(player, at.getNameKey())));
     }
 }

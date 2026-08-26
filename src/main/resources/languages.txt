@@ -1,0 +1,2 @@
+lang/ja_JP.json
+lang/en_US.json

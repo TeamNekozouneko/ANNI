@@ -1,5 +1,6 @@
 package net.nekozouneko.anni.gui.shop;
 
+import net.kyori.adventure.text.Component;
 import net.nekozouneko.anni.ANNIPlugin;
 import net.nekozouneko.anni.gui.AbstractGui;
 import net.nekozouneko.anni.message.MessageManager;
@@ -30,172 +31,41 @@ public class PotionShop extends AbstractGui {
     @Override
     public void update() {
         if (inventory == null)
-            inventory = Bukkit.createInventory(this, 54, mm.build("gui.potion_shop.title"));
-
-        for (int i = 0; i < inventory.getSize(); i++)
-            inventory.setItem(i, ItemStackBuilder.of(Material.GRAY_STAINED_GLASS_PANE)
-                    .name(" ")
-                    .build()
+            inventory = Bukkit.createInventory(
+                    this, 54, ANNIPlugin.getInstance().getTranslationManager()
+                            .component(player, "gui.potion_shop.title")
             );
 
-        NamespacedKey price = new NamespacedKey(plugin, "price");
+        ItemStack background = ItemStack.of(Material.GRAY_STAINED_GLASS_PANE);
+        background.editMeta(meta -> {
+            meta.displayName(Component.space());
+        });
+
+        for (int i = 0; i < inventory.getSize(); i++)
+            inventory.setItem(i, background);
 
         // 基本アイテム
-        inventory.setItem(10,
-                ItemStackBuilder.of(Material.BREWING_STAND)
-                        .persistentData(price, PersistentDataType.DOUBLE, 1500.)
-                        .lore(Collections.singletonList(
-                                mm.build("gui.shop.price", "1500", mm.build("gui.shop.ext"))
-                        ))
-                        .build()
-        );
-        inventory.setItem(11,
-                ItemStackBuilder.of(Material.GLASS_BOTTLE)
-                        .amount(3)
-                        .persistentData(price, PersistentDataType.DOUBLE, 300.)
-                        .lore(Collections.singletonList(
-                                mm.build("gui.shop.price", "300", mm.build("gui.shop.ext"))
-                        ))
-                        .build()
-        );
-        inventory.setItem(12,
-                ItemStackBuilder.of(Material.NETHER_WART)
-                        .persistentData(price, PersistentDataType.DOUBLE, 700.)
-                        .lore(Collections.singletonList(
-                                mm.build("gui.shop.price", "700", mm.build("gui.shop.ext"))
-                        ))
-                        .build()
-        );
-        inventory.setItem(13,
-                ItemStackBuilder.of(Material.GLOWSTONE_DUST)
-                        .persistentData(price, PersistentDataType.DOUBLE, 500.)
-                        .lore(Collections.singletonList(
-                                mm.build("gui.shop.price", "500", mm.build("gui.shop.ext"))
-                        ))
-                        .build()
-        );
-        inventory.setItem(14,
-                ItemStackBuilder.of(Material.REDSTONE)
-                        .persistentData(price, PersistentDataType.DOUBLE, 500.)
-                        .lore(Collections.singletonList(
-                                mm.build("gui.shop.price", "500", mm.build("gui.shop.ext"))
-                        ))
-                        .build()
-        );
-        inventory.setItem(15,
-                ItemStackBuilder.of(Material.GUNPOWDER)
-                        .persistentData(price, PersistentDataType.DOUBLE, 600.)
-                        .lore(Collections.singletonList(
-                                mm.build("gui.shop.price", "600", mm.build("gui.shop.ext"))
-                        ))
-                        .build()
-        );
-        inventory.setItem(16,
-                ItemStackBuilder.of(Material.DRAGON_BREATH)
-                        .persistentData(price, PersistentDataType.DOUBLE, 700.)
-                        .lore(Collections.singletonList(
-                                mm.build("gui.shop.price", "700", mm.build("gui.shop.ext"))
-                        ))
-                        .build()
-        );
+        inventory.setItem(10, shopItem(Material.BREWING_STAND, 1, 1500));
+        inventory.setItem(11, shopItem(Material.GLASS_BOTTLE, 3, 300));
+        inventory.setItem(12, shopItem(Material.NETHER_WART, 1, 700));
+        inventory.setItem(13, shopItem(Material.GLOWSTONE_DUST, 1, 500));
+        inventory.setItem(14, shopItem(Material.REDSTONE, 1, 500));
+        inventory.setItem(15, shopItem(Material.GUNPOWDER, 1, 600));
+        inventory.setItem(16, shopItem(Material.DRAGON_BREATH, 1, 700));
 
         // 材料
-        inventory.setItem(28,
-                ItemStackBuilder.of(Material.FERMENTED_SPIDER_EYE)
-                        .persistentData(price, PersistentDataType.DOUBLE, 700.)
-                        .lore(Collections.singletonList(
-                                mm.build("gui.shop.price", "700", mm.build("gui.shop.ext"))
-                        ))
-                        .build()
-        );
-        inventory.setItem(29,
-                ItemStackBuilder.of(Material.BLAZE_POWDER)
-                        .persistentData(price, PersistentDataType.DOUBLE, 700.)
-                        .lore(Collections.singletonList(
-                                mm.build("gui.shop.price", "700", mm.build("gui.shop.ext"))
-                        ))
-                        .build()
-        );
-        inventory.setItem(30,
-                ItemStackBuilder.of(Material.SUGAR)
-                        .persistentData(price, PersistentDataType.DOUBLE, 600.)
-                        .lore(Collections.singletonList(
-                                mm.build("gui.shop.price", "600", mm.build("gui.shop.ext"))
-                        ))
-                        .build()
-        );
-        inventory.setItem(31,
-                ItemStackBuilder.of(Material.RABBIT_FOOT)
-                        .persistentData(price, PersistentDataType.DOUBLE, 600.)
-                        .lore(Collections.singletonList(
-                                mm.build("gui.shop.price", "600", mm.build("gui.shop.ext"))
-                        ))
-                        .build()
-        );
-        inventory.setItem(32,
-                ItemStackBuilder.of(Material.GLISTERING_MELON_SLICE)
-                        .persistentData(price, PersistentDataType.DOUBLE, 600.)
-                        .lore(Collections.singletonList(
-                                mm.build("gui.shop.price", "600", mm.build("gui.shop.ext"))
-                        ))
-                        .build()
-        );
-        inventory.setItem(33,
-                ItemStackBuilder.of(Material.SPIDER_EYE)
-                        .persistentData(price, PersistentDataType.DOUBLE, 600.)
-                        .lore(Collections.singletonList(
-                                mm.build("gui.shop.price", "600", mm.build("gui.shop.ext"))
-                        ))
-                        .build()
-        );
-        inventory.setItem(34,
-                ItemStackBuilder.of(Material.PUFFERFISH)
-                        .persistentData(price, PersistentDataType.DOUBLE, 600.)
-                        .lore(Collections.singletonList(
-                                mm.build("gui.shop.price", "600", mm.build("gui.shop.ext"))
-                        ))
-                        .build()
-        );
-        inventory.setItem(37,
-                ItemStackBuilder.of(Material.MAGMA_CREAM)
-                        .persistentData(price, PersistentDataType.DOUBLE, 600.)
-                        .lore(Collections.singletonList(
-                                mm.build("gui.shop.price", "600", mm.build("gui.shop.ext"))
-                        ))
-                        .build()
-        );
-        inventory.setItem(38,
-                ItemStackBuilder.of(Material.GOLDEN_CARROT)
-                        .persistentData(price, PersistentDataType.DOUBLE, 600.)
-                        .lore(Collections.singletonList(
-                                mm.build("gui.shop.price", "600", mm.build("gui.shop.ext"))
-                        ))
-                        .build()
-        );
-        inventory.setItem(39,
-                ItemStackBuilder.of(Material.GHAST_TEAR)
-                        .persistentData(price, PersistentDataType.DOUBLE, 600.)
-                        .lore(Collections.singletonList(
-                                mm.build("gui.shop.price", "600", mm.build("gui.shop.ext"))
-                        ))
-                        .build()
-        );
-        inventory.setItem(40,
-                ItemStackBuilder.of(Material.TURTLE_HELMET)
-                        .persistentData(price, PersistentDataType.DOUBLE, 600.)
-                        .lore(Collections.singletonList(
-                                mm.build("gui.shop.price", "600", mm.build("gui.shop.ext"))
-                        ))
-                        .build()
-        );
-        inventory.setItem(41,
-                ItemStackBuilder.of(Material.PHANTOM_MEMBRANE)
-                        .persistentData(price, PersistentDataType.DOUBLE, 600.)
-                        .lore(Collections.singletonList(
-                                mm.build("gui.shop.price", "600", mm.build("gui.shop.ext"))
-                        ))
-                        .build()
-        );
+        inventory.setItem(28, shopItem(Material.FERMENTED_SPIDER_EYE, 1, 700));
+        inventory.setItem(29, shopItem(Material.BLAZE_POWDER, 1, 700));
+        inventory.setItem(30, shopItem(Material.SUGAR, 1, 600));
+        inventory.setItem(31, shopItem(Material.RABBIT_FOOT, 1, 600));
+        inventory.setItem(32, shopItem(Material.GLISTERING_MELON_SLICE, 1, 600));
+        inventory.setItem(33, shopItem(Material.SPIDER_EYE, 1, 600));
+        inventory.setItem(34, shopItem(Material.PUFFERFISH, 1, 600));
+        inventory.setItem(37, shopItem(Material.MAGMA_CREAM, 1, 600));
+        inventory.setItem(38, shopItem(Material.GOLDEN_CARROT, 1, 600));
+        inventory.setItem(39, shopItem(Material.GHAST_TEAR, 1, 600));
+        inventory.setItem(40, shopItem(Material.TURTLE_HELMET, 1, 600));
+        inventory.setItem(41, shopItem(Material.PHANTOM_MEMBRANE, 1, 600));
     }
 
     @EventHandler
@@ -208,7 +78,8 @@ public class PotionShop extends AbstractGui {
 
         ItemStack item = e.getCurrentItem();
         PersistentDataContainer pdc = item.getItemMeta().getPersistentDataContainer();
-        NamespacedKey price = new NamespacedKey(plugin, "price");
+        var price = new NamespacedKey(plugin, "price");
+        var translation = ANNIPlugin.getInstance().getTranslationManager();
 
         if (pdc.has(price, PersistentDataType.DOUBLE)) {
             double val = pdc.get(price, PersistentDataType.DOUBLE);
@@ -219,12 +90,11 @@ public class PotionShop extends AbstractGui {
                         .build();
                 VaultUtil.getEco().withdrawPlayer(player, val);
                 CmnUtil.giveOrDrop(player, clone);
-                player.sendMessage(mm.build("gui.shop.purchased", String.valueOf(val), mm.build("gui.shop.ext")));
+                player.sendMessage(translation.component(player, "gui.shop.purchased", VaultUtil.getEco().format(val)));
             }
             else {
-                player.sendMessage(mm.build("gui.shop.more_points",
-                        String.format("%,.1f", val - VaultUtil.getEco().getBalance(player)),
-                        mm.build("gui.shop.ext")
+                player.sendMessage(translation.component(player, "gui.shop.more_points",
+                        VaultUtil.getEco().format(val - VaultUtil.getEco().getBalance(player))
                 ));
             }
         }
@@ -235,5 +105,26 @@ public class PotionShop extends AbstractGui {
         if (e.getInventory().getHolder() != this) return;
 
         unregisterAllGuiListeners(((Player) e.getPlayer()));
+    }
+
+    private ItemStack shopItem(Material material, int amount, double price) {
+        ItemStack item = ItemStack.of(material);
+        item.setAmount(amount);
+
+        item.editMeta(meta -> {
+            meta.getPersistentDataContainer().set(
+                    new NamespacedKey(ANNIPlugin.getInstance(), "price"),
+                    PersistentDataType.DOUBLE, price
+            );
+
+            meta.lore(Collections.singletonList(
+                    ANNIPlugin.getInstance().getTranslationManager().component(
+                            player, "gui.shop.price",
+                            VaultUtil.getEco().format(price)
+                    )
+            ));
+        });
+
+        return item;
     }
 }

@@ -27,15 +27,15 @@ public class CreateKitSubCommand extends ASubCommand {
         String name = args.size() >= 3 ? String.join(" ", args.subList(2, args.size())) : id;
 
         if (ANNIPlugin.getInstance().getCustomKitManager().getKit(id) != null) {
-            sender.sendMessage(mm.build("command.err.kit_exists"));
+            sender.sendMessage(mm.build("command.error.kit_exists"));
             return true;
         }
 
-        CustomKit ck = new CustomKit(id, shortName, Material.CHEST, name, Collections.emptyList(), new ItemStack[0], Collections.emptyList());
+        CustomKit ck = new CustomKit(id, name, shortName, Material.CHEST, new ItemStack[0]);
 
         try (BufferedWriter writer = new BufferedWriter(
                 new OutputStreamWriter(new FileOutputStream(
-                        new File(ANNIPlugin.getInstance().getKitsDir(), id + ".json")
+                        new File(ANNIPlugin.getInstance().getDefaultKitsDir(), id + ".json")
                 ), StandardCharsets.UTF_8)
         )) {
             FileUtil.createGson().toJson(ck, CustomKit.class, writer);
@@ -44,11 +44,11 @@ public class CreateKitSubCommand extends ASubCommand {
             if (ANNIPlugin.getInstance().getCustomKitManager().getKit(id) != null) {
                 sender.sendMessage(mm.build("command.createkit.success", name, shortName));
             }
-            else sender.sendMessage(mm.build("command.err.unknown"));
+            else sender.sendMessage(mm.build("command.error.unknown"));
         }
         catch (IOException e) {
             e.printStackTrace();
-            sender.sendMessage(mm.build("command.err.ioe"));
+            sender.sendMessage(mm.build("command.error.io"));
         }
 
         return true;

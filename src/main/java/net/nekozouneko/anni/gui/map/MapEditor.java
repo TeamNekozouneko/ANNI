@@ -1,16 +1,17 @@
 package net.nekozouneko.anni.gui.map;
 
+import net.kyori.adventure.text.Component;
 import net.nekozouneko.anni.ANNIPlugin;
 import net.nekozouneko.anni.arena.team.ANNITeam;
 import net.nekozouneko.anni.gui.AbstractGui;
 import net.nekozouneko.anni.listener.BlockBreakListener;
 import net.nekozouneko.anni.map.ANNIMap;
 import net.nekozouneko.anni.map.SpawnLocation;
-import net.nekozouneko.anni.message.MessageManager;
-import net.nekozouneko.commons.spigot.inventory.ItemStackBuilder;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
+import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -31,137 +32,163 @@ public class MapEditor extends AbstractGui {
 
     @Override
     public void update() {
-        final MessageManager mm = plugin.getMessageManager();
+        var translation = ANNIPlugin.getInstance().getTranslationManager();
         NamespacedKey act = new NamespacedKey(plugin, "action");
 
         if (inventory == null)
             inventory = Bukkit.createInventory(
                     this, 27,
-                    mm.build("gui.map_editor.title", map.getId())
+                    translation.component(player, "gui.map_editor.title", map.getId())
             );
         inventory.clear();
 
+        ItemStack background = ItemStack.of(Material.GRAY_STAINED_GLASS_PANE);
+        background.editMeta(meta -> meta.displayName(Component.space()));
+
         for (int i = 0; i < inventory.getSize(); i++)
-            inventory.setItem(i,
-                    ItemStackBuilder.of(Material.GRAY_STAINED_GLASS_PANE)
-                            .name(" ")
-                            .build()
-            );
+            inventory.setItem(i, background);
 
         // デフォルトスポーン地点の設定
-        inventory.setItem(0,
-                ItemStackBuilder.of(Material.WHITE_BED)
-                        .name(mm.build("gui.map_editor.default_spawn"))
-                        .persistentData(act, PersistentDataType.STRING, "default_spawn")
-                        .build()
-        );
+        ItemStack defaultSpawn = ItemStack.of(Material.WHITE_BED);
+        defaultSpawn.editMeta(meta -> {
+            meta.displayName(translation.component(player, "gui.map_editor.default_spawn"));
+            meta.getPersistentDataContainer().set(
+                    act, PersistentDataType.STRING, "default_spawn"
+            );
+        });
+
+        inventory.setItem(0, defaultSpawn);
 
         // 各チーム
-        inventory.setItem(2,
-                ItemStackBuilder.of(Material.RED_WOOL)
-                        .name(ANNITeam.RED.getColoredName())
-                        .build()
-        );
-        inventory.setItem(3,
-                ItemStackBuilder.of(Material.BLUE_WOOL)
-                        .name(ANNITeam.BLUE.getColoredName())
-                        .build()
-        );
-        inventory.setItem(4,
-                ItemStackBuilder.of(Material.GREEN_WOOL)
-                        .name(ANNITeam.GREEN.getColoredName())
-                        .build()
-        );
-        inventory.setItem(5,
-                ItemStackBuilder.of(Material.YELLOW_WOOL)
-                        .name(ANNITeam.YELLOW.getColoredName())
-                        .build()
-        );
+        var red = ItemStack.of(Material.RED_WOOL);
+        red.editMeta(m -> m.displayName(translation.component(player, ANNITeam.RED.getNameKey())));
+
+        inventory.setItem(2, red);
+
+        var blue = ItemStack.of(Material.BLUE_WOOL);
+        blue.editMeta(m -> m.displayName(translation.component(player, ANNITeam.BLUE.getNameKey())));
+
+        inventory.setItem(3, blue);
+
+        var green = ItemStack.of(Material.GREEN_WOOL);
+        green.editMeta(m -> m.displayName(translation.component(player, ANNITeam.GREEN.getNameKey())));
+
+        inventory.setItem(4, green);
+
+        var yellow = ItemStack.of(Material.YELLOW_WOOL);
+        yellow.editMeta(m -> m.displayName(translation.component(player, ANNITeam.YELLOW.getNameKey())));
+
+        inventory.setItem(5, yellow);
 
         // 各チームのスポーン地点
-        inventory.setItem(11,
-                ItemStackBuilder.of(Material.RED_BED)
-                        .name(mm.build(
-                                "gui.map_editor.team_spawn",
-                                ANNITeam.RED.getColoredName()
-                        ))
-                        .persistentData(act, PersistentDataType.STRING, "red_spawn")
-                        .build()
-        );
-        inventory.setItem(12,
-                ItemStackBuilder.of(Material.BLUE_BED)
-                        .name(mm.build(
-                                "gui.map_editor.team_spawn",
-                                ANNITeam.BLUE.getColoredName()
-                        ))
-                        .persistentData(act, PersistentDataType.STRING, "blue_spawn")
-                        .build()
-        );
-        inventory.setItem(13,
-                ItemStackBuilder.of(Material.GREEN_BED)
-                        .name(mm.build(
-                                "gui.map_editor.team_spawn",
-                                ANNITeam.GREEN.getColoredName()
-                        ))
-                        .persistentData(act, PersistentDataType.STRING, "green_spawn")
-                        .build()
-        );
-        inventory.setItem(14,
-                ItemStackBuilder.of(Material.YELLOW_BED)
-                        .name(mm.build(
-                                "gui.map_editor.team_spawn",
-                                ANNITeam.YELLOW.getColoredName()
-                        ))
-                        .persistentData(act, PersistentDataType.STRING, "yellow_spawn")
-                        .build()
-        );
+        ItemStack redSpawn = ItemStack.of(Material.RED_BED);
+        redSpawn.editMeta(meta -> {
+            meta.displayName(translation.component(player,
+                    "gui.map_editor.team_spawn",
+                    translation.component(player, ANNITeam.RED.getNameKey())
+            ));
+            meta.getPersistentDataContainer().set(
+                    act, PersistentDataType.STRING, "red_spawn"
+            );
+        });
+
+        ItemStack blueSpawn = ItemStack.of(Material.BLUE_BED);
+        blueSpawn.editMeta(meta -> {
+            meta.displayName(translation.component(player,
+                    "gui.map_editor.team_spawn",
+                    translation.component(player, ANNITeam.BLUE.getNameKey())
+            ));
+            meta.getPersistentDataContainer().set(
+                    act, PersistentDataType.STRING, "blue_spawn"
+            );
+        });
+
+        ItemStack greenSpawn = ItemStack.of(Material.GREEN_BED);
+        greenSpawn.editMeta(meta -> {
+            meta.displayName(translation.component(player,
+                    "gui.map_editor.team_spawn",
+                    translation.component(player, ANNITeam.GREEN.getNameKey())
+            ));
+            meta.getPersistentDataContainer().set(
+                    act, PersistentDataType.STRING, "green_spawn"
+            );
+        });
+
+        ItemStack yellowSpawn = ItemStack.of(Material.YELLOW_BED);
+        yellowSpawn.editMeta(meta -> {
+            meta.displayName(translation.component(player,
+                    "gui.map_editor.team_spawn",
+                    translation.component(player, ANNITeam.YELLOW.getNameKey())
+            ));
+            meta.getPersistentDataContainer().set(
+                    act, PersistentDataType.STRING, "yellow_spawn"
+            );
+        });
+
+        inventory.setItem(11, redSpawn);
+        inventory.setItem(12, blueSpawn);
+        inventory.setItem(13, greenSpawn);
+        inventory.setItem(14, yellowSpawn);
 
         // 各チームのネクサス
-        inventory.setItem(20,
-                ItemStackBuilder.of(Material.END_STONE)
-                        .name(mm.build(
-                                "gui.map_editor.team_nexus",
-                                ANNITeam.RED.getColoredName()
-                        ))
-                        .persistentData(act, PersistentDataType.STRING, "red_nexus")
-                        .build()
-        );
-        inventory.setItem(21,
-                ItemStackBuilder.of(Material.END_STONE)
-                        .name(mm.build(
-                                "gui.map_editor.team_nexus",
-                                ANNITeam.BLUE.getColoredName()
-                        ))
-                        .persistentData(act, PersistentDataType.STRING, "blue_nexus")
-                        .build()
-        );
-        inventory.setItem(22,
-                ItemStackBuilder.of(Material.END_STONE)
-                        .name(mm.build(
-                                "gui.map_editor.team_nexus",
-                                ANNITeam.GREEN.getColoredName()
-                        ))
-                        .persistentData(act, PersistentDataType.STRING, "green_nexus")
-                        .build()
-        );
-        inventory.setItem(23,
-                ItemStackBuilder.of(Material.END_STONE)
-                        .name(mm.build(
-                                "gui.map_editor.team_nexus",
-                                ANNITeam.YELLOW.getColoredName()
-                        ))
-                        .persistentData(act, PersistentDataType.STRING, "yellow_nexus")
-                        .build()
-        );
+        ItemStack redNexus = ItemStack.of(Material.END_STONE);
+        redNexus.editMeta(meta -> {
+            meta.displayName(translation.component(player,
+                    "gui.map_editor.team_nexus",
+                    translation.component(player, ANNITeam.RED.getNameKey())
+            ));
+            meta.getPersistentDataContainer().set(
+                    act, PersistentDataType.STRING, "red_nexus"
+            );
+        });
 
-        inventory.setItem(18,
-                ItemStackBuilder.of(Material.ENDER_PEARL)
-                    .name(mm.build("gui.map_editor.tp_to_world"))
-                    .persistentData(act,
-                            PersistentDataType.STRING, "teleport"
-                    )
-                    .build()
-        );
+        ItemStack blueNexus = ItemStack.of(Material.END_STONE);
+        blueNexus.editMeta(meta -> {
+            meta.displayName(translation.component(player,
+                    "gui.map_editor.team_nexus",
+                    translation.component(player, ANNITeam.BLUE.getNameKey())
+            ));
+            meta.getPersistentDataContainer().set(
+                    act, PersistentDataType.STRING, "blue_nexus"
+            );
+        });
+
+        ItemStack greenNexus = ItemStack.of(Material.END_STONE);
+        greenNexus.editMeta(meta -> {
+            meta.displayName(translation.component(player,
+                    "gui.map_editor.team_nexus",
+                    translation.component(player, ANNITeam.GREEN.getNameKey())
+            ));
+            meta.getPersistentDataContainer().set(
+                    act, PersistentDataType.STRING, "green_nexus"
+            );
+        });
+
+        ItemStack yellowNexus = ItemStack.of(Material.END_STONE);
+        yellowNexus.editMeta(meta -> {
+            meta.displayName(translation.component(player,
+                    "gui.map_editor.team_nexus",
+                    translation.component(player, ANNITeam.YELLOW.getNameKey())
+            ));
+            meta.getPersistentDataContainer().set(
+                    act, PersistentDataType.STRING, "yellow_nexus"
+            );
+        });
+
+        inventory.setItem(20, redNexus);
+        inventory.setItem(21, blueNexus);
+        inventory.setItem(22, greenNexus);
+        inventory.setItem(23, yellowNexus);
+
+        ItemStack teleportToTheWorld = ItemStack.of(Material.ENDER_PEARL);
+        teleportToTheWorld.editMeta(meta -> {
+            meta.displayName(translation.component(player, "gui.map_editor.tp_to_world"));
+            meta.getPersistentDataContainer().set(
+                    act, PersistentDataType.STRING, "teleport"
+            );
+        });
+
+        inventory.setItem(18, teleportToTheWorld);
     }
 
     @EventHandler
@@ -169,7 +196,7 @@ public class MapEditor extends AbstractGui {
         if (e.getInventory().getHolder() != this) return;
 
         ItemStack item = e.getCurrentItem();
-        MessageManager mm = plugin.getMessageManager();
+        var translation = ANNIPlugin.getInstance().getTranslationManager();
 
         if (item == null) return;
 
@@ -186,105 +213,105 @@ public class MapEditor extends AbstractGui {
                 }
                 case "default_spawn": {
                     map.setDefaultSpawn(player.getLocation().clone());
-                    player.sendMessage(mm.build(
+                    player.sendMessage(translation.component(player, 
                             "gui.map_editor.set_your_location",
-                            mm.yawPitchLocationFormat(player.getLocation())
+                            locationWithYawPitchFormat(player, player.getLocation())
                     ));
                     player.closeInventory();
                     break;
                 }
                 case "red_spawn": {
                     map.setSpawn(ANNITeam.RED, SpawnLocation.fromLocation(player.getLocation()));
-                    player.sendMessage(mm.build(
+                    player.sendMessage(translation.component(player, 
                             "gui.map_editor.set_your_location_team",
                             ANNITeam.RED.getColoredName(),
-                            mm.yawPitchLocationFormat(player.getLocation())
+                            locationWithYawPitchFormat(player, player.getLocation())
                     ));
                     player.closeInventory();
                     break;
                 }
                 case "blue_spawn": {
                     map.setSpawn(ANNITeam.BLUE, SpawnLocation.fromLocation(player.getLocation()));
-                    player.sendMessage(mm.build(
+                    player.sendMessage(translation.component(player, 
                             "gui.map_editor.set_your_location_team",
                             ANNITeam.BLUE.getColoredName(),
-                            mm.yawPitchLocationFormat(player.getLocation())
+                            locationWithYawPitchFormat(player, player.getLocation())
                     ));
                     player.closeInventory();
                     break;
                 }
                 case "green_spawn": {
                     map.setSpawn(ANNITeam.GREEN, SpawnLocation.fromLocation(player.getLocation()));
-                    player.sendMessage(mm.build(
+                    player.sendMessage(translation.component(player, 
                             "gui.map_editor.set_your_location_team",
                             ANNITeam.GREEN.getColoredName(),
-                            mm.yawPitchLocationFormat(player.getLocation())
+                            locationWithYawPitchFormat(player, player.getLocation())
                     ));
                     player.closeInventory();
                     break;
                 }
                 case "yellow_spawn": {
                     map.setSpawn(ANNITeam.YELLOW, SpawnLocation.fromLocation(player.getLocation()));
-                    player.sendMessage(mm.build(
+                    player.sendMessage(translation.component(player, 
                             "gui.map_editor.set_your_location_team",
                             ANNITeam.YELLOW.getColoredName(),
-                            mm.yawPitchLocationFormat(player.getLocation())
+                            locationWithYawPitchFormat(player, player.getLocation())
                     ));
                     player.closeInventory();
                     break;
                 }
                 case "red_nexus": {
                     player.closeInventory();
-                    player.sendMessage(mm.build("gui.map_editor.please_click_a_block"));
+                    player.sendMessage(translation.component(player, "gui.map_editor.please_click_a_block"));
 
                     BlockBreakListener.getQueuedOnDamageMap().put(player.getUniqueId(), (bl) -> {
                         map.setNexus(ANNITeam.RED, bl.getLocation());
-                        player.sendMessage(mm.build(
+                        player.sendMessage(translation.component(player, 
                                 "gui.map_editor.set_team_nexus_loc",
                                 ANNITeam.RED.getColoredName(),
-                                mm.blockLocationFormat(bl.getLocation())
+                                blockFormat(player, bl)
                         ));
                     });
                     break;
                 }
                 case "blue_nexus": {
                     player.closeInventory();
-                    player.sendMessage(mm.build("gui.map_editor.please_click_a_block"));
+                    player.sendMessage(translation.component(player, "gui.map_editor.please_click_a_block"));
 
                     BlockBreakListener.getQueuedOnDamageMap().put(player.getUniqueId(), (bl) -> {
                         map.setNexus(ANNITeam.BLUE, bl.getLocation());
-                        player.sendMessage(mm.build(
+                        player.sendMessage(translation.component(player, 
                                 "gui.map_editor.set_team_nexus_loc",
                                 ANNITeam.BLUE.getColoredName(),
-                                mm.blockLocationFormat(bl.getLocation())
+                                blockFormat(player, bl)
                         ));
                     });
                     break;
                 }
                 case "green_nexus": {
                     player.closeInventory();
-                    player.sendMessage(mm.build("gui.map_editor.please_click_a_block"));
+                    player.sendMessage(translation.component(player, "gui.map_editor.please_click_a_block"));
 
                     BlockBreakListener.getQueuedOnDamageMap().put(player.getUniqueId(), (bl) -> {
                         map.setNexus(ANNITeam.GREEN, bl.getLocation());
-                        player.sendMessage(mm.build(
+                        player.sendMessage(translation.component(player, 
                                 "gui.map_editor.set_team_nexus_loc",
                                 ANNITeam.GREEN.getColoredName(),
-                                mm.blockLocationFormat(bl.getLocation())
+                                blockFormat(player, bl)
                         ));
                     });
                     break;
                 }
                 case "yellow_nexus": {
                     player.closeInventory();
-                    player.sendMessage(mm.build("gui.map_editor.please_click_a_block"));
+                    player.sendMessage(translation.component(player, "gui.map_editor.please_click_a_block"));
 
                     BlockBreakListener.getQueuedOnDamageMap().put(player.getUniqueId(), (bl) -> {
                         map.setNexus(ANNITeam.YELLOW, bl.getLocation());
-                        player.sendMessage(mm.build(
+                        player.sendMessage(translation.component(player, 
                                 "gui.map_editor.set_team_nexus_loc",
                                 ANNITeam.YELLOW.getColoredName(),
-                                mm.blockLocationFormat(bl.getLocation())
+                                blockFormat(player, bl)
                         ));
                     });
                     break;
@@ -298,5 +325,26 @@ public class MapEditor extends AbstractGui {
         if (e.getInventory().getHolder() != this) return;
 
         unregisterAllGuiListeners(player);
+    }
+
+    private Component blockFormat(Player player, Block block) {
+        var translation = ANNIPlugin.getInstance().getTranslationManager();
+
+        return Component.text(String.format(
+                translation.string(player, "format.block"),
+                block.getX(),
+                block.getY(),
+                block.getZ()
+        ));
+    }
+
+    private Component locationWithYawPitchFormat(Player player, Location location) {
+        var translation = ANNIPlugin.getInstance().getTranslationManager();
+
+        return Component.text(String.format(
+                translation.string(player, "format.location.yaw_pitch"),
+                location.x(), location.y(), location.z(),
+                location.getYaw(), location.getPitch()
+        ));
     }
 }

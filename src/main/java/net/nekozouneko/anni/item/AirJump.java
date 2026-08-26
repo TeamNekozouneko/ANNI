@@ -1,11 +1,8 @@
 package net.nekozouneko.anni.item;
 
-import net.md_5.bungee.api.ChatMessageType;
-import net.md_5.bungee.api.chat.TextComponent;
 import net.nekozouneko.anni.ANNIPlugin;
-import net.nekozouneko.anni.message.MessageManager;
+import net.nekozouneko.anni.message.TranslationManager;
 import net.nekozouneko.anni.task.CooldownManager;
-import net.nekozouneko.commons.spigot.inventory.ItemStackBuilder;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.Particle;
@@ -15,22 +12,27 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
+
+import java.util.Locale;
 
 public class AirJump implements Listener {
 
     public static final long DEFAULT_COOLTIME = 10000;
 
-    public static ItemStackBuilder builder() {
-        MessageManager mm = ANNIPlugin.getInstance().getMessageManager();
-        return ItemStackBuilder.of(Material.FEATHER)
-                .name(mm.build("item.airjump.name"))
-                .lore(mm.buildList("item.airjump.lore"))
-                .persistentData(
-                        new NamespacedKey(ANNIPlugin.getInstance(), "special-item"),
-                        PersistentDataType.STRING, "air-jump"
-                );
+    public static ItemStack get(Locale locale) {
+        TranslationManager tm = ANNIPlugin.getInstance().getTranslationManager();
+
+        ItemStack item = ItemStack.of(Material.FEATHER);
+        item.editMeta(meta -> {
+            meta.displayName(tm.component(locale, "item.airjump.name"));
+            meta.lore(tm.componentList(locale, "item.airjump.lore"));
+            meta.getPersistentDataContainer().set(new NamespacedKey(ANNIPlugin.getInstance(), "special-item"), PersistentDataType.STRING, "air-jump");
+        });
+
+        return item;
     }
 
     @EventHandler(priority = EventPriority.LOW)
@@ -54,16 +56,15 @@ public class AirJump implements Listener {
                             Particle.CLOUD, e.getPlayer().getLocation(), 50, .5, .5, .5, .1
                     );
                     e.getPlayer().getWorld().spawnParticle(
-                            Particle.SMOKE_NORMAL, e.getPlayer().getLocation(), 50, .5, .5, .5, .1
+                            Particle.SMOKE, e.getPlayer().getLocation(), 50, .5, .5, .5, .1
                     );
                     e.getPlayer().setVelocity(e.getPlayer().getLocation().getDirection().setY(1));
                 }
                 else {
-                    e.getPlayer().spigot().sendMessage(ChatMessageType.ACTION_BAR,
-                            new TextComponent(ANNIPlugin.getInstance().getMessageManager()
-                                    .build("actionbar.cooldown_stats", cm.getTimeLeftFormatted(e.getPlayer().getUniqueId(), CooldownManager.Type.AIR_JUMP))
-                            )
-                    );
+                    e.getPlayer().sendActionBar(ANNIPlugin.getInstance().getTranslationManager().component(
+                            "actionbar.cooldown.time", cm.getTimeLeftFormatted(e.getPlayer().getUniqueId(), CooldownManager.Type.AIR_JUMP)
+                    ));
+
                     e.getPlayer().playSound(e.getPlayer().getLocation(), Sound.ENTITY_GENERIC_EXTINGUISH_FIRE, 1, 2);
                 }
             }

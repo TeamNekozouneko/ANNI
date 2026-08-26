@@ -2,7 +2,7 @@ name: ANNI
 version: '${project.version}'
 
 main: net.nekozouneko.anni.ANNIPlugin
-api-version: 1.16
+api-version: 1.21
 
 authors: [Taitaitatata]
 description: '${project.description}'
@@ -10,6 +10,8 @@ website: '${project.url}'
 
 softdepend: [Votifier]
 depend: [Vault, ViaVersion, WorldEdit, WorldGuard]
+
+libraries: ["org.xerial:sqlite-jdbc:${libraries.sqlite-jdbc.version}"]
 
 commands:
   anni-admin:
@@ -31,29 +33,25 @@ commands:
     description: "Potion Shop Command"
     permission: "anni.command.potionshop"
     usage: "/<command>"
-  vote:
-    description: "Vote command"
-    permission: anni.command.vote
-    usage: "/<command> <map>"
   kit:
     description: "Kit command"
     permission: anni.command.kit
     usage: "/<command>"
-  suicide:
-    aliases: [redeploy, kill]
-    description: "Suicide command"
-    permission: anni.command.suicide
-    usage: "/<command>"
-  point:
-    description: "Point command"
-    permission: anni.command.point
-    usage: "/<command> [target]"
-  charge:
-    description: "Charge command"
-    permission: anni.command.charge
-    usage: "/<command>"
-
 permissions:
+  anni.command.charge:
+    default: true
+
+  anni.command.player:
+    default: true
+
+  anni.command.player.others:
+    default: op
+
+  anni.command.vote:
+    default: true
+
   anni.mod.global_chat_on_spectator:
     default: op
-    description: "If you have this permission, can use global chat on spectator"
+
+  anni.command.player.other:
+    default: op

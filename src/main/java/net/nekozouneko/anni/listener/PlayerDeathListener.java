@@ -2,10 +2,8 @@ package net.nekozouneko.anni.listener;
 
 import net.nekozouneko.anni.ANNIPlugin;
 import net.nekozouneko.anni.item.DefenseArtifact;
-import net.nekozouneko.anni.message.MessageManager;
 import net.nekozouneko.anni.task.CooldownManager;
 import net.nekozouneko.anni.util.CmnUtil;
-import net.nekozouneko.anni.util.VaultUtil;
 import org.bukkit.ChatColor;
 import org.bukkit.NamespacedKey;
 import org.bukkit.event.EventHandler;
@@ -21,10 +19,11 @@ import java.util.Objects;
 public class PlayerDeathListener implements Listener {
 
     private final ANNIPlugin plugin = ANNIPlugin.getInstance();
-    private final MessageManager mm = plugin.getMessageManager();
 
     @EventHandler
     public void onDeath(PlayerDeathEvent e) {
+        var mm = ANNIPlugin.getInstance().getMessageManager();
+
         ChatColor cc = CmnUtil.getJoinedTeam(e.getEntity()) != null ?
                 CmnUtil.getJoinedTeam(e.getEntity()).getColor() : ChatColor.WHITE;
 
@@ -38,12 +37,10 @@ public class PlayerDeathListener implements Listener {
             e.setDeathMessage(mm.build("kill.default", deadName, killerName));
 
             if (plugin.getCurrentGame().getState().getId() > 0) {
-                VaultUtil.ifAvail((eco) -> {
-                    eco.depositPlayer(e.getEntity().getKiller(), 10);
-                    e.getEntity().getKiller().sendMessage(
-                            mm.build("notify.deposit_points", "10", mm.build("gui.shop.full_ext"))
-                    );
-                });
+                plugin.getPointManager().givePoint(e.getEntity().getKiller(), 10);
+                e.getEntity().getKiller().sendMessage(
+                        mm.build("notify.deposit_points", "10", mm.build("gui.shop.full_ext"))
+                );
             }
         }
         else {
@@ -67,6 +64,7 @@ public class PlayerDeathListener implements Listener {
 
         DefenseArtifact.cancelTask(e.getEntity().getUniqueId());
         e.getEntity().setCompassTarget(e.getEntity().getWorld().getSpawnLocation());
+        ANNIPlugin.getInstance().getCurrentGame().getKit(e.getEntity()).onDeath(e.getEntity());
 
         // {kit-item: 1} じゃないアイテムをドロップさせる。
         new ArrayList<>(e.getDrops()).stream()

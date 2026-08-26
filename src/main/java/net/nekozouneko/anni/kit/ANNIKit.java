@@ -1,5 +1,6 @@
 package net.nekozouneko.anni.kit;
 
+import lombok.Getter;
 import net.nekozouneko.anni.ANNIPlugin;
 import net.nekozouneko.anni.arena.team.ANNITeam;
 import org.bukkit.Color;
@@ -12,8 +13,10 @@ import org.bukkit.persistence.PersistentDataType;
 
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
+@Getter
 public enum ANNIKit {
 
     ACROBAT(new AcrobatKit()),
@@ -21,12 +24,14 @@ public enum ANNIKit {
     BOW(new BowKit()),
     DEFAULT(new DefaultKit()),
     DEFENSE(new DefenseKit()),
+    ENCHANTER(new EnchanterKit()),
+    LUMBERJACK(new LumberjackKit()),
     MOCHI_MOCHI(new MochiMochiKit()),
     MINER(new MinerKit()),
     SCOUTER(new ScouterKit()),
+    SWAPPER(new SwapperKit()),
     WORKER(new WorkerKit()),
     VAMPIRE(new VampireKit());
-    //MUSASABI(new MusasabiKit());
 
     private static final Map<String, ANNIKit> ID_MAP = new HashMap<>();
 
@@ -36,47 +41,45 @@ public enum ANNIKit {
         ID_MAP.put(BOW.getKit().getId(), BOW);
         ID_MAP.put(DEFAULT.getKit().getId(), DEFAULT);
         ID_MAP.put(DEFENSE.getKit().getId(), DEFENSE);
+        ID_MAP.put(ENCHANTER.getKit().getId(), ENCHANTER);
+        ID_MAP.put(LUMBERJACK.getKit().getId(), LUMBERJACK);
         ID_MAP.put(MOCHI_MOCHI.getKit().getId(), MOCHI_MOCHI);
         ID_MAP.put(MINER.getKit().getId(), MINER);
         ID_MAP.put(SCOUTER.getKit().getId(), SCOUTER);
+        ID_MAP.put(SWAPPER.getKit().getId(), SWAPPER);
         ID_MAP.put(WORKER.getKit().getId(), WORKER);
         ID_MAP.put(VAMPIRE.getKit().getId(), VAMPIRE);
-        //ID_MAP.put(MUSASABI.getKit().getId(), MUSASABI);
     }
 
-    private final AbstractKit kit;
+    private final Kit kit;
 
-    private ANNIKit(AbstractKit kit) {
+    private ANNIKit(Kit kit) {
         this.kit = kit;
-    }
-
-    public AbstractKit getKit() {
-        return kit;
     }
 
     public static ANNIKit getKitById(String id) {
         return ID_MAP.getOrDefault(id, DEFAULT);
     }
 
-    public static AbstractKit getAbsKitOrCustomById(String id) {
+    public static Kit getAbsKitOrCustomById(String id) {
         return ANNIPlugin.getInstance().getCustomKitManager().getKit(id) != null ? ANNIPlugin.getInstance().getCustomKitManager().getKit(id) : getKitById(id).getKit();
     }
 
-    public static boolean isDefaultKit(AbstractKit kit) {
+    public static boolean isDefaultKit(Kit kit) {
         return Arrays.stream(values())
                 .map(ANNIKit::getKit)
                 .anyMatch(kit::equals);
     }
 
-    public static ANNIKit get(AbstractKit kit) {
+    public static ANNIKit get(Kit kit) {
         for (ANNIKit k : values()) {
             if (k.getKit().equals(kit)) return k;
         }
         return DEFAULT;
     }
 
-    public static ItemStack[] teamColor(AbstractKit kit, ANNITeam team) {
-        ItemStack[] arr = Arrays.copyOf(kit.getKitContents(), kit.getKitContents().length);
+    public static ItemStack[] teamColor(Kit kit, Locale locale, ANNITeam team) {
+        ItemStack[] arr = Arrays.copyOf(kit.getKitContents(locale), kit.getKitContents(locale).length);
         for (ItemStack is : arr) {
             if (is == null) continue;
 

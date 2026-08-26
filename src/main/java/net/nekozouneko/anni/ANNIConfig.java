@@ -2,7 +2,10 @@ package net.nekozouneko.anni;
 
 import com.google.common.base.Preconditions;
 import net.nekozouneko.anni.arena.team.ANNITeam;
+import net.nekozouneko.anni.util.CmnUtil;
 import org.bukkit.configuration.file.FileConfiguration;
+
+import java.util.Locale;
 
 public class ANNIConfig {
 
@@ -61,6 +64,10 @@ public class ANNIConfig {
 
     public static boolean isCustomKitOnly() {
         return conf.getBoolean("kits.custom-kit-only");
+    }
+
+    public static Locale getDefaultLocale() {
+        return CmnUtil.localeCodeToLocale(conf.getString("languages.default", "ja_JP"));
     }
 
 }

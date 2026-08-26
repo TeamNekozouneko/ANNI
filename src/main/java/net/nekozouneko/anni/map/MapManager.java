@@ -52,7 +52,7 @@ public class MapManager {
 
     public void reload() {
         maps.clear();
-        load(plugin.getMapsDir());
+        load(plugin.getDefaultMapsDir());
     }
 
     public ANNIMap getMap(String id) {

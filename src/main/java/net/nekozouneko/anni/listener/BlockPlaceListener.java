@@ -95,7 +95,7 @@ public final class BlockPlaceListener implements Listener {
                         if (e.getBlock().getLocation().equals(loc)) {
                             e.setCancelled(true); // キャンセルして
                             Bukkit.getScheduler().runTask(plugin, () -> {
-                                if (current.isNexusLost(ent.getKey())) // ネクサスの体力が0もしくはnullの場合
+                                if (current.getTeamManager().getTeam(ent.getKey()).isLost()) // ネクサスの体力が0もしくはnullの場合
                                     e.getBlock().setType(Material.BEDROCK); // 岩盤設置
                                 else e.getBlock().setType(Material.END_STONE); // そうじゃないならエンドストーンを設置
                             });

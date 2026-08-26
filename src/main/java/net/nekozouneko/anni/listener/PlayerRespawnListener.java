@@ -20,14 +20,15 @@ public class PlayerRespawnListener implements Listener {
     @EventHandler
     public void onRespawn(PlayerRespawnEvent e) {
         ANNIArena current = plugin.getCurrentGame();
+        var teamManager = current.getTeamManager();
 
         if (current.getState().getId() > 0 && current.isJoined(e.getPlayer())) {
-            ANNITeam at = current.getTeamByPlayer(e.getPlayer());
+            ANNITeam at = teamManager.getTeamColorByPlayer(e.getPlayer().getUniqueId());
 
             if (at != null) {
                 e.setRespawnLocation(current.getMap().getSpawnOrDefault(at).toLocation(current.getCopyWorld()));
 
-                if (current.isNexusLost(at)) {
+                if (teamManager.getTeam(at).isLost()) {
                     e.getPlayer().getInventory().clear();
                     e.getPlayer().getEnderChest().clear();
                     e.getPlayer().setExp(0);
@@ -42,19 +43,21 @@ public class PlayerRespawnListener implements Listener {
                 return;
             }
 
-            // リスキル対策で 耐性255 と スピード 1 をリスポーン時付与
+            // リスキル対策で 耐性256 と スピード 1 をリスポーン時付与
             Bukkit.getScheduler().runTask(plugin, () -> {
-                        e.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 200, 255, false, false, true));
-                        e.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 200, 1, false, false, true));
+                        e.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.RESISTANCE, 200, 255, false, false, true));
+                        e.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 200, 0, false, false, true));
                     }
             );
 
             e.getPlayer().setGameMode(GameMode.SURVIVAL);
             e.getPlayer().getInventory().setContents(
-                    current.getTeamByPlayer(e.getPlayer()) != null ?
-                        ANNIKit.teamColor(current.getKit(e.getPlayer()), current.getTeamByPlayer(e.getPlayer()))
-                        : current.getKit(e.getPlayer()).getKitContents()
+                    at != null ?
+                        ANNIKit.teamColor(current.getKit(e.getPlayer()), e.getPlayer().locale(), at)
+                        : current.getKit(e.getPlayer()).getKitContents(e.getPlayer().locale())
             );
+
+            current.getKit(e.getPlayer()).onRespawn(e.getPlayer());
         }
         else {
             SpectatorManager.remove(e.getPlayer());

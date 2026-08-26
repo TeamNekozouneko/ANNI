@@ -11,7 +11,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityPickupItemEvent;
 import org.bukkit.event.inventory.CraftItemEvent;
@@ -50,6 +49,8 @@ public class PlayerDenyActionListener implements Listener {
             if (pdc.getOrDefault(noRemove, PersistentDataType.INTEGER, 0) == 1 || pdc.getOrDefault(anniKit, PersistentDataType.INTEGER, 0) == 1) {
                 e.getPlayer().playSound(e.getItemDrop().getLocation(), Sound.ENTITY_ITEM_BREAK, 1, 1);
                 e.getItemDrop().remove();
+
+                if (pdc.getOrDefault(noRemove, PersistentDataType.INTEGER, 0) == 1) e.setCancelled(true);
                 return;
             }
         }
@@ -79,53 +80,6 @@ public class PlayerDenyActionListener implements Listener {
         }
     }
 
-    /*@EventHandler
-    public void onClick(InventoryClickEvent e) {
-        if (SpectatorManager.isSpectating((Player) e.getWhoClicked()) && e.getWhoClicked().getGameMode() != GameMode.CREATIVE) {
-            if (e.getInventory().getType() != InventoryType.PLAYER) {
-                e.setCancelled(true);
-                return;
-            }
-        }
-
-        if (plugin.getCurrentGame().getState().getId() >= 0) {
-            if (e.getClick() == ClickType.NUMBER_KEY) {
-                ItemStack item = e.getWhoClicked().getInventory().getItem(e.getHotbarButton());
-
-                if (item != null && !item.getType().isAir()) {
-                    PersistentDataContainer pdc = item.getItemMeta().getPersistentDataContainer();
-                    if (pdc.getOrDefault(noRemove, PersistentDataType.INTEGER, 0) == 1 || pdc.getOrDefault(anniKit, PersistentDataType.INTEGER, 0) == 1) {
-                        e.setCancelled(true);
-                    }
-                }
-
-                return;
-            }
-            else if (e.getCurrentItem() == null || e.getCurrentItem().getType().isAir()) return;
-
-            PersistentDataContainer pdc = e.getCurrentItem().getItemMeta().getPersistentDataContainer();
-
-            if (pdc.getOrDefault(noRemove, PersistentDataType.INTEGER, 0) == 1 || pdc.getOrDefault(anniKit, PersistentDataType.INTEGER, 0) == 1) {
-                if (e.getWhoClicked().getGameMode() != GameMode.CREATIVE && e.getInventory() != null) {
-                    if (e.getClick() == ClickType.DROP || e.getClick() == ClickType.CONTROL_DROP) {
-                        e.setCurrentItem(null);
-                        ((Player) e.getWhoClicked()).playSound(e.getWhoClicked().getLocation(), Sound.ENTITY_ITEM_BREAK, 1, 1);
-                        return;
-                    }
-                    else if (
-                            !(e.getInventory().getType() == InventoryType.CRAFTING ||
-                                    e.getInventory().getType() == InventoryType.PLAYER ||
-                                    e.getInventory().getType() == InventoryType.CREATIVE
-                            )
-                            && pdc.getOrDefault(anniKit, PersistentDataType.INTEGER, 0) == 1
-                    ) {
-                        e.setCancelled(true);
-                    }
-                }
-            }
-        }
-    }*/
-
     @EventHandler(ignoreCancelled = true, priority = EventPriority.LOWEST)
     public void onInteract(PlayerInteractEvent e) {
         if (SpectatorManager.isSpectating(e.getPlayer()) && e.getPlayer().getGameMode() != GameMode.CREATIVE) {
@@ -133,14 +87,10 @@ public class PlayerDenyActionListener implements Listener {
             return;
         }
 
-        if (e.getAction() == Action.RIGHT_CLICK_BLOCK && e.getClickedBlock() != null && e.getClickedBlock().getType() == Material.DECORATED_POT && e.getPlayer().getGameMode() != GameMode.CREATIVE) {
+        if (e.getAction().isRightClick() && e.getClickedBlock() != null && e.getClickedBlock().getType() == Material.DECORATED_POT && e.getPlayer().getGameMode() != GameMode.CREATIVE) {
             if (e.getItem() == null || e.getItem().getType().isAir()) return;
 
-            PersistentDataContainer pdc = e.getItem().getItemMeta().getPersistentDataContainer();
-
-            if (pdc.getOrDefault(noRemove, PersistentDataType.INTEGER, 0) == 1 || pdc.getOrDefault(anniKit, PersistentDataType.INTEGER, 0) == 1) {
-                e.setCancelled(true);
-            }
+            e.setCancelled(true);
         }
     }
 

@@ -4,7 +4,8 @@ import com.google.common.base.Enums;
 import com.google.common.base.Optional;
 import net.nekozouneko.anni.ANNIPlugin;
 import net.nekozouneko.anni.arena.team.ANNITeam;
-import net.nekozouneko.anni.message.MessageManager;
+import net.nekozouneko.anni.message.TranslationManager;
+import net.nekozouneko.anni.util.CmnUtil;
 import net.nekozouneko.commons.spigot.inventory.ItemStackBuilder;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -13,6 +14,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 
@@ -27,7 +29,7 @@ public class TeamSelector extends AbstractGui {
     private final Set<ANNITeam> disabled;
     private final boolean disableRandom;
 
-    private final MessageManager mm = plugin.getMessageManager();
+    private final TranslationManager tm = plugin.getTranslationManager();
 
     public TeamSelector(ANNIPlugin plugin, Player player, Set<ANNITeam> disabled, boolean disableRandom, Consumer<ANNITeam> onSelect) {
         super(plugin, player);
@@ -40,7 +42,7 @@ public class TeamSelector extends AbstractGui {
     @Override
     public void update() {
         if (inventory == null)
-            inventory = Bukkit.createInventory(this, 9, mm.build("gui.team_selector.title"));
+            inventory = Bukkit.createInventory(this, 9, tm.component(player, "gui.team_selector.title"));
         inventory.clear();
 
         for (int i = 0; i < inventory.getSize(); i++)
@@ -52,48 +54,43 @@ public class TeamSelector extends AbstractGui {
         final NamespacedKey tea = new NamespacedKey(plugin, "select-team");
 
         if (!disabled.contains(ANNITeam.RED)) {
-            inventory.setItem(0,
-                    ItemStackBuilder.of(Material.RED_WOOL)
-                            .name(ANNITeam.RED.getColoredName())
-                            .persistentData(tea, PersistentDataType.STRING, ANNITeam.RED.name())
-                            .build()
-            );
+            ItemStack red = ItemStack.of(Material.RED_WOOL);
+            red.editMeta(m -> m.displayName(tm.component(player, ANNITeam.RED.getNameKey())));
+            CmnUtil.editPDC(red, c -> c.set(tea, PersistentDataType.STRING, ANNITeam.RED.name()));
+
+            inventory.setItem(0, red);
         }
 
         if (!disabled.contains(ANNITeam.BLUE)) {
-            inventory.setItem(1,
-                    ItemStackBuilder.of(Material.BLUE_WOOL)
-                            .name(ANNITeam.BLUE.getColoredName())
-                            .persistentData(tea, PersistentDataType.STRING, ANNITeam.BLUE.name())
-                            .build()
-            );
+            ItemStack blue = ItemStack.of(Material.BLUE_WOOL);
+            blue.editMeta(m -> m.displayName(tm.component(player, ANNITeam.BLUE.getNameKey())));
+            CmnUtil.editPDC(blue, c -> c.set(tea, PersistentDataType.STRING, ANNITeam.BLUE.name()));
+
+            inventory.setItem(1, blue);
         }
 
         if (!disabled.contains(ANNITeam.GREEN)) {
-            inventory.setItem(2,
-                    ItemStackBuilder.of(Material.GREEN_WOOL)
-                            .name(ANNITeam.GREEN.getColoredName())
-                            .persistentData(tea, PersistentDataType.STRING, ANNITeam.GREEN.name())
-                            .build()
-            );
+            ItemStack green = ItemStack.of(Material.GREEN_WOOL);
+            green.editMeta(m -> m.displayName(tm.component(player, ANNITeam.GREEN.getNameKey())));
+            CmnUtil.editPDC(green, c -> c.set(tea, PersistentDataType.STRING, ANNITeam.GREEN.name()));
+
+            inventory.setItem(2, green);
         }
 
         if (!disabled.contains(ANNITeam.YELLOW)) {
-            inventory.setItem(1,
-                    ItemStackBuilder.of(Material.YELLOW_WOOL)
-                            .name(ANNITeam.YELLOW.getColoredName())
-                            .persistentData(tea, PersistentDataType.STRING, ANNITeam.YELLOW.name())
-                            .build()
-            );
+            ItemStack yellow = ItemStack.of(Material.YELLOW_WOOL);
+            yellow.editMeta(m -> m.displayName(tm.component(player, ANNITeam.YELLOW.getNameKey())));
+            CmnUtil.editPDC(yellow, c -> c.set(tea, PersistentDataType.STRING, ANNITeam.YELLOW.name()));
+
+            inventory.setItem(3, yellow);
         }
 
         if (!disableRandom) {
-            inventory.setItem(8,
-                    ItemStackBuilder.of(Material.WHITE_WOOL)
-                            .name(mm.build("gui.random"))
-                            .persistentData(tea, PersistentDataType.STRING, "@random")
-                            .build()
-            );
+            ItemStack random = ItemStack.of(Material.WHITE_WOOL);
+            random.editMeta(m -> m.displayName(tm.component(player, "gui.random")));
+            CmnUtil.editPDC(random, c -> c.set(tea, PersistentDataType.STRING, "@random"));
+
+            inventory.setItem(8, random);
         }
     }
 
@@ -110,7 +107,7 @@ public class TeamSelector extends AbstractGui {
 
         if (pdc.has(tea, PersistentDataType.STRING)) {
             String res = pdc.get(tea, PersistentDataType.STRING);
-            if (res.equals("@random")) {
+            if ("@random".equals(res)) {
                 ANNITeam[] arr = Arrays.stream(ANNITeam.values())
                         .filter(at -> !disabled.contains(at))
                         .toArray(ANNITeam[]::new);

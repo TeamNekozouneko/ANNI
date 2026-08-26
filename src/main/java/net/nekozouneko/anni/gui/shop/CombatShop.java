@@ -1,8 +1,8 @@
 package net.nekozouneko.anni.gui.shop;
 
+import net.kyori.adventure.text.Component;
 import net.nekozouneko.anni.ANNIPlugin;
 import net.nekozouneko.anni.gui.AbstractGui;
-import net.nekozouneko.anni.message.MessageManager;
 import net.nekozouneko.anni.util.CmnUtil;
 import net.nekozouneko.anni.util.VaultUtil;
 import net.nekozouneko.commons.spigot.inventory.ItemStackBuilder;
@@ -21,8 +21,6 @@ import java.util.Collections;
 
 public class CombatShop extends AbstractGui {
 
-    private final MessageManager mm = plugin.getMessageManager();
-
     public CombatShop(ANNIPlugin plugin, Player player) {
         super(plugin, player);
     }
@@ -30,165 +28,44 @@ public class CombatShop extends AbstractGui {
     @Override
     public void update() {
         if (inventory == null)
-            inventory = Bukkit.createInventory(this, 54, mm.build("gui.combat_shop.title"));
-
-        for (int i = 0; i < inventory.getSize(); i++)
-            inventory.setItem(i, ItemStackBuilder.of(Material.GRAY_STAINED_GLASS_PANE)
-                    .name(" ")
-                    .build()
+            inventory = Bukkit.createInventory(
+                    this, 54, ANNIPlugin.getInstance().getTranslationManager()
+                            .component(player, "gui.combat_shop.title")
             );
 
-        NamespacedKey price = new NamespacedKey(plugin, "price");
+        ItemStack background = ItemStack.of(Material.GRAY_STAINED_GLASS_PANE);
+        background.editMeta(meta -> {
+            meta.displayName(Component.space());
+        });
+
+        for (int i = 0; i < inventory.getSize(); i++)
+            inventory.setItem(i, background);
 
         // 鉄装備
-        inventory.setItem(10,
-                ItemStackBuilder.of(Material.IRON_HELMET)
-                        .persistentData(price, PersistentDataType.DOUBLE, 1200.)
-                        .lore(Collections.singletonList(
-                                mm.build("gui.shop.price", "1200", mm.build("gui.shop.ext"))
-                        ))
-                        .build()
-        );
-        inventory.setItem(19,
-                ItemStackBuilder.of(Material.IRON_CHESTPLATE)
-                        .persistentData(price, PersistentDataType.DOUBLE, 1700.)
-                        .lore(Collections.singletonList(
-                                mm.build("gui.shop.price", "1700", mm.build("gui.shop.ext"))
-                        ))
-                        .build()
-        );
-        inventory.setItem(28,
-                ItemStackBuilder.of(Material.IRON_LEGGINGS)
-                        .persistentData(price, PersistentDataType.DOUBLE, 1500.)
-                        .lore(Collections.singletonList(
-                                mm.build("gui.shop.price", "1500", mm.build("gui.shop.ext"))
-                        ))
-                        .build()
-        );
-        inventory.setItem(37,
-                ItemStackBuilder.of(Material.IRON_BOOTS)
-                        .persistentData(price, PersistentDataType.DOUBLE, 1200.)
-                        .lore(Collections.singletonList(
-                                mm.build("gui.shop.price", "1200", mm.build("gui.shop.ext"))
-                        ))
-                        .build()
-        );
+        inventory.setItem(10, shopItem(Material.IRON_HELMET, 1, 1200));
+        inventory.setItem(19, shopItem(Material.IRON_CHESTPLATE, 1, 1700));
+        inventory.setItem(28, shopItem(Material.IRON_LEGGINGS, 1, 1500));
+        inventory.setItem(37, shopItem(Material.IRON_BOOTS, 1, 1200));
 
         // 武器/ツール
-        inventory.setItem(12,
-                ItemStackBuilder.of(Material.IRON_SWORD)
-                        .persistentData(price, PersistentDataType.DOUBLE, 1500.)
-                        .lore(Collections.singletonList(
-                                mm.build("gui.shop.price", "1500", mm.build("gui.shop.ext"))
-                        ))
-                        .build()
-        );
-        inventory.setItem(13,
-                ItemStackBuilder.of(Material.BOW)
-                        .persistentData(price, PersistentDataType.DOUBLE, 1700.)
-                        .lore(Collections.singletonList(
-                                mm.build("gui.shop.price", "1700", mm.build("gui.shop.ext"))
-                        ))
-                        .build()
-        );
-        inventory.setItem(21,
-                ItemStackBuilder.of(Material.IRON_PICKAXE)
-                        .persistentData(price, PersistentDataType.DOUBLE, 1200.)
-                        .lore(Collections.singletonList(
-                                mm.build("gui.shop.price", "1200", mm.build("gui.shop.ext"))
-                        ))
-                        .build()
-        );
-        inventory.setItem(22,
-                ItemStackBuilder.of(Material.CROSSBOW)
-                        .persistentData(price, PersistentDataType.DOUBLE, 1700.)
-                        .lore(Collections.singletonList(
-                                mm.build("gui.shop.price", "1700", mm.build("gui.shop.ext"))
-                        ))
-                        .build()
-        );
+        inventory.setItem(12, shopItem(Material.IRON_SWORD, 1, 1500));
+        inventory.setItem(13, shopItem(Material.BOW, 1, 1700));
+        inventory.setItem(21, shopItem(Material.IRON_PICKAXE, 1, 1200));
+        inventory.setItem(22, shopItem(Material.CROSSBOW, 1, 1700));
 
-        inventory.setItem(39,
-                ItemStackBuilder.of(Material.SHIELD)
-                        .persistentData(price, PersistentDataType.DOUBLE, 1500.)
-                        .lore(Collections.singletonList(
-                                mm.build("gui.shop.price", "1500", mm.build("gui.shop.ext"))
-                        ))
-                        .build()
-        );
-        inventory.setItem(40,
-                ItemStackBuilder.of(Material.ARROW)
-                        .amount(16)
-                        .persistentData(price, PersistentDataType.DOUBLE, 800.)
-                        .lore(Collections.singletonList(
-                                mm.build("gui.shop.price", "800", mm.build("gui.shop.ext"))
-                        ))
-                        .build()
-        );
+        inventory.setItem(39, shopItem(Material.SHIELD, 1, 1500));
+        inventory.setItem(40, shopItem(Material.ARROW, 16, 800));
 
         // 食料
-        inventory.setItem(15,
-                ItemStackBuilder.of(Material.COOKED_BEEF)
-                        .amount(16)
-                        .persistentData(price, PersistentDataType.DOUBLE, 500.)
-                        .lore(Collections.singletonList(
-                                mm.build("gui.shop.price", "500", mm.build("gui.shop.ext"))
-                        ))
-                        .build()
-        );
-        inventory.setItem(16,
-                ItemStackBuilder.of(Material.CAKE)
-                        .persistentData(price, PersistentDataType.DOUBLE, 700.)
-                        .lore(Collections.singletonList(
-                                mm.build("gui.shop.price", "700", mm.build("gui.shop.ext"))
-                        ))
-                        .build()
-        );
-        inventory.setItem(24,
-                ItemStackBuilder.of(Material.BREAD)
-                        .amount(16)
-                        .persistentData(price, PersistentDataType.DOUBLE, 300.)
-                        .lore(Collections.singletonList(
-                                mm.build("gui.shop.price", "300", mm.build("gui.shop.ext"))
-                        ))
-                        .build()
-        );
-        inventory.setItem(25,
-                ItemStackBuilder.of(Material.MILK_BUCKET)
-                        .persistentData(price, PersistentDataType.DOUBLE, 800.)
-                        .lore(Collections.singletonList(
-                                mm.build("gui.shop.price", "800", mm.build("gui.shop.ext"))
-                        ))
-                        .build()
-        );
+        inventory.setItem(15, shopItem(Material.COOKED_BEEF, 16, 500));
+        inventory.setItem(16, shopItem(Material.CAKE, 1, 700));
+        inventory.setItem(24, shopItem(Material.BREAD, 16, 500));
+        inventory.setItem(25, shopItem(Material.MILK_BUCKET, 1, 800));
 
         // その他
-        inventory.setItem(42,
-                ItemStackBuilder.of(Material.FISHING_ROD)
-                        .persistentData(price, PersistentDataType.DOUBLE, 1200.)
-                        .lore(Collections.singletonList(
-                                mm.build("gui.shop.price", "1200", mm.build("gui.shop.ext"))
-                        ))
-                        .build()
-        );
-        inventory.setItem(43,
-                ItemStackBuilder.of(Material.ENDER_PEARL)
-                        .amount(2)
-                        .persistentData(price, PersistentDataType.DOUBLE, 1500.)
-                        .lore(Collections.singletonList(
-                                mm.build("gui.shop.price", "1500", mm.build("gui.shop.ext"))
-                        ))
-                        .build()
-        );
-        inventory.setItem(34,
-                ItemStackBuilder.of(Material.EXPERIENCE_BOTTLE)
-                        .amount(4)
-                        .persistentData(price, PersistentDataType.DOUBLE, 700.)
-                        .lore(Collections.singletonList(
-                                mm.build("gui.shop.price", "700", mm.build("gui.shop.ext"))
-                        ))
-                        .build()
-        );
+        inventory.setItem(42, shopItem(Material.FISHING_ROD, 1, 1200));
+        inventory.setItem(43, shopItem(Material.ENDER_PEARL, 2, 1500));
+        inventory.setItem(34, shopItem(Material.EXPERIENCE_BOTTLE, 4, 700));
     }
 
     @EventHandler
@@ -201,7 +78,8 @@ public class CombatShop extends AbstractGui {
 
         ItemStack item = e.getCurrentItem();
         PersistentDataContainer pdc = item.getItemMeta().getPersistentDataContainer();
-        NamespacedKey price = new NamespacedKey(plugin, "price");
+        var price = new NamespacedKey(plugin, "price");
+        var translation = ANNIPlugin.getInstance().getTranslationManager();
 
         if (pdc.has(price, PersistentDataType.DOUBLE)) {
             double val = pdc.get(price, PersistentDataType.DOUBLE);
@@ -212,12 +90,11 @@ public class CombatShop extends AbstractGui {
                         .build();
                 VaultUtil.getEco().withdrawPlayer(player, val);
                 CmnUtil.giveOrDrop(player, clone);
-                player.sendMessage(mm.build("gui.shop.purchased", String.valueOf(val), mm.build("gui.shop.ext")));
+                player.sendMessage(translation.component(player, "gui.shop.purchased", VaultUtil.getEco().format(val)));
             }
             else {
-                player.sendMessage(mm.build("gui.shop.more_points",
-                        String.format("%,.1f", val - VaultUtil.getEco().getBalance(player)),
-                        mm.build("gui.shop.ext")
+                player.sendMessage(translation.component(player, "gui.shop.more_points",
+                        VaultUtil.getEco().format(val - VaultUtil.getEco().getBalance(player))
                 ));
             }
         }
@@ -228,6 +105,27 @@ public class CombatShop extends AbstractGui {
         if (e.getInventory().getHolder() != this) return;
 
         unregisterAllGuiListeners(((Player) e.getPlayer()));
+    }
+
+    private ItemStack shopItem(Material material, int amount, double price) {
+        ItemStack item = ItemStack.of(material);
+        item.setAmount(amount);
+
+        item.editMeta(meta -> {
+            meta.getPersistentDataContainer().set(
+                    new NamespacedKey(ANNIPlugin.getInstance(), "price"),
+                    PersistentDataType.DOUBLE, price
+            );
+
+            meta.lore(Collections.singletonList(
+                    ANNIPlugin.getInstance().getTranslationManager().component(
+                            player, "gui.shop.price",
+                            VaultUtil.getEco().format(price)
+                    )
+            ));
+        });
+
+        return item;
     }
 
 }

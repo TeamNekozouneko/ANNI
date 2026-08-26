@@ -47,7 +47,7 @@ public class MapSubCommand extends ASubCommand {
                 .getMap(args.get(0));
 
         if (map == null) {
-            sender.sendMessage(mem.build("command.err.map_not_found", args.get(0)));
+            sender.sendMessage(mem.build("command.error.map_not_found", args.get(0)));
             return true;
         }
 
@@ -93,7 +93,7 @@ public class MapSubCommand extends ASubCommand {
                                 Float.parseFloat(args.get(5)),
                                 Float.parseFloat(args.get(6))
                         ));
-                        FileUtil.writeGson(new File(plugin.getMapsDir(), map.getId() + ".json"), map, ANNIMap.class);
+                        FileUtil.writeGson(new File(plugin.getDefaultMapsDir(), map.getId() + ".json"), map, ANNIMap.class);
                         plugin.getMapManager().reload();
                     }
                     else if (args.size() == 5) {
@@ -102,58 +102,58 @@ public class MapSubCommand extends ASubCommand {
                                 Double.parseDouble(args.get(3)),
                                 Double.parseDouble(args.get(4))
                         ));
-                        FileUtil.writeGson(new File(plugin.getMapsDir(), map.getId() + ".json"), map, ANNIMap.class);
+                        FileUtil.writeGson(new File(plugin.getDefaultMapsDir(), map.getId() + ".json"), map, ANNIMap.class);
                         plugin.getMapManager().reload();
                     }
                     else {
                         if (sender instanceof Player) {
                             map.setDefaultSpawn(((Player) sender).getLocation());
-                            FileUtil.writeGson(new File(plugin.getMapsDir(), map.getId() + ".json"), map, ANNIMap.class);
+                            FileUtil.writeGson(new File(plugin.getDefaultMapsDir(), map.getId() + ".json"), map, ANNIMap.class);
                             plugin.getMapManager().reload();
                         }
-                        else sender.sendMessage(mem.build("command.err.player_only"));
+                        else sender.sendMessage(mem.build("command.error.player_only"));
                     }
                     break;
                 }
                 case "delete": {
-                    if (new File(plugin.getMapsDir(), map.getId() + ".json").delete()) {
+                    if (new File(plugin.getDefaultMapsDir(), map.getId() + ".json").delete()) {
                         plugin.getMapManager().reload();
                     }
-                    else sender.sendMessage(mem.build("command.err.ioe"));
+                    else sender.sendMessage(mem.build("command.error.io"));
                     break;
                 }
                 case "editor": {
                     if (sender instanceof Player) {
                         new MapEditor(plugin, (Player) sender, map).open();
                     }
-                    else sender.sendMessage(mem.build("command.err.player_only"));
+                    else sender.sendMessage(mem.build("command.error.player_only"));
                     break;
                 }
                 case "spawn": {
                     if (args.size() < 3) return false;
                     if (!(sender instanceof Player)) {
-                        sender.sendMessage(mem.build("command.err.player_only"));
+                        sender.sendMessage(mem.build("command.error.player_only"));
                         return true;
                     }
 
                     map.setSpawn(
                             ANNITeam.valueOf(args.get(2)),
                             SpawnLocation.fromLocation(((Player) sender).getLocation()));
-                    FileUtil.writeGson(new File(plugin.getMapsDir(), map.getId() + ".json"), map, ANNIMap.class);
+                    FileUtil.writeGson(new File(plugin.getDefaultMapsDir(), map.getId() + ".json"), map, ANNIMap.class);
                     plugin.getMapManager().reload();
                     break;
                 }
                 case "nexus": {
                     if (args.size() < 3) return false;
                     if (!(sender instanceof Player)) {
-                        sender.sendMessage(mem.build("command.err.player_only"));
+                        sender.sendMessage(mem.build("command.error.player_only"));
                         return true;
                     }
 
                     BlockBreakListener.getQueuedOnDamageMap()
                             .put(((Player) sender).getUniqueId(), block -> {
                                         map.setNexus(ANNITeam.valueOf(args.get(2)), block.getLocation());
-                                        FileUtil.writeGson(new File(plugin.getMapsDir(), map.getId() + ".json"), map, ANNIMap.class);
+                                        FileUtil.writeGson(new File(plugin.getDefaultMapsDir(), map.getId() + ".json"), map, ANNIMap.class);
                                         plugin.getMapManager().reload();
                                     }
                             );
@@ -165,7 +165,7 @@ public class MapSubCommand extends ASubCommand {
                     ANNITeam at = Enums.getIfPresent(ANNITeam.class, args.get(2)).orNull();
 
                     if (at == null) {
-                        sender.sendMessage(mem.build("command.err.team_undefined", args.get(2)));
+                        sender.sendMessage(mem.build("command.error.team_undefined", args.get(2)));
                         return true;
                     }
 
@@ -176,12 +176,12 @@ public class MapSubCommand extends ASubCommand {
                             .getRegion(region);
 
                     if (pr == null) {
-                        sender.sendMessage(mem.build("command.err.region_not_found", args.get(3)));
+                        sender.sendMessage(mem.build("command.error.region_not_found", args.get(3)));
                         return true;
                     }
 
                     map.setTeamRegion(at, region);
-                    FileUtil.writeGson(new File(plugin.getMapsDir(), map.getId() + ".json"), map, ANNIMap.class);
+                    FileUtil.writeGson(new File(plugin.getDefaultMapsDir(), map.getId() + ".json"), map, ANNIMap.class);
                     plugin.getMapManager().reload();
                     break;
                 }

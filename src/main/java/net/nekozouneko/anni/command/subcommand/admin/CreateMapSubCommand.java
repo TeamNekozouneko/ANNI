@@ -27,7 +27,7 @@ public class CreateMapSubCommand extends ASubCommand {
 
         String id = args.get(0);
         if (id.startsWith("@")) {
-            sender.sendMessage(plugin.getMessageManager().build("command.err.cant_use_char"));
+            sender.sendMessage(plugin.getMessageManager().build("command.error.cant_use_char"));
             return true;
         }
 
@@ -46,7 +46,7 @@ public class CreateMapSubCommand extends ASubCommand {
 
         if (world == null) {
             sender.sendMessage(plugin.getMessageManager()
-                    .build("command.err.world_not_found", args.get(1))
+                    .build("command.error.world_not_found", args.get(1))
             );
             return true;
         }
@@ -59,7 +59,7 @@ public class CreateMapSubCommand extends ASubCommand {
             sender.sendMessage(plugin.getMessageManager().build("command.createmap.success"));
         }
         else {
-            sender.sendMessage(plugin.getMessageManager().build("command.err.ioe"));
+            sender.sendMessage(plugin.getMessageManager().build("command.error.io"));
         }
 
         return true;

@@ -2,7 +2,9 @@ package net.nekozouneko.anni.kit.custom;
 
 import com.google.common.base.Enums;
 import com.google.common.base.Preconditions;
-import net.nekozouneko.anni.kit.AbstractKit;
+import lombok.Setter;
+import net.kyori.adventure.text.Component;
+import net.nekozouneko.anni.kit.Kit;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.io.BukkitObjectInputStream;
@@ -11,33 +13,58 @@ import org.bukkit.util.io.BukkitObjectOutputStream;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Base64;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
-public class CustomKit extends AbstractKit {
+public class CustomKit implements Kit {
+
+    private final String id;
+    @Setter
+    private String name, shortName;
+    private String icon;
 
     private String inventory;
-    private List<String> blacklist;
 
-    public CustomKit(String id, String shortName,String icon, String name, List<String> lore, String inventory, List<String> blacklist) {
-        super(id, shortName, name, icon, lore);
+    public CustomKit(String id, String name, String shortName, String icon, String inventory) {
+        this.id = id;
+        this.name = name;
+        this.shortName = shortName;
+        this.icon = icon;
 
         this.inventory = inventory != null ? inventory : "";
-        this.blacklist = blacklist;
     }
 
-    public CustomKit(String id, String shortName, Material icon, String name, List<String> lore, ItemStack[] inventory, List<String> blacklist) {
-        super(id, shortName, name, icon.name(), lore);
+    public CustomKit(String id, String name, String shortName, Material icon, ItemStack[] inventory) {
+        this.id = id;
+        this.name = name;
+        this.shortName = shortName;
+        this.icon = icon.name();
 
         setKitContents(inventory);
-        this.blacklist = blacklist;
     }
 
     @Override
-    public String getName() {
-        return name;
+    public String getId() {
+        return id;
+    }
+
+    @Override
+    public Component getName(Locale locale) {
+        return Component.text(name);
+    }
+
+    @Override
+    public List<Component> getLore(Locale locale) {
+        return Collections.emptyList();
+    }
+
+    @Override
+    public String getShortName() {
+        return shortName;
+    }
+
+    @Override
+    public Material getIcon() {
+        return Enums.getIfPresent(Material.class, icon.toUpperCase()).or(Material.CHEST);
     }
 
     public void setIcon(String material) {
@@ -50,23 +77,8 @@ public class CustomKit extends AbstractKit {
         this.icon = material.name();
     }
 
-    @Override
-    public Material getIcon() {
-        return Enums.getIfPresent(Material.class, icon.toUpperCase()).or(Material.CHEST);
-    }
-
     public String getRawIcon() {
         return icon.toUpperCase();
-    }
-
-    public void setLore(List<String> lore) {
-        Preconditions.checkArgument(lore != null);
-
-        this.lore = new ArrayList<>(lore);
-    }
-
-    public List<String> getLore() {
-        return Collections.unmodifiableList(lore);
     }
 
     public void setKitContents(String contents) {
@@ -90,7 +102,7 @@ public class CustomKit extends AbstractKit {
     }
 
     @Override
-    public ItemStack[] getKitContents() {
+    public ItemStack[] getKitContents(Locale locale) {
         byte[] ba = Base64.getDecoder().decode(inventory);
         try (ByteArrayInputStream bytes = new ByteArrayInputStream(ba);
              BukkitObjectInputStream in = new BukkitObjectInputStream(bytes)

@@ -17,3 +17,6 @@ on-votifier:
 kits:
   enable-custom-kit: true
   custom-kit-only: false
+
+language:
+  default: ja_JP

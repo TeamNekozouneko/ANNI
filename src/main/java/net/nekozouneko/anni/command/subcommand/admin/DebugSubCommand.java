@@ -1,10 +1,10 @@
 package net.nekozouneko.anni.command.subcommand.admin;
 
+import net.kyori.adventure.text.Component;
 import net.nekozouneko.anni.ANNIPlugin;
 import net.nekozouneko.anni.arena.ANNIArena;
 import net.nekozouneko.anni.arena.ArenaState;
 import net.nekozouneko.anni.arena.spectator.SpectatorManager;
-import net.nekozouneko.anni.arena.team.ANNITeam;
 import net.nekozouneko.anni.command.ASubCommand;
 import net.nekozouneko.anni.item.AirJump;
 import net.nekozouneko.anni.item.GrapplingHook;
@@ -13,10 +13,9 @@ import net.nekozouneko.anni.kit.ANNIKit;
 import net.nekozouneko.anni.kit.custom.CustomKit;
 import net.nekozouneko.anni.listener.BlockBreakListener;
 import net.nekozouneko.anni.util.CmdUtil;
-import net.nekozouneko.anni.vote.VoteManager;
+import net.nekozouneko.anni.util.CmnUtil;
 import net.nekozouneko.commons.spigot.command.TabCompletes;
 import org.bukkit.Bukkit;
-import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -49,7 +48,7 @@ public class DebugSubCommand extends ASubCommand {
                 ANNIPlugin.getInstance().getCurrentGame().setKit(Bukkit.getPlayer(args.get(1)), ANNIKit.getAbsKitOrCustomById(args.get(2)));
                 break;
             case "get-stung":
-                ((Player) sender).getInventory().addItem(StunGrenade.builder().amount(16).build());
+                ((Player) sender).getInventory().addItem(StunGrenade.get(((Player) sender).locale()).add(15));
                 break;
             case "toggle-spec": {
                 Player p;
@@ -73,15 +72,7 @@ public class DebugSubCommand extends ASubCommand {
                 break;
             }
             case "get-airjump": {
-                ((Player)sender).getInventory().addItem(AirJump.builder().build());
-                break;
-            }
-            case "teams": {
-                for (ANNITeam at : ar.getEnabledTeams().keySet()) {
-                    sender.sendMessage(at.name() + " list (" + ar.getTeamPlayers(at).size() + " | " + ar.getTeam(at).getPlayers().size() + "):");
-                    sender.sendMessage(ar.getTeam(at).getPlayers().stream().map(OfflinePlayer::getName).collect(Collectors.joining(", ")));
-                    sender.sendMessage("不正: " + ar.getTeam(at).getPlayers().stream().filter(op -> !op.isOnline()).map(OfflinePlayer::getName).collect(Collectors.joining(", ")));
-                }
+                ((Player)sender).getInventory().addItem(AirJump.get(((Player) sender).locale()));
                 break;
             }
             case "players": {
@@ -95,11 +86,18 @@ public class DebugSubCommand extends ASubCommand {
                 break;
             }
             case "get-grapple": {
-                ((Player) sender).getInventory().addItem(GrapplingHook.builder().build());
+                ((Player) sender).getInventory().addItem(GrapplingHook.get(((Player) sender).locale()));
                 break;
             }
-            case "vote": {
-                VoteManager.vote(ANNIPlugin.getInstance().getCurrentGame().getId(), Bukkit.getOfflinePlayer(UUID.randomUUID()), args.get(1));
+            case "locale-check": {
+                Locale locale = ((Player) sender).locale();
+
+                Locale converted = CmnUtil.localeCodeToLocale(args.get(1));
+
+                sender.sendMessage(Component.text(locale.toString()));
+                sender.sendMessage(Component.text(converted.toString()));
+                sender.sendMessage(Component.text(converted.equals(locale)));
+                sender.sendMessage(Component.text(converted == locale));
                 break;
             }
             default: return false;
@@ -132,12 +130,6 @@ public class DebugSubCommand extends ASubCommand {
                                 .map(CustomKit::getId).collect(Collectors.toList()));
 
                         return TabCompletes.sorted(args.get(1), ids);
-                    }
-                    case "vote": {
-                        String id = ANNIPlugin.getInstance().getCurrentGame().getId();
-                        if (VoteManager.isNowVoting(id)) {
-                            return TabCompletes.sorted(args.get(1), VoteManager.getChoices(id).stream().map(Object::toString).collect(Collectors.toList()));
-                        }
                     }
                 }
             }

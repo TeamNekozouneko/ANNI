@@ -1,7 +1,5 @@
 package net.nekozouneko.anni.arena.spectator;
 
-import net.md_5.bungee.api.ChatMessageType;
-import net.md_5.bungee.api.chat.TextComponent;
 import net.nekozouneko.anni.ANNIPlugin;
 import org.bukkit.Bukkit;
 import org.bukkit.potion.PotionEffect;
@@ -17,9 +15,9 @@ public class SpectatorTask extends BukkitRunnable {
                 player.addPotionEffect(new PotionEffect(PotionEffectType.SATURATION, 40, 255, false, false, true));
                 player.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, 40, 0, false, false, true));
                 player.setAllowFlight(true);
-                player.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(ANNIPlugin.getInstance().getMessageManager()
-                        .build("actionbar.spectator_mode")
-                ));
+                player.sendActionBar(
+                        ANNIPlugin.getInstance().getTranslationManager().component(player, "actionbar.spectator")
+                );
             }
 
             Bukkit.getOnlinePlayers().forEach(watcher -> {

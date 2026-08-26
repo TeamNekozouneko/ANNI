@@ -35,7 +35,7 @@ public class CustomKitEditor extends AbstractGui {
                     ANNIPlugin.getInstance().getMessageManager().build("gui.customkit_editor.title")
             );
 
-        ItemStack[] arr = Arrays.copyOf(kit.getKitContents(), 41);
+        ItemStack[] arr = Arrays.copyOf(kit.getKitContents(player.locale()), 41);
 
         int p1 = 0;
         for (int i = 9; i < 36; i++) {
@@ -121,7 +121,7 @@ public class CustomKitEditor extends AbstractGui {
 
         try (BufferedWriter writer = new BufferedWriter(
                 new OutputStreamWriter(new FileOutputStream(
-                        new File(plugin.getKitsDir(), kit.getId() + ".json")
+                        new File(plugin.getDefaultKitsDir(), kit.getId() + ".json")
                 ))
         )) {
             FileUtil.createGson().toJson(kit, CustomKit.class, writer);

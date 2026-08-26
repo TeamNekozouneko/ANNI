@@ -3,21 +3,16 @@ package net.nekozouneko.anni.item;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
-import net.md_5.bungee.api.ChatMessageType;
-import net.md_5.bungee.api.chat.TextComponent;
 import net.nekozouneko.anni.ANNIPlugin;
 import net.nekozouneko.anni.arena.ANNIArena;
 import net.nekozouneko.anni.arena.spectator.SpectatorManager;
 import net.nekozouneko.anni.task.CooldownManager;
-import net.nekozouneko.commons.spigot.inventory.ItemStackBuilder;
 import org.bukkit.*;
-import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.inventory.ItemFlag;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.potion.PotionEffect;
@@ -56,7 +51,7 @@ public class DefenseArtifact implements Listener {
             }
 
             ANNIArena game = ANNIPlugin.getInstance().getCurrentGame();
-            String region = game.getMap().getTeamRegion(game.getTeamByPlayer(player));
+            String region = game.getMap().getTeamRegion(game.getTeamManager().getTeamColorByPlayer(player.getUniqueId()));
 
             if (region != null) {
                 ProtectedRegion pr = WorldGuard.getInstance().getPlatform().getRegionContainer()
@@ -64,11 +59,10 @@ public class DefenseArtifact implements Listener {
                         .getRegion(region);
 
                 if (!pr.contains(BukkitAdapter.asBlockVector(player.getLocation()))) {
-                    player.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(
-                            ANNIPlugin.getInstance().getMessageManager().build(
-                                    "actionbar.out_of_team_region"
-                            )
+                    player.sendActionBar(ANNIPlugin.getInstance().getTranslationManager().component(
+                            "actionbar.out_of_team_region"
                     ));
+
                     player.getWorld().playSound(player.getLocation(), Sound.BLOCK_GLASS_BREAK, 1, 0);
 
                     cancel();
@@ -82,26 +76,27 @@ public class DefenseArtifact implements Listener {
             if (for_first_check == time) {
                 player.getWorld().spawnParticle(
                         Particle.DRAGON_BREATH, player.getLocation(),
-                        1000, .1, .1, .1, 1
+                        1000, .1, .1, .1, .1F, 1F
                 );
                 player.getWorld().playSound(
                         player.getLocation(), Sound.BLOCK_ANVIL_USE, 1, 0
                 );
             }
 
+            var teamManager = game.getTeamManager();
             ANNIPlugin.getInstance().getCurrentGame().getPlayers().stream()
                     .filter(p -> !SpectatorManager.isSpectating(p))
-                    .filter(p -> game.getTeamByPlayer(p) != null)
-                    .filter(p -> game.getTeamByPlayer(p) != game.getTeamByPlayer(player))
+                    .filter(p -> teamManager.getTeamColorByPlayer(p.getUniqueId()) != null)
+                    .filter(p -> teamManager.getTeamColorByPlayer(p.getUniqueId()) != teamManager.getTeamColorByPlayer(player.getUniqueId()))
                     .filter(p -> isInCylinder(player.getLocation(), p.getLocation()))
                     .forEach(victim -> {
                         if (for_first_check == time) {
                             victim.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 20, 0, false, true, true));
-                            victim.addPotionEffect(new PotionEffect(PotionEffectType.SLOW_DIGGING, 40, 1, false, true, true));
+                            victim.addPotionEffect(new PotionEffect(PotionEffectType.MINING_FATIGUE, 60, 254, false, true, true));
                             ANNIPlugin.getInstance().getCooldownManager().set(victim.getUniqueId(), CooldownManager.Type.GRAPPLING_HOOK, 5000);
                         }
 
-                        victim.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 40, 1, false, true, true));
+                        victim.addPotionEffect(new PotionEffect(PotionEffectType.SLOWNESS, 40, 1, false, true, true));
                     });
 
             time--;
@@ -116,13 +111,18 @@ public class DefenseArtifact implements Listener {
         }
     }
 
-    public static ItemStackBuilder builder() {
-        return ItemStackBuilder.of(Material.HEART_OF_THE_SEA)
-                .name(ANNIPlugin.getInstance().getMessageManager().build("item.defense_artifact.name"))
-                .lore(ANNIPlugin.getInstance().getMessageManager().buildList("item.defense_artifact.lore"))
-                .persistentData(new NamespacedKey(ANNIPlugin.getInstance(), "special-item"), PersistentDataType.STRING, "defense-artifact")
-                .enchant(Enchantment.DURABILITY, 1, false)
-                .itemFlags(ItemFlag.HIDE_ENCHANTS);
+    public static ItemStack get(Locale locale) {
+        var tm = ANNIPlugin.getInstance().getTranslationManager();
+
+        ItemStack item = ItemStack.of(Material.HEART_OF_THE_SEA);
+        item.editMeta(meta -> {
+            meta.displayName(tm.component(locale, "item.defense_artifact.name"));
+            meta.lore(tm.componentList(locale, "item.defense_artifact.lore"));
+            meta.getPersistentDataContainer().set(new NamespacedKey(ANNIPlugin.getInstance(), "special-item"), PersistentDataType.STRING, "defense-artifact");
+            meta.setEnchantmentGlintOverride(true);
+        });
+
+        return item;
     }
 
     public static void cancelTask(UUID player) {
@@ -150,7 +150,7 @@ public class DefenseArtifact implements Listener {
 
     @EventHandler
     public void onUse(PlayerInteractEvent event) {
-        if (!(event.getAction() == Action.RIGHT_CLICK_AIR || event.getAction() == Action.RIGHT_CLICK_BLOCK)) return;
+        if (!event.getAction().isRightClick()) return;
 
         if (event.getItem() == null || event.getItem().getType().isAir()) return;
 
@@ -163,15 +163,15 @@ public class DefenseArtifact implements Listener {
         CooldownManager cm = ANNIPlugin.getInstance().getCooldownManager();
 
         if (!cm.isCooldownEnd(event.getPlayer().getUniqueId(), CooldownManager.Type.DEFENSE_ARTIFACT)) {
-            event.getPlayer().spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(ANNIPlugin.getInstance().getMessageManager().build(
-                    "command.err.cooldown", cm.getTimeLeftFormatted(event.getPlayer().getUniqueId(), CooldownManager.Type.DEFENSE_ARTIFACT)
-            )));
+            event.getPlayer().sendActionBar(ANNIPlugin.getInstance().getTranslationManager().component(
+                    "command.error.cooldown", cm.getTimeLeftFormatted(event.getPlayer().getUniqueId(), CooldownManager.Type.DEFENSE_ARTIFACT)
+            ));
             event.getPlayer().playSound(event.getPlayer().getLocation(), Sound.ENTITY_GENERIC_EXTINGUISH_FIRE, 1, 2);
             return;
         }
 
         ANNIArena game = ANNIPlugin.getInstance().getCurrentGame();
-        String region = game.getMap().getTeamRegion(game.getTeamByPlayer(event.getPlayer()));
+        String region = game.getMap().getTeamRegion(game.getTeamManager().getTeamColorByPlayer(event.getPlayer().getUniqueId()));
 
         if (region != null) {
             ProtectedRegion pr = WorldGuard.getInstance().getPlatform().getRegionContainer()
@@ -179,11 +179,9 @@ public class DefenseArtifact implements Listener {
                     .getRegion(region);
 
             if (!pr.contains(BukkitAdapter.asBlockVector(event.getPlayer().getLocation()))) {
-                event.getPlayer().spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(
-                        ANNIPlugin.getInstance().getMessageManager().build(
-                                "actionbar.out_of_team_region"
-                        )
-                ));
+                event.getPlayer().sendActionBar(
+                        ANNIPlugin.getInstance().getTranslationManager().component("actionbar.out_of_team_region")
+                );
                 return;
             }
         }

@@ -1,11 +1,8 @@
 package net.nekozouneko.anni.item;
 
-import net.md_5.bungee.api.ChatMessageType;
-import net.md_5.bungee.api.chat.TextComponent;
 import net.nekozouneko.anni.ANNIPlugin;
-import net.nekozouneko.anni.message.MessageManager;
+import net.nekozouneko.anni.message.TranslationManager;
 import net.nekozouneko.anni.task.CooldownManager;
-import net.nekozouneko.commons.spigot.inventory.ItemStackBuilder;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -18,30 +15,35 @@ import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.player.PlayerFishEvent;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.persistence.PersistentDataContainer;
+import org.bukkit.persistence.PersistentDataHolder;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 
 public class GrapplingHook implements Listener {
 
     public static final List<EntityType> CANT_PULL_ENTITIES = Arrays.asList(
-            EntityType.WITHER, EntityType.ENDER_DRAGON, EntityType.ENDER_CRYSTAL,
+            EntityType.WITHER, EntityType.ENDER_DRAGON, EntityType.END_CRYSTAL,
             EntityType.AREA_EFFECT_CLOUD, EntityType.WARDEN, EntityType.IRON_GOLEM
     );
 
-    public static ItemStackBuilder builder() {
-        MessageManager mm = ANNIPlugin.getInstance().getMessageManager();
+    public static ItemStack get(Locale locale) {
+        TranslationManager tm = ANNIPlugin.getInstance().getTranslationManager();
 
-        return ItemStackBuilder.of(Material.FISHING_ROD)
-                .name(mm.build("item.grappling_hook.name"))
-                .lore(mm.buildList("item.grappling_hook.lore"))
-                .persistentData(new NamespacedKey(ANNIPlugin.getInstance(), "special-item"), PersistentDataType.STRING, "grappling-hook")
-                .unbreakable(true)
-                .itemFlags(ItemFlag.HIDE_UNBREAKABLE);
+        ItemStack item = ItemStack.of(Material.FISHING_ROD);
+        item.editMeta(meta -> {
+            meta.displayName(tm.component(locale, "item.grappling_hook.name"));
+            meta.lore(tm.componentList(locale, "item.grappling_hook.lore"));
+            meta.setUnbreakable(true);
+            meta.addItemFlags(ItemFlag.HIDE_UNBREAKABLE);
+            meta.getPersistentDataContainer().set(new NamespacedKey(ANNIPlugin.getInstance(), "special-item"), PersistentDataType.STRING, "grappling-hook");
+        });
+
+        return item;
     }
 
     @EventHandler
@@ -51,10 +53,7 @@ public class GrapplingHook implements Listener {
             return;
         }
 
-        PersistentDataContainer c = event.getHook().getPersistentDataContainer();
-
-        if (c.getOrDefault(new NamespacedKey(ANNIPlugin.getInstance(), "grappling-hook"), PersistentDataType.INTEGER, 0) != 1)
-            return;
+        if (!isGrapplingHook(event.getHook())) return;
 
         CooldownManager cm = ANNIPlugin.getInstance().getCooldownManager();
 
@@ -62,6 +61,9 @@ public class GrapplingHook implements Listener {
             case BITE: {
                 event.setCancelled(true);
                 break;
+            }
+            case REEL_IN: {
+                if (!event.getHook().getVelocity().equals(new Vector(0,0,0))) break;
             }
             case IN_GROUND: {
                 event.getPlayer().setVelocity(calculateVel(event.getPlayer().getLocation(), event.getHook().getLocation(), 2));
@@ -83,10 +85,7 @@ public class GrapplingHook implements Listener {
         if (event.getEntity().getShooter() == null) return;
         if (!(event.getEntity() instanceof FishHook)) return;
 
-        PersistentDataContainer c = event.getEntity().getPersistentDataContainer();
-
-        if (c.getOrDefault(new NamespacedKey(ANNIPlugin.getInstance(), "grappling-hook"), PersistentDataType.INTEGER, 0) != 1)
-            return;
+        if (!isGrapplingHook(event.getEntity())) return;
 
         if (event.getHitEntity() != null) {
             event.setCancelled(true);
@@ -99,44 +98,41 @@ public class GrapplingHook implements Listener {
         ItemStack item = event.getPlayer().getInventory().getItem(event.getHand());
         if (item == null || item.getType().isAir()) return;
 
-        if (isGrapplingHook(item)) {
-            boolean cantUse = event.getPlayer().isVisualFire();
-            cantUse = cantUse || event.getPlayer().hasPotionEffect(PotionEffectType.BLINDNESS);
-            cantUse = cantUse || event.getPlayer().hasPotionEffect(PotionEffectType.DARKNESS);
-            cantUse = cantUse || event.getPlayer().hasPotionEffect(PotionEffectType.LEVITATION);
+        if (!isGrapplingHook(item.getItemMeta())) return;
 
-            try {
-                cantUse = cantUse || event.getPlayer().isFrozen();
-            }
-            catch (Exception ignored) {}
+        boolean cantUse = event.getPlayer().getVisualFire().toBooleanOrElse(false);
+        cantUse = cantUse || event.getPlayer().hasPotionEffect(PotionEffectType.BLINDNESS);
+        cantUse = cantUse || event.getPlayer().hasPotionEffect(PotionEffectType.DARKNESS);
+        cantUse = cantUse || event.getPlayer().hasPotionEffect(PotionEffectType.LEVITATION);
 
-            if (cantUse) {
-                event.setCancelled(true);
-                return;
-            }
-
-            CooldownManager cm = ANNIPlugin.getInstance().getCooldownManager();
-
-            if (!cm.isCooldownEnd(event.getPlayer().getUniqueId(), CooldownManager.Type.GRAPPLING_HOOK)) {
-                event.setCancelled(true);
-
-                event.getPlayer().spigot().sendMessage(ChatMessageType.ACTION_BAR,
-                        new TextComponent(
-                                ANNIPlugin.getInstance().getMessageManager().build(
-                                    "command.err.cooldown",
-                                        cm.getTimeLeftFormatted(event.getPlayer().getUniqueId(), CooldownManager.Type.GRAPPLING_HOOK)
-
-                                )
-                        )
-                );
-                event.getPlayer().playSound(event.getPlayer().getLocation(), Sound.ENTITY_GENERIC_EXTINGUISH_FIRE, 1, 2);
-                return;
-            }
-
-            event.getHook().getPersistentDataContainer()
-                    .set(new NamespacedKey(ANNIPlugin.getInstance(), "grappling-hook"), PersistentDataType.INTEGER, 1);
-            event.getHook().setVelocity(event.getHook().getVelocity().multiply(1.75));
+        try {
+            cantUse = cantUse || event.getPlayer().isFrozen();
         }
+        catch (Exception ignored) {}
+
+        if (cantUse) {
+            event.setCancelled(true);
+            return;
+        }
+
+        CooldownManager cm = ANNIPlugin.getInstance().getCooldownManager();
+
+        if (!cm.isCooldownEnd(event.getPlayer().getUniqueId(), CooldownManager.Type.GRAPPLING_HOOK)) {
+            event.setCancelled(true);
+
+            event.getPlayer().sendActionBar(
+                        ANNIPlugin.getInstance().getTranslationManager().component(
+                            "command.error.cooldown",
+                                cm.getTimeLeftFormatted(event.getPlayer().getUniqueId(), CooldownManager.Type.GRAPPLING_HOOK)
+                        )
+            );
+            event.getPlayer().playSound(event.getPlayer().getLocation(), Sound.ENTITY_GENERIC_EXTINGUISH_FIRE, 1, 2);
+            return;
+        }
+
+        event.getHook().getPersistentDataContainer()
+                .set(new NamespacedKey(ANNIPlugin.getInstance(), "special-item"), PersistentDataType.STRING, "grappling-hook");
+        event.getHook().setVelocity(event.getHook().getVelocity().multiply(1.75));
     }
 
     private Vector calculateVel(Location from, Location to, double m) {
@@ -145,10 +141,8 @@ public class GrapplingHook implements Listener {
         return vel.normalize().multiply(m);
     }
 
-    public static boolean isGrapplingHook(ItemStack item) {
-        if (item == null || item.getType().isAir()) return false;
-
-        return item.getItemMeta().getPersistentDataContainer().getOrDefault(
+    public static boolean isGrapplingHook(PersistentDataHolder holder) {
+        return holder.getPersistentDataContainer().getOrDefault(
                 new NamespacedKey(ANNIPlugin.getInstance(), "special-item"),
                 PersistentDataType.STRING, ""
         ).equals("grappling-hook");

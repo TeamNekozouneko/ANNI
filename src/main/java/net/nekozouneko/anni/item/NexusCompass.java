@@ -4,39 +4,39 @@ import com.google.common.base.Enums;
 import net.nekozouneko.anni.ANNIPlugin;
 import net.nekozouneko.anni.arena.ANNIArena;
 import net.nekozouneko.anni.arena.team.ANNITeam;
-import net.nekozouneko.commons.spigot.inventory.ItemStackBuilder;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
-import org.bukkit.scoreboard.Team;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 public class NexusCompass implements Listener {
 
-    public static ItemStackBuilder builder() {
-        return ItemStackBuilder.of(Material.COMPASS)
-                .name(ANNIPlugin.getInstance().getMessageManager().build("item.nexus_compass.name"));
+    public static ItemStack get(Locale locale) {
+        ItemStack item = ItemStack.of(Material.COMPASS);
+        item.editMeta(meta -> meta.displayName(ANNIPlugin.getInstance().getTranslationManager().component(locale, "item.nexus_compass.name")));
+
+        return item;
     }
 
     @EventHandler
     public void onClick(PlayerInteractEvent e) {
         if (e.getItem() == null || e.getItem().getType() != Material.COMPASS) return;
-        if (!(e.getAction() == Action.RIGHT_CLICK_AIR || e.getAction() == Action.RIGHT_CLICK_BLOCK)) return;
+        if (!e.getAction().isRightClick()) return;
 
         PersistentDataContainer c = e.getItem().getItemMeta().getPersistentDataContainer();
         NamespacedKey key = new NamespacedKey(ANNIPlugin.getInstance(), "nexus-target");
         List<ANNITeam> enabled = new ArrayList<>(
-                ANNIPlugin.getInstance().getCurrentGame().getTeams().keySet()
+                ANNIPlugin.getInstance().getCurrentGame().getTeamManager().getTeams().keySet()
         );
 
         if (c.has(key, PersistentDataType.STRING)) {
@@ -66,10 +66,9 @@ public class NexusCompass implements Listener {
     private void setTarget(Player player, ItemStack is, ANNITeam target) {
         ItemMeta meta = is.getItemMeta();
 
-        Team t = ANNIPlugin.getInstance().getCurrentGame().getTeam(target);
-        meta.setDisplayName(ANNIPlugin.getInstance().getMessageManager().build(
+        meta.displayName(ANNIPlugin.getInstance().getTranslationManager().component(
                 "item.nexus_compass.name.target",
-                t.getColor() + t.getDisplayName()
+                ANNIPlugin.getInstance().getTranslationManager().component(target.getNameKey())
         ));
 
         PersistentDataContainer c = meta.getPersistentDataContainer();
