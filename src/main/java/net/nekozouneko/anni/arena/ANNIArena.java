@@ -824,8 +824,7 @@ public class ANNIArena extends BukkitRunnable {
         player.setItemOnCursor(null);
         player.getInventory().clear();
 
-        var open = player.getOpenInventory().getTopInventory();
-        if (open.getType() == InventoryType.CRAFTING || open.getType() == InventoryType.CRAFTER || open.getType() == InventoryType.WORKBENCH) open.clear();
+        player.getOpenInventory().getTopInventory().clear();
 
         player.getEnderChest().clear();
         player.setHealth(player.getAttribute(Attribute.MAX_HEALTH).getValue());
